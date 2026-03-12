@@ -25,11 +25,20 @@ users
  ├── created_at / updated_at
  └── deleted_at                 ← SoftDelete
 
+companies                        ← Sprint 5
+ ├── id (PK)
+ ├── name
+ ├── slug (UNIQUE, soft-delete aware)
+ ├── is_default                  ← защита от удаления (DENCO)
+ ├── created_at / updated_at
+ └── deleted_at                 ← SoftDelete
+
 workspaces
  ├── id (PK)
  ├── name
  ├── slug (UNIQUE, soft-delete aware)
  ├── is_personal
+ ├── company_id (FK → companies.id, NOT NULL, ON DELETE RESTRICT)  ← Sprint 5
  ├── created_at / updated_at
  └── deleted_at                 ← SoftDelete
 
@@ -92,6 +101,7 @@ transcriptions
 | `8bbd4d787381_add_segments_jsonb` | JSONB поле segments в transcriptions |
 | `c7de8c3861e3_add_processing_step` | Поле processing_step в content_items |
 | `1df12fc898d5_add_workspace_invitations` | Таблица workspace_invitations + is_platform_owner в users |
+| `8f4620605110_add_companies` | Таблица companies + company_id FK в workspaces + seed DENCO |
 
 ---
 

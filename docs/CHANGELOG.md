@@ -4,6 +4,31 @@
 
 ---
 
+## Sprint 5 — Companies (в процессе)
+
+**Цель**: Иерархия компаний над воркспейсами. Platform owner управляет компаниями, каждый воркспейс принадлежит компании.
+
+### Chunk 1 ✅ DONE
+
+**Коммит**: `feat(companies): add Company model, migration, and workspace integration`
+
+- Создана таблица `companies` (id, name, slug, is_default, soft delete) с partial unique index на slug
+- Добавлен `company_id` FK (NOT NULL, ON DELETE RESTRICT) в таблицу `workspaces` + relationship
+- 3-шаговая data migration: создание таблицы → seed DENCO (is_default=True) → backfill всех workspaces → NOT NULL → FK
+- Создан `app/utils/slugify.py` — утилита slugify с транслитерацией кириллицы (перенесена из workspace_service + расширена)
+- Создан `CompanyRepository` (минимальный: `get_by_slug`, `get_default`)
+- Обновлён `WorkspaceResponse` — добавлены поля `company_id`, `company_name`
+- Обновлён `PlatformWorkspaceResponse` — добавлены поля `company_id`, `company_name`
+- Обновлён `WorkspaceCreate` — добавлено опциональное поле `company_id`
+- `selectinload(Workspace.company)` во всех repository-запросах (fix N+1)
+- При регистрации personal workspace создаётся в default company
+- При создании workspace: если `company_id` не передан → берётся из personal ws → или из default company
+- Добавлен `default_company_slug` в `config.py`
+- Обновлены тесты: seed DENCO в conftest, fix хелпера в test_transcription_service
+- Применена миграция `8f4620605110`
+
+---
+
 ## Sprint 4 — Workspaces & Teams (завершён, 2026-03-12)
 
 **Цель**: Расширение ролевой системы — platform owner, приглашения по ссылке, передача ownership.
