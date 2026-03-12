@@ -4,7 +4,7 @@
 
 ---
 
-## Sprint 4 — Workspaces & Teams (в работе, 2026-03-12)
+## Sprint 4 — Workspaces & Teams (завершён, 2026-03-12)
 
 **Цель**: Расширение ролевой системы — platform owner, приглашения по ссылке, передача ownership.
 
@@ -46,15 +46,34 @@
 - Атомарно: старый OWNER → ADMIN, target → OWNER (одна транзакция)
 - Новая схема `TransferOwnershipRequest` в `app/schemas/workspace.py`
 
-### Chunks 5–7 🔄 В ПЛАНИРОВАНИИ
+### Chunk 5 ✅ DONE
 
-Детальный план: `denco-content-hub-backend/chunks-workspaces.md`
+**Коммит**: `feat(invitations): add invitation service and repository`
 
-| Chunk | Что | Закрывает |
-|-------|-----|-----------|
-| 5 | Invitation service + repository (с `SELECT FOR UPDATE`) | fix #4, #5, #6, #7, #10 |
-| 6 | Invitation API endpoints (create, list, cancel, public accept) | — |
-| 7 | Auto-accept при регистрации + cleanup при удалении workspace | fix #7, #12 |
+- `InvitationRepository` с методами: `get_by_token_for_update` (SELECT FOR UPDATE), `get_pending_by_email`, `cancel_all_for_workspace`
+- `InvitationService`: create, accept, cancel, get_invitation_info
+- Лимит 20 pending инвайтов на workspace (fix #6)
+- Проверка `expires_at` (7 дней, fix #10)
+- Email-матч при accept (fix #4)
+- Partial unique index `UNIQUE(workspace_id, email) WHERE status='pending'` (fix #6)
+
+### Chunk 6 ✅ DONE
+
+**Коммит**: `feat(invitations): add invitation API endpoints`
+
+- `POST /api/v1/workspaces/{id}/invitations` — создать инвайт (OWNER/ADMIN)
+- `GET /api/v1/workspaces/{id}/invitations` — список инвайтов
+- `DELETE /api/v1/workspaces/{id}/invitations/{invitation_id}` — отменить
+- `GET /api/v1/invitations/{token}` — публичная инфо (masked email)
+- `POST /api/v1/invitations/{token}/accept` — принять (требует auth)
+
+### Chunk 7 ✅ DONE
+
+**Коммит**: `feat(auth): auto-accept invitations on registration`
+
+- Auto-accept pending invitations при регистрации нового юзера (fix #12)
+- Отмена инвайтов при soft-delete workspace (fix #7)
+- Защита от дубликатов: если уже member → invite cancelled
 
 ---
 
