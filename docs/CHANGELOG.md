@@ -18,15 +18,40 @@
 - Добавлен `frontend_url` в `config.py` для генерации инвайт-ссылок
 - Применена миграция `1df12fc898d5`
 
-### Chunks 2–7 🔄 В ПЛАНИРОВАНИИ
+### Chunk 2 ✅ DONE
+
+**Коммит**: `feat(auth): add platform owner read-only access to all workspaces`
+
+- `require_platform_owner` dependency в `app/dependencies.py`
+- Synthetic VIEWER bypass в 3 точках авторизации: `get_workspace_from_path`, `_require_membership`, `_require_manage_permission`
+- `is_platform_owner` добавлен в `UserResponse`
+- Fix #9: ADMIN не может изменять другого ADMIN (только OWNER)
+
+### Chunk 3 ✅ DONE
+
+**Коммит**: `feat(platform): add admin API for workspaces and users`
+
+- `GET /api/v1/platform/workspaces` — все воркспейсы с пагинацией и поиском
+- `GET /api/v1/platform/workspaces/{id}` — детали + счётчик members
+- `POST /api/v1/platform/workspaces/{id}/join` — добавить себя как member
+- `GET /api/v1/platform/users` — все юзеры платформы
+- Отдельная `PlatformWorkspaceResponse` без поля `role` (fix #8)
+
+### Chunk 4 ✅ DONE
+
+**Коммит**: `feat(workspaces): add ownership transfer endpoint`
+
+- `POST /api/v1/workspaces/{id}/transfer-ownership` — передача ownership
+- Только OWNER может вызвать, нельзя для личного workspace
+- Атомарно: старый OWNER → ADMIN, target → OWNER (одна транзакция)
+- Новая схема `TransferOwnershipRequest` в `app/schemas/workspace.py`
+
+### Chunks 5–7 🔄 В ПЛАНИРОВАНИИ
 
 Детальный план: `denco-content-hub-backend/chunks-workspaces.md`
 
 | Chunk | Что | Закрывает |
 |-------|-----|-----------|
-| 2 | Platform owner read-only bypass (synthetic VIEWER) | fix #1 — 3 точки авторизации |
-| 3 | Platform API: `/platform/workspaces`, `/platform/users`, `/platform/.../join` | fix #2, #8 |
-| 4 | Transfer ownership: `POST /workspaces/{id}/transfer-ownership` | fix #3 |
 | 5 | Invitation service + repository (с `SELECT FOR UPDATE`) | fix #4, #5, #6, #7, #10 |
 | 6 | Invitation API endpoints (create, list, cancel, public accept) | — |
 | 7 | Auto-accept при регистрации + cleanup при удалении workspace | fix #7, #12 |
