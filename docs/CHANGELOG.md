@@ -4,6 +4,25 @@
 
 ---
 
+## Sprint 6 — Workspace Navigation (в процессе)
+
+**Цель**: Навигационный скелет — dashboard с карточками воркспейсов, hub-страница, conditional sidebar. Только фронтенд, бэкенд не меняется.
+
+### Chunk 1 ✅ DONE
+
+**Коммит**: `feat(dashboard): add workspace cards grid and create modal`
+
+- Переписан `app/(dashboard)/dashboard/page.tsx` — убран `redirect('/library')`, теперь отображает grid карточек воркспейсов через `useWorkspacesQuery()`
+- Создан `WorkspaceCard` — карточка воркспейса: name, company_name, role badge (цвет по роли), badge "Личный" для personal workspace, дата создания, клик → `/workspaces/${id}`
+- Создан `CreateWorkspaceModal` — модалка создания воркспейса (TextInput name + валидация Zod 1-255 символов)
+- Добавлен `useCreateWorkspaceMutation` в `useWorkspaces.ts` — POST /api/v1/workspaces с invalidate queries
+- Создана Zod-схема `createWorkspaceSchema` в `lib/validations/workspace.ts`
+- Responsive grid: 1 колонка mobile, 2 sm, 3 lg (Mantine SimpleGrid)
+- Состояния: Loading, Error (с retry), EmptyState
+- Старые роуты `/library`, `/settings` не затронуты
+
+---
+
 ## Sprint 5 — Companies (в процессе)
 
 **Цель**: Иерархия компаний над воркспейсами. Platform owner управляет компаниями, каждый воркспейс принадлежит компании.
@@ -26,6 +45,39 @@
 - Добавлен `default_company_slug` в `config.py`
 - Обновлены тесты: seed DENCO в conftest, fix хелпера в test_transcription_service
 - Применена миграция `8f4620605110`
+
+### Chunk 2 ✅ DONE
+
+**Коммит**: `feat(companies): add Company schemas and repository`
+
+- Создан `app/schemas/company.py` — `CompanyCreate`, `CompanyUpdate`, `CompanyResponse`, `CompanyDetailResponse`
+- Расширен `CompanyRepository` полным CRUD + статистика:
+  - `get_all(params, search)` — пагинированный список с поиском по имени
+  - `has_active_workspaces(company_id)` — проверка наличия активных воркспейсов (для защиты от удаления)
+  - `slug_exists(slug, exclude_id)` — проверка уникальности slug
+  - `get_detail_stats(company_id)` — агрегация `workspaces_count`, `members_count` (уникальные через workspace_members), `content_count`
+- `is_default` добавлен в `CompanyResponse` для фронтенда (пометка DENCO, запрет удаления)
+
+### Chunk 3 ✅ DONE
+
+**Коммит**: `feat(companies): add Company CRUD API for platform owners`
+
+- Создан `app/services/company_service.py` — бизнес-логика компаний:
+  - `create_company` — генерация slug, проверка уникальности с суффиксом, лимит 100 компаний
+  - `get_company` — детали + статистика (workspaces_count, members_count, content_count)
+  - `list_companies` — пагинация + поиск по имени
+  - `update_company` — обновление name с перегенерацией slug
+  - `delete_company` — защита default company (is_default) и компаний с активными воркспейсами
+- Создан `app/api/companies.py` — 5 CRUD endpoints под `/api/v1/platform/companies`:
+  - `GET /` — список компаний (пагинация, search)
+  - `POST /` — создать (201)
+  - `GET /{company_id}` — детали + stats
+  - `PATCH /{company_id}` — обновить
+  - `DELETE /{company_id}` — soft-delete (204)
+- Все endpoints требуют `require_platform_owner`
+- Добавлен query param `company_id` в `GET /api/v1/platform/workspaces` для фильтрации воркспейсов по компании
+- Обновлён `WorkspaceRepository.get_all_workspaces()` — поддержка фильтрации по `company_id`
+- Обновлён `PlatformService.list_workspaces()` — прокидывает `company_id`
 
 ---
 
