@@ -4,7 +4,79 @@
 
 ---
 
-## Sprint 6 — Workspace Navigation (в процессе)
+## Sprint 7 — Workspace-scoped Content & Settings (завершён)
+
+**Цель**: Перенос библиотеки и настроек внутрь воркспейса. Ребрендинг "Библиотека" → "Референсы". Старые роуты → redirect.
+
+### Chunk 1 ✅ DONE
+
+**Утилиты и вынос компонентов**
+
+- Создан `src/lib/utils/youtube.ts` — вынесены `extractYouTubeVideoId`, `formatDuration`, `formatTimecode` (дублировались в `library/page.tsx` и `library/[id]/page.tsx`)
+- Создан `src/components/features/references/ContentRow.tsx` — компонент строки контента, принимает `basePath` prop для гибкого формирования href (`${basePath}/${item.id}` вместо захардкоженного `/library/${item.id}`)
+- Создан `src/components/features/references/ContentRow.module.css` — стили `contentCard`, `thumbnail`, `videoId` (вынесены из `library.module.css`)
+- Создан `src/components/features/settings/constants.ts` — `roleLabelMap`, `roleColorMap`, `inviteSchema`, `InviteFormValues`
+- Создан `src/components/features/settings/TeamTab.tsx` — таб "Команда": форма приглашения + список участников (вынесен из `settings/page.tsx`)
+- Создан `src/components/features/settings/InvitationsTab.tsx` — таб "Приглашения": список pending инвайтов с отменой (вынесен из `settings/page.tsx`)
+- `sectionTitle` стиль реализован через Mantine props вместо импорта `dashboard.module.css`
+- Старые файлы (`library/page.tsx`, `library/[id]/page.tsx`, `settings/page.tsx`) не затронуты
+
+### Chunk 2 ✅ DONE
+
+**Полные референсы внутри воркспейса**
+
+- Создан `src/app/(dashboard)/workspaces/[id]/references/page.tsx` — список контента workspace-scoped: `workspaceId` из `useParams().id` (не из стора), breadcrumbs (company → workspace → Референсы), использует `ContentRow` с `basePath`, фильтры по статусу, поиск, пагинация через URL searchParams
+- Создан `src/app/(dashboard)/workspaces/[id]/references/references.module.css` — стили страницы-списка (`pageTitle`, `addForm`, `sectionTitle`)
+- Создан `src/app/(dashboard)/workspaces/[id]/references/[contentId]/page.tsx` — детальная страница контента: `workspaceId` из `params.id`, `contentId` из `params.contentId`, кнопка "Назад" → `/workspaces/${wsId}/references`, breadcrumbs (company → workspace → Референсы → Детали), YouTube embed, транскрипция с группировкой по спикерам, таймкоды с seekTo
+- Создан `src/app/(dashboard)/workspaces/[id]/references/[contentId]/content-detail.module.css` — стили детальной страницы (3-колоночный grid layout, player, segments, speaker grouping)
+- Удалён `src/app/(dashboard)/workspaces/[id]/library/page.tsx` — заглушка заменена полноценной страницей референсов
+- Утилиты (`extractYouTubeVideoId`, `formatDuration`, `formatTimecode`) импортируются из `lib/utils/youtube.ts` (chunk 1), дублирования нет
+- Убрана зависимость от `useWorkspacesQuery()` + auto-select useEffect — workspace layout уже обеспечивает загрузку и валидацию
+
+### Chunk 3 ✅ DONE
+
+**Полные настройки внутри воркспейса**
+
+- Перезаписан `src/app/(dashboard)/workspaces/[id]/settings/page.tsx` — заглушка ("Раздел в разработке") заменена полной страницей настроек
+- `workspaceId` берётся из URL (`Number(useParams().id)`), убрана зависимость от `useWorkspacesQuery()` + auto-select `useEffect`
+- Используются вынесенные компоненты из chunk 1: `TeamTab`, `InvitationsTab` из `components/features/settings/`
+- Breadcrumbs: company → workspace → Настройки
+- Табы: Команда (форма приглашения + список участников) / Приглашения (pending инвайты с отменой)
+- `keepMounted={false}` на табах — ленивый рендеринг неактивных панелей
+
+### Chunk 4 ✅ DONE
+
+**Редиректы, сайдбар, Workspace Hub**
+
+- Перезаписан `src/app/(dashboard)/library/page.tsx` → redirect-страница: `activeWorkspace` → `/workspaces/${id}/references` с пробросом `searchParams`, fallback: fetch workspaces → первый → redirect, нет воркспейсов → `EmptyState`
+- Перезаписан `src/app/(dashboard)/library/[id]/page.tsx` → redirect-страница: `activeWorkspace` → `/workspaces/${wsId}/references/${contentId}`, аналогичный fallback
+- Перезаписан `src/app/(dashboard)/settings/page.tsx` → redirect-страница: `activeWorkspace` → `/workspaces/${wsId}/settings`, аналогичный fallback
+- Изменён `src/app/(dashboard)/layout.tsx`:
+  - Убраны "Библиотека" и "Настройки" из `generalLinks` (остались "Главная" + "Компании" для platform owner)
+  - В `workspaceLinks`: `/workspaces/${id}/library` → `/workspaces/${id}/references`, label "Референсы", icon `IconSearch`
+  - Заменён импорт `IconLibrary` → `IconSearch`
+- Изменён `src/app/(dashboard)/workspaces/[id]/page.tsx` — SectionCard: "Библиотека" → "Референсы", href → `/workspaces/${id}/references`, icon `IconSearch` вместо `IconLibrary`
+- Изменён `src/app/(dashboard)/companies/page.tsx` — guard redirect для не-platform-owner: `/library` → `/dashboard`
+- Удалён `src/app/(dashboard)/library/library.module.css` — redirect-страница не использует стили
+- Удалён `src/app/(dashboard)/library/[id]/content-detail.module.css` — redirect-страница не использует стили
+
+### Chunk 5 ✅ DONE
+
+**Cleanup — удаление мёртвого кода**
+
+- Проверена папка `workspaces/[id]/library/` — уже удалена в chunk 2
+- Проверены CSS файлы `library/library.module.css` и `library/[id]/content-detail.module.css` — уже удалены в chunk 4
+- Проверен `IconLibrary` — нигде не импортируется, уже заменён на `IconSearch` в chunk 4
+- Удалены неиспользуемые CSS-классы из `src/app/(dashboard)/dashboard.module.css`:
+  - `.sectionTitle` — больше не используется (references и companies имеют свои собственные определения в `references.module.css` и `companies.module.css`)
+  - `.logoIcon` — нигде не импортируется
+  - `.headerTitle` — нигде не импортируется
+- `features/library/TranscriptionDrawer.tsx` + `.module.css` — не тронуты (будет использован в следующих спринтах)
+- `npx tsc --noEmit` — пройден без ошибок
+
+---
+
+## Sprint 6 — Workspace Navigation (завершён)
 
 **Цель**: Навигационный скелет — dashboard с карточками воркспейсов, hub-страница, conditional sidebar. Только фронтенд, бэкенд не меняется.
 
@@ -20,6 +92,32 @@
 - Responsive grid: 1 колонка mobile, 2 sm, 3 lg (Mantine SimpleGrid)
 - Состояния: Loading, Error (с retry), EmptyState
 - Старые роуты `/library`, `/settings` не затронуты
+
+### Chunk 2 ✅ DONE
+
+**Workspace layout + hub-страница + заглушки разделов + breadcrumbs**
+
+- Создан `app/(dashboard)/workspaces/[id]/layout.tsx` — data loader: загружает workspace через `useWorkspaceDetailQuery`, валидирует id (NaN → redirect), обрабатывает 403/404 → redirect `/dashboard` + notification, обновляет workspace-store
+- Создан `app/(dashboard)/workspaces/[id]/page.tsx` — hub-страница: breadcrumbs (company / workspace) + заголовок + grid карточек разделов (Библиотека, Настройки)
+- Создан `app/(dashboard)/workspaces/[id]/library/page.tsx` — заглушка с breadcrumbs (company / workspace / Библиотека)
+- Создан `app/(dashboard)/workspaces/[id]/settings/page.tsx` — заглушка с breadcrumbs (company / workspace / Настройки)
+- Создан `components/features/workspace/SectionCard.tsx` — карточка раздела (иконка, название, описание, стрелка-шеврон)
+- Создан `components/shared/Breadcrumbs.tsx` — обёртка над Mantine Breadcrumbs: последний элемент без ссылки, truncate (max-width 200px)
+- Добавлен `useWorkspaceDetailQuery(workspaceId)` в `api/hooks/useWorkspaces.ts` — GET /api/v1/workspaces/{id}
+- Расширен `ActiveWorkspace` в `stores/workspace-store.ts` — добавлено поле `company_name`
+- Исправлены вызовы `setActiveWorkspace` в `library/page.tsx` и `settings/page.tsx` (добавлен `company_name`)
+
+### Chunk 3 ✅ DONE
+
+**Коммит**: `feat(workspaces): add conditional sidebar for workspace navigation`
+
+- Изменён `app/(dashboard)/layout.tsx` — sidebar теперь conditional по pathname:
+  - **Вне воркспейса** (`/dashboard`, `/companies`, `/library`, `/settings`): общая навигация (Главная, Библиотека, Настройки, Компании)
+  - **Внутри воркспейса** (`/workspaces/[id]/*`): кнопка "← Все воркспейсы" → `/dashboard`, разделитель, имя воркспейса из store, ссылки Обзор / Библиотека / Настройки
+- Определение контекста: `pathname.match(/^\/workspaces\/(\d+)/)` — извлекает workspaceId из URL
+- Active state: exact match для "Обзор" (`pathname === href`), `startsWith` для разделов (Библиотека, Настройки)
+- Имя воркспейса читается из `useWorkspaceStore` (обновляется workspace layout из Chunk 2)
+- Добавлены импорты: `Divider`, `IconLayoutDashboard`, `IconArrowLeft`, `useWorkspaceStore`
 
 ---
 
