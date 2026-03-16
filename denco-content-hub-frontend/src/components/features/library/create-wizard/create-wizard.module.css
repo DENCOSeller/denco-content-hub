@@ -1,0 +1,97 @@
+.pageTitle {
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.platformCard {
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-bg);
+  border-radius: var(--mantine-radius-md);
+  padding: 24px;
+  text-align: center;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.platformCard:hover {
+  background: var(--card-bg-hover);
+}
+
+.platformCardSelected {
+  border-color: var(--neon-blue);
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.typeCard {
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-bg);
+  border-radius: var(--mantine-radius-md);
+  padding: 16px 20px;
+  transition: all 0.2s ease;
+}
+
+.typeCard:hover {
+  background: var(--card-bg-hover);
+}
+
+.typeCardSelected {
+  border-color: var(--neon-blue);
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.sourceCard {
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-bg);
+  border-radius: var(--mantine-radius-md);
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.sourceCard:hover {
+  background: var(--card-bg-hover);
+}
+
+.sourceCardSelected {
+  border-color: var(--neon-blue);
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.summaryLabel {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.summaryValue {
+  font-weight: 500;
+}
+
+.referenceItem {
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-bg);
+  border-radius: var(--mantine-radius-md);
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.referenceItem:hover {
+  background: var(--card-bg-hover);
+}
+
+.referenceItemSelected {
+  border-color: var(--neon-blue);
+  background: rgba(10, 132, 255, 0.08);
+}

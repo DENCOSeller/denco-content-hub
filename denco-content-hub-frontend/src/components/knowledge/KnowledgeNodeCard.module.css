@@ -1,0 +1,12 @@
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cardAppear {
+  animation: nodeAppear 0.25s ease-out;
+}

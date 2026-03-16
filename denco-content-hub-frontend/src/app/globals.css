@@ -1,0 +1,71 @@
+/* React Flow base styles — MUST be first (@import before any rules) */
+@import '@xyflow/react/dist/style.css';
+
+/* Minimal reset — Mantine handles the rest */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --app-bg: #0d0d0f;
+  --card-bg: #1c1c1e;
+  --card-bg-hover: #2c2e33;
+  --sidebar-bg: #141416;
+  --header-bg: #1c1c1e;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(10, 132, 255, 0.25);
+  --neon-blue: #0A84FF;
+  --neon-violet: #BF5AF2;
+  --neon-cyan: #32ADE6;
+  --gradient-main: linear-gradient(135deg, #0A84FF, #BF5AF2);
+  --gradient-subtle: linear-gradient(135deg, rgba(10,132,255,0.15), rgba(191,90,242,0.15));
+  --text-primary: #f0f0ff;
+  --text-muted: rgba(255, 255, 255, 0.45);
+}
+
+/* React Flow dark theme overrides */
+.react-flow {
+  --xy-background-color: #0a0a0f;
+  --xy-background-pattern-color: rgba(255, 255, 255, 0.03);
+  --xy-node-border-radius: 8px;
+  --xy-edge-stroke: rgba(130, 130, 220, 0.3);
+  --xy-edge-stroke-selected: var(--neon-blue);
+  --xy-edge-stroke-width: 2;
+  --xy-minimap-background: var(--card-bg);
+  --xy-minimap-mask-background: rgba(0, 0, 0, 0.7);
+  --xy-controls-button-background: var(--card-bg);
+  --xy-controls-button-background-hover: var(--card-bg-hover);
+  --xy-controls-button-color: var(--text-primary);
+  --xy-controls-button-border-color: var(--border-subtle);
+}
+
+.react-flow__minimap {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+.react-flow__controls {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.react-flow__controls button {
+  border-bottom-color: var(--border-subtle);
+}
+
+/* Knowledge node hover */
+.knowledge-node-card:hover {
+  background: var(--card-bg-hover) !important;
+}
+
+/* Handle visibility on hover */
+.react-flow__node:hover .react-flow__handle {
+  background: var(--neon-blue) !important;
+  width: 10px !important;
+  height: 10px !important;
+}

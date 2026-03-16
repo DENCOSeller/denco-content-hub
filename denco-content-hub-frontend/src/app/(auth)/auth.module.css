@@ -1,0 +1,100 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+}
+
+.brandPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0A84FF 0%, #BF5AF2 100%);
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.brandPanel::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.brandLogo {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  position: relative;
+  z-index: 1;
+}
+
+.brandSlogan {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.125rem;
+  margin-top: 0.75rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.formPanel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-bg);
+  padding: 2rem;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-lg);
+  padding: 2.5rem;
+}
+
+.formTitle {
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mobile: stack vertically, hide brand panel */
+@media (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .brandPanel {
+    min-height: 180px;
+    flex: none;
+    padding: 2rem;
+  }
+
+  .brandLogo {
+    font-size: 1.75rem;
+  }
+
+  .brandSlogan {
+    font-size: 0.95rem;
+  }
+
+  .formPanel {
+    flex: 1;
+    padding: 1.5rem;
+  }
+
+  .formCard {
+    padding: 1.5rem;
+  }
+}

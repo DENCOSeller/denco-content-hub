@@ -1,0 +1,71 @@
+/* Transcription segments */
+.segmentRow {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 150ms ease;
+}
+
+.segmentRow:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.segmentRow:last-child {
+  border-bottom: none;
+}
+
+/* Speaker grouping */
+.speakerHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px var(--mantine-spacing-sm) 4px;
+  margin-top: 4px;
+}
+
+.speakerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.speakerLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Timecodes */
+.timecode {
+  flex-shrink: 0;
+  min-width: 60px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(10, 132, 255, 0.7);
+}
+
+.timecodeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 60px;
+  color: rgba(10, 132, 255, 0.8);
+  cursor: pointer;
+  border-radius: var(--mantine-radius-xs);
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.timecodeLink:hover {
+  background: rgba(10, 132, 255, 0.12);
+  color: var(--neon-blue);
+}
+
+.segmentText {
+  line-height: 1.6;
+  color: rgba(220, 220, 255, 0.85);
+}

@@ -1,0 +1,32 @@
+.contentCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-lg);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease, background 200ms ease;
+  text-decoration: none;
+}
+
+.contentCard:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--border-accent);
+  box-shadow: 0 4px 24px rgba(10, 132, 255, 0.12), 0 0 0 1px rgba(10, 132, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.thumbnail {
+  width: 120px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: var(--mantine-radius-sm);
+  flex-shrink: 0;
+  display: block;
+}
+
+.videoId {
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 5px;
+  border-radius: 4px;
+}

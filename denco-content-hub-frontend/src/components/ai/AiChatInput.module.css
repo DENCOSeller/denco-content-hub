@@ -1,0 +1,125 @@
+.inputWrapper {
+  position: relative;
+  padding: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 2px 8px;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 8px 10px;
+  transition: border-color 200ms ease;
+}
+
+.inputContainer:focus-within {
+  border-color: var(--border-accent);
+}
+
+.attachButton {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 200ms ease, background 200ms ease;
+}
+
+.attachButton:hover:not(:disabled) {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.attachButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.textarea {
+  flex: 1;
+  min-height: 20px;
+  max-height: 120px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  padding: 0;
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.sendButton {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: var(--gradient-main);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 200ms ease, transform 100ms ease;
+}
+
+.sendButton:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.sendButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.sendButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.stopButton {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 90, 90, 0.3);
+  background: rgba(255, 90, 90, 0.1);
+  color: #ff5a5a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 200ms ease;
+}
+
+.stopButton:hover {
+  background: rgba(255, 90, 90, 0.2);
+}
+
+.hint {
+  text-align: center;
+  padding: 4px 12px 2px;
+  font-size: 11px;
+  color: var(--text-muted);
+}

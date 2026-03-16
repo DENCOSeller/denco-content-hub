@@ -1,0 +1,102 @@
+.layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+  gap: 0;
+}
+
+.leftCol {
+  padding: var(--mantine-spacing-lg);
+  border-right: 1px solid var(--border-subtle);
+  overflow-y: auto;
+  background: var(--card-bg);
+}
+
+.centerCol {
+  padding: var(--mantine-spacing-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-bg);
+}
+
+.playerWrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--mantine-radius-md);
+  overflow: hidden;
+  background: #000;
+  flex-shrink: 0;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.playerIframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.playerPlaceholder {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--mantine-radius-md);
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.metaBlock {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-sm);
+}
+
+/* Tabs */
+.tabsRoot {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tabsList {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--mantine-spacing-md);
+}
+
+.tabPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+
+  .leftCol {
+    border-right: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .leftCol {
+    padding: var(--mantine-spacing-sm);
+  }
+
+  .centerCol {
+    padding: var(--mantine-spacing-sm);
+  }
+}

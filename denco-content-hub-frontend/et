@@ -1,0 +1,20 @@
+[0;1;32m●[0m denco-frontend.service - Denco Content Hub Frontend
+     Loaded: loaded (]8;;file://yoltxgtspx/etc/systemd/system/denco-frontend.service/etc/systemd/system/denco-frontend.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Thu 2026-03-12 20:45:03 UTC; 3s ago
+   Main PID: 278351 (npm run start -)
+      Tasks: 25 (limit: 7064)
+     Memory: 156.9M (peak: 157.2M)
+        CPU: 1.449s
+     CGroup: /system.slice/denco-frontend.service
+             ├─[0;38;5;245m278351 "npm run start --port 3001"[0m
+             ├─[0;38;5;245m278363 sh -c "next start --port 3001"[0m
+             └─[0;38;5;245m278364 "next-server (v15.5.12)"[0m
+
+Mar 12 20:45:03 yoltxgtspx systemd[1]: Started denco-frontend.service - Denco Content Hub Frontend.
+Mar 12 20:45:03 yoltxgtspx npm[278351]: > denco-content-hub-frontend@0.1.0 start
+Mar 12 20:45:03 yoltxgtspx npm[278351]: > next start --port 3001
+Mar 12 20:45:03 yoltxgtspx npm[278364]:    ▲ Next.js 15.5.12
+Mar 12 20:45:03 yoltxgtspx npm[278364]:    - Local:        http://localhost:3001
+Mar 12 20:45:03 yoltxgtspx npm[278364]:    - Network:      http://155.212.190.58:3001
+Mar 12 20:45:03 yoltxgtspx npm[278364]:  ✓ Starting...
+Mar 12 20:45:04 yoltxgtspx npm[278364]:  ✓ Ready in 698ms

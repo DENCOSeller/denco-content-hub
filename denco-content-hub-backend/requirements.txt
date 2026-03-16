@@ -1,0 +1,5 @@
+anthropic
+python-docx
+pyannote.audio
+pymupdf
+trafilatura

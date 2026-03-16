@@ -1,0 +1,26 @@
+.switcher {
+  min-width: 160px;
+  max-width: 220px;
+}
+
+.switcherInput {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--mantine-color-gray-2);
+  font-size: 0.85rem;
+  height: 34px;
+  transition: border-color 160ms ease;
+}
+
+.switcherInput:hover {
+  border-color: var(--neon-blue);
+}
+
+.switcherInput:focus {
+  border-color: var(--neon-blue);
+}
+
+.switcherDropdown {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+}

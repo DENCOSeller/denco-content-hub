@@ -1,0 +1,114 @@
+/* AddSourceModal */
+
+.modal :global(.mantine-Modal-content) {
+  background: #0a0a0f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.modal :global(.mantine-Modal-header) {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 20px 24px;
+}
+
+.modal :global(.mantine-Modal-title) {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary, #f0f0ff);
+}
+
+.modal :global(.mantine-Modal-body) {
+  padding: 24px;
+}
+
+.modal :global(.mantine-Modal-close) {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.modal :global(.mantine-Modal-close:hover) {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Type selector */
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.typeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 88px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 8px;
+}
+
+.typeCard:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: scale(1.03);
+}
+
+.typeCardSelected {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--mantine-color-blue-6);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.typeLabel {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.45);
+  transition: color 0.2s ease;
+}
+
+.typeLabelSelected {
+  color: var(--text-primary, #f0f0ff);
+}
+
+/* Dropzone */
+.dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  min-height: 120px;
+  transition: all 0.2s ease;
+}
+
+.dropzone:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dropzoneAccept {
+  border-color: var(--mantine-color-blue-6);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.dropzoneReject {
+  border-color: var(--mantine-color-red-6);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.selectedFile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
