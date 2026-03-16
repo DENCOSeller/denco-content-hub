@@ -174,3 +174,54 @@ class NodePositionUpdate(BaseModel):
 
 class BatchPositionUpdateRequest(BaseModel):
     positions: list[NodePositionUpdate] = Field(max_length=500)
+
+
+# --- KgNodeTypeDef ---
+
+
+class KgNodeTypeDefCreate(BaseModel):
+    slug: str = Field(max_length=50, pattern=r"^[a-z][a-z0-9_]*$")
+    label: str = Field(min_length=1, max_length=100)
+    icon: str = "IconNote"
+    color: str = "#8E8E93"
+    gradient: str | None = None
+
+
+class KgNodeTypeDefResponse(BaseModel):
+    id: int
+    slug: str
+    label: str
+    label_en: str | None = None
+    icon: str
+    color: str
+    gradient: str | None = None
+    sort_order: int
+    is_system: bool
+    is_active: bool
+    company_id: int | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# --- KgEdgeTypeDef ---
+
+
+class KgEdgeTypeDefCreate(BaseModel):
+    slug: str = Field(max_length=50, pattern=r"^[a-z][a-z0-9_]*$")
+    label: str = Field(min_length=1, max_length=100)
+    description: str | None = None
+    is_directed: bool = True
+
+
+class KgEdgeTypeDefResponse(BaseModel):
+    id: int
+    slug: str
+    label: str
+    label_en: str | None = None
+    description: str | None = None
+    is_directed: bool
+    is_system: bool
+    is_active: bool
+    company_id: int | None = None
+
+    model_config = ConfigDict(from_attributes=True)

@@ -1,37 +1,69 @@
+/* Weekday headers — отдельный grid */
+.weekdayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
 .weekdayHeader {
   padding: 8px 4px;
-  border-bottom: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+}
+
+/* Grid wrapper — clips AnimatePresence overflow */
+.gridWrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Calendar grid — gap-as-border technique */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .dayCell {
-  min-height: 110px;
+  min-height: 120px;
   padding: 6px;
-  border: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
-  border-right: none;
-  border-bottom: none;
+  background: var(--mantine-color-body);
 }
 
-.dayCell:nth-child(7n) {
-  border-right: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+.dayCell[data-weekend='true'] {
+  background: color-mix(in srgb, var(--mantine-color-body) 95%, var(--mantine-color-dark-5));
 }
 
-.dayCell:nth-last-child(-n+7) {
-  border-bottom: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+.dayCell[data-other-month='true'] {
+  opacity: 0.3;
 }
 
-.dayCell[data-other-month] {
-  opacity: 0.4;
+.dayCell[data-today='true'] {
+  background: color-mix(in srgb, var(--neon-blue, var(--mantine-color-blue-9)) 8%, var(--mantine-color-body));
 }
 
-.dayCell[data-today] {
-  background: color-mix(in srgb, var(--neon-blue, var(--mantine-color-blue-9)) 10%, transparent);
+/* Today circle */
+.todayCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--neon-blue, var(--mantine-color-blue-6));
+  color: var(--mantine-color-white);
+  font-weight: 700;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-.todayNumber {
-  color: var(--neon-blue, var(--mantine-color-blue-5));
-}
-
+/* Add button — absolute top-right corner */
 .addButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
   opacity: 0;
   transition: opacity 150ms ease;
 }
@@ -46,11 +78,27 @@
   }
 }
 
-.todayLink {
-  cursor: pointer;
-  user-select: none;
+/* Empty day dashed zone — shows on hover */
+.emptyZone {
+  flex: 1;
+  min-height: 28px;
+  border: 1px dashed transparent;
+  border-radius: var(--mantine-radius-sm);
+  transition: border-color 150ms ease;
+  margin-top: 4px;
 }
 
-.todayLink:hover {
-  text-decoration: underline;
+.dayCell:hover .emptyZone {
+  border-color: var(--mantine-color-dark-3);
 }
+
+/* Overflow link */
+.overflowLink {
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.overflowLink:hover {
+  color: var(--mantine-color-blue-4);
+}
+

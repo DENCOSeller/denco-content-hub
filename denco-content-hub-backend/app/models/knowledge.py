@@ -134,6 +134,60 @@ class KnowledgeEdge(Base, TimestampMixin, SoftDeleteMixin):
     )
 
 
+class KgNodeTypeDef(Base, TimestampMixin):
+    __tablename__ = "kg_node_type_defs"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    slug: Mapped[str] = mapped_column(String(50), nullable=False)
+    label: Mapped[str] = mapped_column(String(100), nullable=False)
+    label_en: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    icon: Mapped[str] = mapped_column(String(50), nullable=False, server_default="IconNote")
+    color: Mapped[str] = mapped_column(String(7), nullable=False, server_default="#8E8E93")
+    gradient: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    sort_order: Mapped[int] = mapped_column(nullable=False, server_default="0")
+    is_system: Mapped[bool] = mapped_column(nullable=False, server_default="false")
+    is_active: Mapped[bool] = mapped_column(nullable=False, server_default="true")
+    company_id: Mapped[int | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+
+    __table_args__ = (
+        Index(
+            "uq_kntd_slug_company",
+            "slug",
+            text("COALESCE(company_id, 0)"),
+            unique=True,
+        ),
+    )
+
+
+class KgEdgeTypeDef(Base, TimestampMixin):
+    __tablename__ = "kg_edge_type_defs"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    slug: Mapped[str] = mapped_column(String(50), nullable=False)
+    label: Mapped[str] = mapped_column(String(100), nullable=False)
+    label_en: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_directed: Mapped[bool] = mapped_column(nullable=False, server_default="true")
+    is_system: Mapped[bool] = mapped_column(nullable=False, server_default="false")
+    is_active: Mapped[bool] = mapped_column(nullable=False, server_default="true")
+    company_id: Mapped[int | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+
+    __table_args__ = (
+        Index(
+            "uq_ketd_slug_company",
+            "slug",
+            text("COALESCE(company_id, 0)"),
+            unique=True,
+        ),
+    )
+
+
 class KnowledgeNodeVersion(Base, TimestampMixin):
     __tablename__ = "knowledge_node_versions"
 

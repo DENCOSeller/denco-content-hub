@@ -51,7 +51,7 @@ export default function ContentPlanPage() {
             {
               label: (
                 <Group gap={6}>
-                  <IconCalendar size={16} />
+                  <IconCalendar size={16} stroke={1.5} />
                   Календарь
                 </Group>
               ),
@@ -60,7 +60,7 @@ export default function ContentPlanPage() {
             {
               label: (
                 <Group gap={6}>
-                  <IconList size={16} />
+                  <IconList size={16} stroke={1.5} />
                   Список
                 </Group>
               ),
@@ -68,6 +68,15 @@ export default function ContentPlanPage() {
             },
           ]}
           size="sm"
+          withItemsBorders={false}
+          classNames={{
+            root: styles.viewSwitchRoot,
+            indicator: styles.viewSwitchIndicator,
+            label: styles.viewSwitchLabel,
+            control: styles.viewSwitchControl,
+          }}
+          transitionDuration={250}
+          transitionTimingFunction="ease"
         />
       </Group>
 

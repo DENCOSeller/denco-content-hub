@@ -1,0 +1,118 @@
+.drawerContent {
+  background: var(--mantine-color-dark-7) !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerBody {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+.messageList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 8px;
+  min-height: 100%;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  gap: 12px;
+  min-height: 240px;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(10, 132, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.suggestionBtn {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.suggestionBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(10, 132, 255, 0.3);
+  color: #f0f0ff;
+}
+
+/* Apply button */
+.applyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0 4px 42px;
+  padding: 4px 10px;
+  background: rgba(10, 132, 255, 0.1);
+  border: 1px solid rgba(10, 132, 255, 0.25);
+  border-radius: 6px;
+  color: rgba(10, 132, 255, 0.9);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.applyBtn:hover:not(:disabled) {
+  background: rgba(10, 132, 255, 0.18);
+  border-color: rgba(10, 132, 255, 0.4);
+}
+
+.applyBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.applyBtnDone {
+  background: rgba(64, 192, 87, 0.1);
+  border-color: rgba(64, 192, 87, 0.25);
+  color: rgba(64, 192, 87, 0.9);
+}

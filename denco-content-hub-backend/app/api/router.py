@@ -13,6 +13,7 @@ from app.api.content_plan import router as content_plan_router
 from app.api.health import router as health_router
 from app.api.invitations import public_router as invitations_public_router
 from app.api.invitations import ws_router as invitations_ws_router
+from app.api.kg_types import router as kg_types_router
 from app.api.knowledge import router as knowledge_router
 from app.api.library import router as library_router
 from app.api.platform import router as platform_router
@@ -35,6 +36,7 @@ api_router.include_router(companies_router)
 api_router.include_router(company_members_router)
 api_router.include_router(knowledge_router)
 api_router.include_router(company_knowledge_router)
+api_router.include_router(kg_types_router)
 api_router.include_router(ai_router)
 api_router.include_router(analysis_router)
 api_router.include_router(content_chat_router)

@@ -10,11 +10,11 @@ import { PlanItemActions } from './PlanItemActions'
 import { MetricsModal } from './MetricsModal'
 import styles from './plan-item-card.module.css'
 
-const PLATFORM_CONFIG: Record<string, { label: string; color: string }> = {
-  youtube: { label: 'YT', color: '#FF0000' },
-  instagram: { label: 'IG', color: '#E1306C' },
-  telegram: { label: 'TG', color: '#0088CC' },
-  vk: { label: 'VK', color: '#4680C2' },
+const PLATFORM_COLOR: Record<string, string> = {
+  youtube: '#FF0000',
+  instagram: '#E1306C',
+  telegram: '#0088CC',
+  vk: '#4680C2',
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -39,10 +39,8 @@ interface PlanItemCardProps {
 export function PlanItemCard({ item, workspaceId }: PlanItemCardProps) {
   const [metricsOpened, setMetricsOpened] = useState(false)
 
-  const platform = PLATFORM_CONFIG[item.platform] ?? {
-    label: item.platform.slice(0, 2).toUpperCase(),
-    color: 'var(--mantine-color-gray-5)',
-  }
+  const platformColor =
+    PLATFORM_COLOR[item.platform] ?? 'var(--mantine-color-gray-5)'
 
   const title = item.library_item_title ?? 'Без названия'
   const time = item.scheduled_at
@@ -61,17 +59,18 @@ export function PlanItemCard({ item, workspaceId }: PlanItemCardProps) {
           component={Link}
           href={libraryHref}
           className={styles.card}
-          style={{ textDecoration: 'none', color: 'inherit' }}
+          style={{
+            textDecoration: 'none',
+            color: 'inherit',
+            '--platform-color': platformColor,
+          } as React.CSSProperties}
         >
-          <Group gap={4} wrap="nowrap">
-            <Box
-              className={styles.platformBadge}
-              style={{ backgroundColor: platform.color }}
-            >
-              <Text size="8px" fw={700} c="white" lh={1}>
-                {platform.label}
+          <Group gap={6} wrap="nowrap" w="100%">
+            {time && (
+              <Text size="10px" c="dimmed" className={styles.time}>
+                {time}
               </Text>
-            </Box>
+            )}
 
             <Text size="xs" className={styles.title} flex={1}>
               {title}
@@ -88,12 +87,6 @@ export function PlanItemCard({ item, workspaceId }: PlanItemCardProps) {
               style={{ backgroundColor: STATUS_COLOR[item.status] }}
             />
           </Group>
-
-          {time && (
-            <Text size="10px" c="dimmed" mt={2}>
-              {time}
-            </Text>
-          )}
         </Box>
       </Tooltip>
 

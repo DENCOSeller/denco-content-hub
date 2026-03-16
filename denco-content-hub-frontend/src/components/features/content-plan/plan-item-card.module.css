@@ -1,23 +1,24 @@
 .card {
-  padding: 4px 6px;
-  border-radius: var(--mantine-radius-xs);
+  padding: 2px 8px 2px 0;
+  border-radius: var(--mantine-radius-sm);
   background: var(--card-bg, var(--mantine-color-dark-6));
   border: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+  border-left: 3px solid var(--platform-color, var(--mantine-color-gray-5));
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: background 150ms ease, transform 150ms ease;
+  height: 28px;
+  display: flex;
+  align-items: center;
 }
 
 .card:hover {
   background: var(--mantine-color-dark-5);
+  transform: translateX(2px);
 }
 
-.platformBadge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1px 4px;
-  border-radius: var(--mantine-radius-xs);
+.time {
   flex-shrink: 0;
+  opacity: 0.6;
 }
 
 .title {

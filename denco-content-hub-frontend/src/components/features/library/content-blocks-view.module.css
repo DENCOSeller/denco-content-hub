@@ -1,0 +1,135 @@
+.blocksStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+}
+
+.block {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-md);
+  transition: border-color 0.15s ease;
+}
+
+.block:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.blockHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.blockLabel {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.blockIcon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* AI improve button — visible on block hover */
+.aiButton {
+  opacity: 0;
+  transition: opacity 150ms ease;
+  color: rgba(10, 132, 255, 0.7);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.aiButton:hover {
+  color: rgba(10, 132, 255, 1);
+}
+
+.block:hover .aiButton {
+  opacity: 1;
+}
+
+.blockContent {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--mantine-color-gray-2);
+}
+
+.blockContent p {
+  margin: 0 0 0.5em;
+}
+
+.blockContent p:last-child {
+  margin-bottom: 0;
+}
+
+.blockContent ul,
+.blockContent ol {
+  padding-left: 1.4em;
+  margin: 0.4em 0;
+}
+
+.blockContent li {
+  margin-bottom: 0.2em;
+}
+
+.blockContent strong {
+  color: var(--mantine-color-gray-1);
+}
+
+.blockContent h1,
+.blockContent h2,
+.blockContent h3 {
+  margin: 0.6em 0 0.3em;
+  color: var(--mantine-color-gray-1);
+}
+
+.blockContent h1 { font-size: 1.1rem; }
+.blockContent h2 { font-size: 1rem; }
+.blockContent h3 { font-size: 0.95rem; }
+
+.blockContent code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.blockContentPlain {
+  white-space: pre-wrap;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--mantine-color-gray-2);
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Nested cards for arrays */
+.nestedStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+}
+
+.nestedCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-sm);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.nestedHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--mantine-spacing-xs);
+  margin-bottom: 4px;
+}
