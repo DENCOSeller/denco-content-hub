@@ -104,7 +104,7 @@ class KnowledgeService:
             search,
             company_id=workspace.company_id,
         )
-        return [KnowledgeNodeResponse.model_validate(n) for n in nodes]
+        return await self._enrich_with_usage(nodes, node_type)
 
     async def get_company_nodes(
         self,
@@ -113,7 +113,7 @@ class KnowledgeService:
         search: str | None = None,
     ) -> list[KnowledgeNodeResponse]:
         nodes = await self.node_repo.get_by_company(company_id, node_type, search)
-        return [KnowledgeNodeResponse.model_validate(n) for n in nodes]
+        return await self._enrich_with_usage(nodes, node_type)
 
     # --- Graph ---
 
@@ -193,6 +193,39 @@ class KnowledgeService:
         return [KnowledgeNodeVersionResponse.model_validate(v) for v in versions]
 
     # --- Private ---
+
+    async def _enrich_with_usage(
+        self,
+        nodes: list[KnowledgeNode],
+        node_type: NodeType | None,
+    ) -> list[KnowledgeNodeResponse]:
+        """Добавляет usage_count к списку узлов."""
+        if not nodes:
+            return []
+        # Если фильтр по конкретному типу — один запрос на все узлы
+        if node_type is not None:
+            node_ids = [n.id for n in nodes]
+            counts = await self.node_repo.get_usage_counts(node_ids, node_type.value)
+            result = []
+            for n in nodes:
+                resp = KnowledgeNodeResponse.model_validate(n)
+                resp.usage_count = counts.get(n.id, 0)
+                result.append(resp)
+            return result
+        # Без фильтра — группируем по типу, один запрос на тип
+        by_type: dict[str, list[int]] = {}
+        for n in nodes:
+            by_type.setdefault(n.node_type.value, []).append(n.id)
+        all_counts: dict[int, int] = {}
+        for nt, ids in by_type.items():
+            counts = await self.node_repo.get_usage_counts(ids, nt)
+            all_counts.update(counts)
+        result = []
+        for n in nodes:
+            resp = KnowledgeNodeResponse.model_validate(n)
+            resp.usage_count = all_counts.get(n.id, 0)
+            result.append(resp)
+        return result
 
     async def _validate_edge_scope(self, source: KnowledgeNode, target: KnowledgeNode) -> None:
         if source.workspace_id and target.workspace_id:

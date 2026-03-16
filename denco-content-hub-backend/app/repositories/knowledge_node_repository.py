@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
-from sqlalchemy import or_, select, update
+from sqlalchemy import Column, func, or_, select, update
 
 from app.models.knowledge import KnowledgeNode, NodeType
+from app.models.library_item import LibraryItem
 from app.models.workspace import Workspace
 from app.repositories.base import BaseRepository
 
@@ -252,6 +253,27 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         query = query.order_by(KnowledgeNode.created_at.desc()).limit(limit)
         result = await self.db.execute(query)
         return list(result.tuples().all())
+
+    # Маппинг node_type → FK поле в library_items
+    _NODE_TYPE_FK_MAP: ClassVar[dict[str, Column]] = {  # type: ignore[type-arg]
+        "speaker": LibraryItem.speaker_node_id,
+        "content_goal": LibraryItem.content_goal_node_id,
+        "narrative_format": LibraryItem.narrative_node_id,
+        "hook_type": LibraryItem.hook_type_node_id,
+        "tone_of_voice": LibraryItem.tone_node_id,
+        "product_focus": LibraryItem.product_node_id,
+    }
+
+    async def get_usage_counts(self, node_ids: list[int], node_type: str) -> dict[int, int]:
+        """Count how many non-deleted library_items reference each node."""
+        fk_col = self._NODE_TYPE_FK_MAP.get(node_type)
+        if not fk_col or not node_ids:
+            return {}
+        query = (
+            select(fk_col, func.count()).where(fk_col.in_(node_ids), LibraryItem.deleted_at.is_(None)).group_by(fk_col)
+        )
+        result = await self.db.execute(query)
+        return dict(result.tuples().all())
 
     @staticmethod
     def _apply_filters(query, node_type: NodeType | None, search: str | None):

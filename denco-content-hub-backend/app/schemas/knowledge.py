@@ -99,6 +99,7 @@ class KnowledgeNodeResponse(BaseModel):
     position_y: float
     is_position_fixed: bool
     color: str | None = None
+    usage_count: int = 0
     created_at: datetime
     updated_at: datetime
 
