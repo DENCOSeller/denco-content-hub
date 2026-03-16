@@ -427,3 +427,41 @@ app/integrations/sources/
 ```
 
 Каждый адаптер реализует `extract(source_url_or_data) → ExtractedContent` с единым интерфейсом.
+
+---
+
+## Sprint 11 — Контент-план (Планировщик публикаций)
+
+### Суть
+Новый раздел "Контент-план" — планировщик публикаций готового контента из Библиотеки.
+Третье звено воронки: Референсы → Библиотека → **Контент-план**.
+
+### Новая таблица
+- `content_plan_items` — элемент контент-плана (workspace_id, library_item_id, scheduled_at, published_at, assignee_id, status, platform, metrics JSONB, notes, soft delete)
+- Миграции: `e33d870558be` (create table), `a82ad052df80` (add notes)
+
+### LibraryStatus расширен
+- Добавлен `SCHEDULED` в enum `LibraryStatus` (Python StrEnum, хранится как VARCHAR)
+
+### Новые файлы
+- `app/models/content_plan_item.py` — модель ContentPlanItem
+- `app/schemas/content_plan.py` — Pydantic схемы (Create, Update, Response, Filters)
+- `app/repositories/content_plan_repository.py` — CRUD + фильтры по дате/статусу/платформе/assignee
+- `app/services/content_plan_service.py` — бизнес-логика, синхронизация статусов Library↔Plan, валидация assignee
+- `app/api/content_plan.py` — 7 эндпоинтов
+
+### API эндпоинты
+```
+GET    /workspaces/{id}/content-plan                    — список (фильтры: date_from, date_to, status, platform, assignee_id)
+GET    /workspaces/{id}/content-plan/{item_id}          — одна запись
+POST   /workspaces/{id}/content-plan                    — создать
+PATCH  /workspaces/{id}/content-plan/{item_id}          — обновить
+DELETE /workspaces/{id}/content-plan/{item_id}          — soft delete
+PATCH  /workspaces/{id}/content-plan/{item_id}/publish  — отметить как опубликовано
+PATCH  /workspaces/{id}/content-plan/{item_id}/metrics  — обновить метрики
+```
+
+### Синхронизация статусов Library ↔ Plan
+- Создание plan_item → library_item.status = 'scheduled'
+- Удаление/отмена plan_item → library_item.status = 'ready'
+- Публикация plan_item → library_item.status = 'published' + published_at

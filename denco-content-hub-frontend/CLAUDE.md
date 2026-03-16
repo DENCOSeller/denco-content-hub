@@ -1268,4 +1268,45 @@ src/
 
 ---
 
+## Sprint 11 — Контент-план (Планировщик публикаций)
+
+### Суть
+Новый раздел "Контент-план" — планировщик публикаций готового контента из Библиотеки.
+Третье звено воронки: Референсы → Библиотека → **Контент-план**.
+
+### Новые файлы
+```
+src/
+├── app/(dashboard)/workspaces/[id]/content-plan/
+│   ├── page.tsx                    — страница с Calendar/List toggle
+│   └── content-plan.module.css
+├── components/features/content-plan/
+│   ├── CalendarView.tsx            — месячный календарь (@mantine/dates)
+│   ├── ListView.tsx                — хронологический список по дням
+│   ├── PlanItemCard.tsx            — карточка элемента плана (цвет по платформе)
+│   ├── AddToPlanModal.tsx          — модалка добавления в план (выбор library item + дата/время + assignee)
+│   ├── MetricsModal.tsx            — модалка ввода метрик (просмотры, охват, лайки, комментарии)
+│   ├── PlanItemActions.tsx         — кнопки действий (опубликовать, отменить)
+│   ├── calendar-view.module.css
+│   ├── list-view.module.css
+│   └── plan-item-card.module.css
+├── api/hooks/
+│   └── useContentPlan.ts           — 7 TanStack Query хуков (list, get, create, update, delete, publish, metrics)
+└── lib/validations/
+    └── content-plan.ts             — Zod схемы (addToPlanSchema, metricsSchema)
+```
+
+### Изменённые файлы
+- `src/app/(dashboard)/layout.tsx` — пункт "Контент-план" в сайдбар
+- `src/components/features/library/LibraryItemCard.tsx` — кнопка "В план"
+- `src/app/(dashboard)/workspaces/[id]/library/[itemId]/page.tsx` — кнопка "В план"
+- `src/api/client/*` — перегенерированный hey-api клиент (content-plan endpoints)
+- `package.json` — `@mantine/dates`, `dayjs`
+
+### Зависимости добавлены
+- `@mantine/dates` — календарь (Mantine native)
+- `dayjs` — peer dependency для @mantine/dates
+
+---
+
 *Конец инструкций. Следуй им при каждом запросе.*
