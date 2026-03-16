@@ -45,12 +45,12 @@ export function AddToPlanModal({
   const createItem = useCreateContentPlanItemMutation(workspaceId)
 
   const { data: libraryData } = useLibraryItemsQuery(workspaceId, {
-    size: 200,
+    size: 100,
     status: 'ready',
   })
 
   const { data: draftLibraryData } = useLibraryItemsQuery(workspaceId, {
-    size: 200,
+    size: 100,
     status: 'draft',
   })
 

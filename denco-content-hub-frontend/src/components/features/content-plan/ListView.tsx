@@ -62,7 +62,7 @@ function groupByDay(items: ContentPlanItemResponse[]): DayGroup[] {
 export function ListView({ workspaceId }: ListViewProps) {
   const { data, isLoading, isError, refetch } = useContentPlanItemsQuery(
     workspaceId,
-    { size: 200 },
+    { size: 100 },
   )
 
   const groups = useMemo(

@@ -88,7 +88,7 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
     {
       date_from: dateFrom,
       date_to: dateTo,
-      size: 200,
+      size: 100,
     },
   )
 
