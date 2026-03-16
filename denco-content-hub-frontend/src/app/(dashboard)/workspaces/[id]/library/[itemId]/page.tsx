@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import {
   Group,
@@ -10,7 +10,6 @@ import {
   Badge,
   Tabs,
   Button,
-  Textarea,
   Loader,
   Divider,
 } from '@mantine/core'
@@ -23,7 +22,9 @@ import {
   IconWorld,
   IconSparkles,
   IconDeviceFloppy,
+  IconEdit,
   IconRefresh,
+  IconCalendarPlus,
 } from '@tabler/icons-react'
 
 import {
@@ -36,6 +37,11 @@ import { useWorkspaceStore } from '@/stores/workspace-store'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
+import { ContentBlocksView } from '@/components/features/library/ContentBlocksView'
+import { ContentBlocksEdit } from '@/components/features/library/ContentBlocksEdit'
+import { ContentBlockAiPanel } from '@/components/features/library/ContentBlockAiPanel'
+import type { BlockInfo } from '@/components/features/library/ContentBlockAiPanel'
+import { AddToPlanModal } from '@/components/features/content-plan/AddToPlanModal'
 
 import styles from './library-item.module.css'
 
@@ -92,7 +98,7 @@ const HUNT_LEVEL_LABELS: Record<number, string> = {
 }
 
 // ---------------------------------------------------------------------------
-// Content rendering helpers
+// Content rendering helper (used in Params tab)
 // ---------------------------------------------------------------------------
 
 function ContentBlockDisplay({ label, children }: { label: string; children: React.ReactNode }) {
@@ -102,160 +108,6 @@ function ContentBlockDisplay({ label, children }: { label: string; children: Rea
       {children}
     </div>
   )
-}
-
-function TextBlock({ label, value }: { label: string; value: string | undefined | null }) {
-  if (!value) return null
-  return (
-    <ContentBlockDisplay label={label}>
-      <div className={styles.contentBlockText}>{value}</div>
-    </ContentBlockDisplay>
-  )
-}
-
-function TagsBlock({ label, tags }: { label: string; tags: string[] | undefined | null }) {
-  if (!tags || tags.length === 0) return null
-  return (
-    <ContentBlockDisplay label={label}>
-      <div className={styles.tagsList}>
-        {tags.map((tag, i) => (
-          <Badge key={i} variant="outline" color="gray" size="sm">
-            {tag}
-          </Badge>
-        ))}
-      </div>
-    </ContentBlockDisplay>
-  )
-}
-
-/**
- * Renders generated_content based on its structure.
- * Supports all known content_type schemas: shorts, post, carousel, long_video, article.
- */
-function GeneratedContentView({ content }: { content: Record<string, unknown> }) {
-  const entries = Object.entries(content)
-  if (entries.length === 0) return null
-
-  // raw_text fallback
-  if (typeof content.raw_text === 'string') {
-    return <TextBlock label="Текст" value={content.raw_text as string} />
-  }
-
-  return (
-    <>
-      {/* Title */}
-      <TextBlock label="Заголовок" value={content.title as string} />
-
-      {/* Hook */}
-      <TextBlock label="Хук" value={content.hook as string} />
-
-      {/* Body */}
-      <TextBlock label="Текст" value={content.body as string} />
-
-      {/* Description (long_video) */}
-      <TextBlock label="Описание" value={content.description as string} />
-
-      {/* Caption (carousel) */}
-      <TextBlock label="Подпись" value={content.caption as string} />
-
-      {/* CTA */}
-      <TextBlock label="Призыв к действию" value={content.cta as string} />
-
-      {/* Duration hint */}
-      <TextBlock label="Длительность" value={content.duration_hint as string} />
-
-      {/* Visual hint */}
-      <TextBlock label="Визуал" value={content.visual_hint as string} />
-
-      {/* Storyboard */}
-      {Array.isArray(content.storyboard) && content.storyboard.length > 0 && (
-        <ContentBlockDisplay label="Раскадровка">
-          <Stack gap="xs">
-            {(content.storyboard as string[]).map((scene, i) => (
-              <div key={i} className={styles.slideCard}>
-                <Text size="xs" c="dimmed" mb={2}>Сцена {i + 1}</Text>
-                <Text size="sm" className={styles.contentBlockText}>{scene}</Text>
-              </div>
-            ))}
-          </Stack>
-        </ContentBlockDisplay>
-      )}
-
-      {/* Chapters (long_video) */}
-      {Array.isArray(content.chapters) && content.chapters.length > 0 && (
-        <ContentBlockDisplay label="Главы">
-          <Stack gap="xs">
-            {(content.chapters as Array<{ time?: string; title?: string; content?: string }>).map((ch, i) => (
-              <div key={i} className={styles.chapterCard}>
-                <Group gap="xs" mb={4}>
-                  {ch.time && <Badge variant="light" color="gray" size="xs">{ch.time}</Badge>}
-                  {ch.title && <Text size="sm" fw={500}>{ch.title}</Text>}
-                </Group>
-                {ch.content && <Text size="sm" className={styles.contentBlockText}>{ch.content}</Text>}
-              </div>
-            ))}
-          </Stack>
-        </ContentBlockDisplay>
-      )}
-
-      {/* Slides (carousel) */}
-      {Array.isArray(content.slides) && content.slides.length > 0 && (
-        <ContentBlockDisplay label="Слайды">
-          <Stack gap="xs">
-            {(content.slides as Array<{ title?: string; body?: string; visual_hint?: string }>).map((slide, i) => (
-              <div key={i} className={styles.slideCard}>
-                <Text size="xs" c="dimmed" mb={2}>Слайд {i + 1}</Text>
-                {slide.title && <Text size="sm" fw={500} mb={2}>{slide.title}</Text>}
-                {slide.body && <Text size="sm" className={styles.contentBlockText}>{slide.body}</Text>}
-                {slide.visual_hint && (
-                  <Text size="xs" c="dimmed" mt={4}>Визуал: {slide.visual_hint}</Text>
-                )}
-              </div>
-            ))}
-          </Stack>
-        </ContentBlockDisplay>
-      )}
-
-      {/* Hashtags / Tags */}
-      <TagsBlock label="Хештеги" tags={content.hashtags as string[]} />
-      <TagsBlock label="Теги" tags={content.tags as string[]} />
-    </>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Editable content — flattens generated_content into single text for editing
-// ---------------------------------------------------------------------------
-
-function flattenContentToText(content: Record<string, unknown>): string {
-  const parts: string[] = []
-
-  if (typeof content.raw_text === 'string') return content.raw_text
-
-  if (content.title) parts.push(`# ${content.title}`)
-  if (content.hook) parts.push(`## Хук\n${content.hook}`)
-  if (content.body) parts.push(`${content.body}`)
-  if (content.description) parts.push(`## Описание\n${content.description}`)
-  if (content.caption) parts.push(`## Подпись\n${content.caption}`)
-  if (content.cta) parts.push(`## CTA\n${content.cta}`)
-  if (content.duration_hint) parts.push(`Длительность: ${content.duration_hint}`)
-  if (content.visual_hint) parts.push(`Визуал: ${content.visual_hint}`)
-
-  if (Array.isArray(content.storyboard)) {
-    parts.push(`## Раскадровка\n${(content.storyboard as string[]).map((s, i) => `${i + 1}. ${s}`).join('\n')}`)
-  }
-  if (Array.isArray(content.chapters)) {
-    const chapters = content.chapters as Array<{ time?: string; title?: string; content?: string }>
-    parts.push(`## Главы\n${chapters.map((ch) => `[${ch.time ?? ''}] ${ch.title ?? ''}\n${ch.content ?? ''}`).join('\n\n')}`)
-  }
-  if (Array.isArray(content.slides)) {
-    const slides = content.slides as Array<{ title?: string; body?: string; visual_hint?: string }>
-    parts.push(`## Слайды\n${slides.map((s, i) => `--- Слайд ${i + 1} ---\n${s.title ?? ''}\n${s.body ?? ''}\n${s.visual_hint ? `Визуал: ${s.visual_hint}` : ''}`).join('\n\n')}`)
-  }
-  if (Array.isArray(content.hashtags)) parts.push(`#${(content.hashtags as string[]).join(' #')}`)
-  if (Array.isArray(content.tags)) parts.push(`Теги: ${(content.tags as string[]).join(', ')}`)
-
-  return parts.join('\n\n')
 }
 
 // ---------------------------------------------------------------------------
@@ -281,7 +133,22 @@ export default function LibraryItemDetailPage() {
   const generateMutation = useGenerateLibraryContentMutation(workspaceId)
 
   const [isEditing, setIsEditing] = useState(false)
-  const [editText, setEditText] = useState('')
+  const [editedContent, setEditedContent] = useState<Record<string, unknown>>({})
+
+  // Plan modal state
+  const [planModalOpen, setPlanModalOpen] = useState(false)
+
+  // AI panel state
+  const [aiPanelOpen, setAiPanelOpen] = useState(false)
+  const [aiBlock, setAiBlock] = useState<BlockInfo | null>(null)
+
+  const handleAiImprove = useCallback(
+    (fieldName: string, fieldLabel: string, fieldValue: string) => {
+      setAiBlock({ fieldName, fieldLabel, fieldValue })
+      setAiPanelOpen(true)
+    },
+    [],
+  )
 
   // Current content: prefer edited_content over generated_content
   const currentContent = useMemo(() => {
@@ -294,7 +161,7 @@ export default function LibraryItemDetailPage() {
   // Start editing
   function handleStartEdit() {
     if (!currentContent) return
-    setEditText(flattenContentToText(currentContent))
+    setEditedContent(structuredClone(currentContent))
     setIsEditing(true)
   }
 
@@ -303,7 +170,7 @@ export default function LibraryItemDetailPage() {
     updateMutation.mutate(
       {
         itemId,
-        data: { edited_content: { raw_text: editText } },
+        data: { edited_content: editedContent },
       },
       {
         onSuccess: () => {
@@ -376,7 +243,7 @@ export default function LibraryItemDetailPage() {
               {item.title ?? 'Без названия'}
             </Text>
 
-            {/* Status */}
+            {/* Status + Actions */}
             <Group gap="xs">
               <Badge
                 variant="light"
@@ -387,6 +254,15 @@ export default function LibraryItemDetailPage() {
                 {isGenerating ? 'Генерация...' : status.label}
               </Badge>
             </Group>
+
+            <Button
+              variant="light"
+              size="xs"
+              leftSection={<IconCalendarPlus size={14} />}
+              onClick={() => setPlanModalOpen(true)}
+            >
+              В план
+            </Button>
 
             <Divider color="var(--border-subtle)" />
 
@@ -481,7 +357,7 @@ export default function LibraryItemDetailPage() {
                   <Button
                     variant="light"
                     size="xs"
-                    leftSection={<IconDeviceFloppy size={14} />}
+                    leftSection={<IconEdit size={14} />}
                     onClick={handleStartEdit}
                   >
                     Редактировать
@@ -549,24 +425,17 @@ export default function LibraryItemDetailPage() {
                 )}
 
                 {!isGenerating && hasContent && !isEditing && (
-                  <GeneratedContentView content={currentContent!} />
+                  <ContentBlocksView
+                    content={currentContent!}
+                    contentType={item.content_type}
+                    onAiImprove={handleAiImprove}
+                  />
                 )}
 
                 {isEditing && (
-                  <Textarea
-                    value={editText}
-                    onChange={(e) => setEditText(e.currentTarget.value)}
-                    autosize
-                    minRows={15}
-                    maxRows={40}
-                    styles={{
-                      input: {
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid var(--border-subtle)',
-                        fontSize: '0.9rem',
-                        lineHeight: 1.6,
-                      },
-                    }}
+                  <ContentBlocksEdit
+                    content={editedContent}
+                    onChange={setEditedContent}
                   />
                 )}
               </div>
@@ -629,6 +498,29 @@ export default function LibraryItemDetailPage() {
           </Tabs>
         </div>
       </div>
+
+      {/* Add to Plan Modal */}
+      <AddToPlanModal
+        opened={planModalOpen}
+        onClose={() => setPlanModalOpen(false)}
+        workspaceId={workspaceId}
+        preselectedItem={{
+          id: item.id,
+          label: item.title ?? `#${item.id} (${item.platform})`,
+        }}
+      />
+
+      {/* AI Improve Drawer */}
+      <ContentBlockAiPanel
+        opened={aiPanelOpen}
+        onClose={() => setAiPanelOpen(false)}
+        block={aiBlock}
+        workspaceId={workspaceId}
+        itemId={itemId}
+        contentType={item.content_type}
+        platform={item.platform}
+        allContent={currentContent ?? {}}
+      />
     </>
   )
 }

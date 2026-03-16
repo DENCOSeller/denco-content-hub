@@ -1,0 +1,35 @@
+.card {
+  padding: 4px 6px;
+  border-radius: var(--mantine-radius-xs);
+  background: var(--card-bg, var(--mantine-color-dark-6));
+  border: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.card:hover {
+  background: var(--mantine-color-dark-5);
+}
+
+.platformBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px;
+  border-radius: var(--mantine-radius-xs);
+  flex-shrink: 0;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

@@ -29,6 +29,7 @@ import {
   IconShare,
   IconSparkles,
   IconBooks,
+  IconCalendar,
 } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -122,6 +123,7 @@ export default function DashboardLayout({
         { href: `/workspaces/${workspaceId}`, label: 'Обзор', icon: IconLayoutDashboard, exact: true },
         { href: `/workspaces/${workspaceId}/references`, label: 'Референсы', icon: IconSearch, exact: false },
         { href: `/workspaces/${workspaceId}/library`, label: 'Библиотека', icon: IconBooks, exact: false },
+        { href: `/workspaces/${workspaceId}/content-plan`, label: 'Контент-план', icon: IconCalendar, exact: false },
         { href: `/workspaces/${workspaceId}/settings`, label: 'Настройки', icon: IconSettings, exact: false },
       ]
     : []

@@ -53,6 +53,7 @@ class LibrarySourceType(enum.StrEnum):
 class LibraryStatus(enum.StrEnum):
     DRAFT = "draft"
     READY = "ready"
+    SCHEDULED = "scheduled"
     PUBLISHED = "published"
 
 

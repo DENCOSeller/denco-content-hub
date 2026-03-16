@@ -1,0 +1,8 @@
+.dayGroup {
+  border-left: 2px solid var(--neon-blue, var(--mantine-color-blue-5));
+  padding-left: 16px;
+}
+
+.dayHeader {
+  text-transform: capitalize;
+}

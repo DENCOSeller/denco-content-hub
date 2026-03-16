@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   Card,
   Group,
@@ -14,6 +15,7 @@ import { notifications } from '@mantine/notifications'
 import Link from 'next/link'
 import {
   IconTrash,
+  IconCalendarPlus,
   IconBrandYoutube,
   IconBrandInstagram,
   IconBrandTelegram,
@@ -21,6 +23,7 @@ import {
 } from '@tabler/icons-react'
 
 import { useDeleteLibraryItemMutation } from '@/api/hooks/useLibrary'
+import { AddToPlanModal } from '@/components/features/content-plan/AddToPlanModal'
 import type { LibraryItemResponse } from '@/api/client/types.gen'
 
 import styles from './LibraryItemCard.module.css'
@@ -62,6 +65,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 
 export function LibraryItemCard({ item, workspaceId }: LibraryItemCardProps) {
   const deleteItem = useDeleteLibraryItemMutation(workspaceId)
+  const [planModalOpen, setPlanModalOpen] = useState(false)
   const basePath = `/workspaces/${workspaceId}/library`
 
   const platform = PLATFORM_CONFIG[item.platform] ?? PLATFORM_CONFIG.vk
@@ -131,6 +135,17 @@ export function LibraryItemCard({ item, workspaceId }: LibraryItemCardProps) {
           <Badge variant="light" color={status.color} size="sm">{status.label}</Badge>
           <Badge variant="outline" color="gray" size="sm">Hunt {item.hunt_level}</Badge>
 
+          <Tooltip label="В план">
+            <ActionIcon
+              variant="light"
+              color="blue"
+              size="sm"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setPlanModalOpen(true) }}
+            >
+              <IconCalendarPlus size={14} />
+            </ActionIcon>
+          </Tooltip>
+
           <Tooltip label="Удалить">
             <ActionIcon
               variant="light"
@@ -144,6 +159,16 @@ export function LibraryItemCard({ item, workspaceId }: LibraryItemCardProps) {
           </Tooltip>
         </Group>
       </Group>
+
+      <AddToPlanModal
+        opened={planModalOpen}
+        onClose={() => setPlanModalOpen(false)}
+        workspaceId={workspaceId}
+        preselectedItem={{
+          id: item.id,
+          label: item.title ?? `#${item.id} (${item.platform})`,
+        }}
+      />
     </Card>
   )
 }

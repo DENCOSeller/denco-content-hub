@@ -9,6 +9,7 @@ from app.api.company_knowledge import router as company_knowledge_router
 from app.api.company_members import router as company_members_router
 from app.api.content import router as content_router
 from app.api.content_chat import router as content_chat_router
+from app.api.content_plan import router as content_plan_router
 from app.api.health import router as health_router
 from app.api.invitations import public_router as invitations_public_router
 from app.api.invitations import ws_router as invitations_ws_router
@@ -38,4 +39,5 @@ api_router.include_router(ai_router)
 api_router.include_router(analysis_router)
 api_router.include_router(content_chat_router)
 api_router.include_router(library_router)
+api_router.include_router(content_plan_router)
 api_router.include_router(admin_router)

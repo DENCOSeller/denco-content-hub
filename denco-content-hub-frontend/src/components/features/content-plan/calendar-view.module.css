@@ -1,0 +1,56 @@
+.weekdayHeader {
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+}
+
+.dayCell {
+  min-height: 110px;
+  padding: 6px;
+  border: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+  border-right: none;
+  border-bottom: none;
+}
+
+.dayCell:nth-child(7n) {
+  border-right: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+}
+
+.dayCell:nth-last-child(-n+7) {
+  border-bottom: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
+}
+
+.dayCell[data-other-month] {
+  opacity: 0.4;
+}
+
+.dayCell[data-today] {
+  background: color-mix(in srgb, var(--neon-blue, var(--mantine-color-blue-9)) 10%, transparent);
+}
+
+.todayNumber {
+  color: var(--neon-blue, var(--mantine-color-blue-5));
+}
+
+.addButton {
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.dayCell:hover .addButton {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .addButton {
+    opacity: 1;
+  }
+}
+
+.todayLink {
+  cursor: pointer;
+  user-select: none;
+}
+
+.todayLink:hover {
+  text-decoration: underline;
+}

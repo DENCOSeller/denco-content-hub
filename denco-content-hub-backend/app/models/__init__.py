@@ -5,6 +5,7 @@ from app.models.company_member import CompanyMember, CompanyRole
 from app.models.content_analysis import ContentAnalysis
 from app.models.content_chat_message import ContentChatMessage
 from app.models.content_item import ContentItem, ContentStatus, SourceType
+from app.models.content_plan_item import ContentPlanItem, PlanItemStatus
 from app.models.invitation import InvitationStatus, WorkspaceInvitation
 from app.models.knowledge import (
     ChangeType,
@@ -41,6 +42,7 @@ __all__ = [
     "ContentAnalysis",
     "ContentChatMessage",
     "ContentItem",
+    "ContentPlanItem",
     "ContentStatus",
     "ContentType",
     "InvitationStatus",
@@ -51,6 +53,7 @@ __all__ = [
     "LibrarySourceType",
     "LibraryStatus",
     "NodeType",
+    "PlanItemStatus",
     "Platform",
     "ScopeType",
     "SourceType",
