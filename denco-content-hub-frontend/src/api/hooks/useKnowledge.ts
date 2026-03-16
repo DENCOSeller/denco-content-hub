@@ -128,6 +128,7 @@ export function useUpdateNodeMutation(workspaceId: number) {
     onSuccess: async (_data, variables) => {
       await qc.refetchQueries({ queryKey: knowledgeKeys.graph(workspaceId) })
       qc.invalidateQueries({ queryKey: knowledgeKeys.node(workspaceId, variables.nodeId) })
+      qc.invalidateQueries({ queryKey: knowledgeKeys.nodes(workspaceId) })
     },
   })
 }

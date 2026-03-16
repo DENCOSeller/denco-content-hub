@@ -889,6 +889,10 @@ export type KnowledgeNodeResponse = {
      */
     color?: string | null;
     /**
+     * Usage Count
+     */
+    usage_count?: number;
+    /**
      * Created At
      */
     created_at: string;

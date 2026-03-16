@@ -9,6 +9,8 @@ import {
   Stack,
   Loader,
   UnstyledButton,
+  Select,
+  Textarea,
 } from '@mantine/core'
 
 import { NODE_TYPE_CONFIG, type NodeType } from '@/lib/knowledge-utils'
@@ -31,6 +33,15 @@ interface CreateNodeModalProps {
 }
 
 const NODE_TYPES = Object.entries(NODE_TYPE_CONFIG) as [NodeType, (typeof NODE_TYPE_CONFIG)[NodeType]][]
+
+const SPEAKER_STYLE_OPTIONS = [
+  { value: 'expert', label: 'Экспертный' },
+  { value: 'lively', label: 'Живой' },
+  { value: 'provocative', label: 'Провокационный' },
+  { value: 'motivational', label: 'Мотивационный' },
+  { value: 'analytical', label: 'Аналитический' },
+  { value: 'conversational', label: 'Разговорный' },
+]
 
 /* Convert hex #RRGGBB to "R, G, B" for rgba() usage */
 function hexToRgb(hex: string): string {
@@ -64,6 +75,13 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
   const handleContentChange = useCallback((json: Record<string, unknown>) => {
     setContent(json)
   }, [])
+
+  const handleSpeakerFieldChange = useCallback(
+    (field: string, value: string | null) => {
+      setContent((prev) => ({ ...(prev ?? {}), [field]: value ?? '' }))
+    },
+    [],
+  )
 
   const handleSubmit = () => {
     if (!title.trim()) return
@@ -107,7 +125,7 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
                 return (
                   <UnstyledButton
                     key={type}
-                    onClick={() => setSelectedType(type)}
+                    onClick={() => { setSelectedType(type); setContent(null) }}
                     className={`${styles.typeCard} ${isSelected ? styles.typeCardSelected : ''}`}
                     style={cssVars}
                   >
@@ -132,18 +150,61 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
               variant="unstyled"
             />
 
-            {/* Editor */}
-            <div>
-              <Text className={styles.sectionLabel} mb={8}>Содержание</Text>
-              <div className={styles.editorWrapper}>
-                <TipTapEditor
-                  content={content}
-                  onChange={handleContentChange}
-                  accentGradient={selectedConfig.gradient}
-                  placeholder="Начните описывать узел..."
+            {/* Editor / Speaker fields */}
+            {selectedType === 'speaker' ? (
+              <Stack gap="md">
+                <TextInput
+                  label="Должность"
+                  placeholder="Например: CEO, Маркетолог"
+                  value={(content?.position as string) ?? ''}
+                  onChange={(e) => handleSpeakerFieldChange('position', e.currentTarget.value)}
                 />
+                <Select
+                  label="Стиль подачи"
+                  placeholder="Выберите стиль"
+                  data={SPEAKER_STYLE_OPTIONS}
+                  value={(content?.style as string) ?? null}
+                  onChange={(val) => handleSpeakerFieldChange('style', val)}
+                  clearable
+                />
+                <Textarea
+                  label="Особенности"
+                  placeholder="Особенности спикера для написания сценариев..."
+                  autosize
+                  minRows={3}
+                  maxRows={6}
+                  value={(content?.notes as string) ?? ''}
+                  onChange={(e) => handleSpeakerFieldChange('notes', e.currentTarget.value)}
+                />
+                <Textarea
+                  label="Описание для AI"
+                  placeholder="Инструкция для AI при генерации контента..."
+                  autosize
+                  minRows={3}
+                  maxRows={6}
+                  value={(content?.ai_description as string) ?? ''}
+                  onChange={(e) => handleSpeakerFieldChange('ai_description', e.currentTarget.value)}
+                />
+                <TextInput
+                  label="Фото URL"
+                  placeholder="https://example.com/photo.jpg"
+                  value={(content?.photo_url as string) ?? ''}
+                  onChange={(e) => handleSpeakerFieldChange('photo_url', e.currentTarget.value)}
+                />
+              </Stack>
+            ) : (
+              <div>
+                <Text className={styles.sectionLabel} mb={8}>Содержание</Text>
+                <div className={styles.editorWrapper}>
+                  <TipTapEditor
+                    content={content}
+                    onChange={handleContentChange}
+                    accentGradient={selectedConfig.gradient}
+                    placeholder="Начните описывать узел..."
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </Stack>
         </div>
 

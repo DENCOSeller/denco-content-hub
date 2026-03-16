@@ -7,6 +7,7 @@ import { useWorkspaceStore } from '@/stores/workspace-store'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { TeamTab } from '@/components/features/settings/TeamTab'
 import { InvitationsTab } from '@/components/features/settings/InvitationsTab'
+import { ContentSettingsTab } from '@/components/features/settings/ContentSettingsTab'
 
 export default function WorkspaceSettingsPage() {
   const params = useParams()
@@ -28,6 +29,7 @@ export default function WorkspaceSettingsPage() {
         <Tabs.List mb="md">
           <Tabs.Tab value="team">Команда</Tabs.Tab>
           <Tabs.Tab value="invitations">Приглашения</Tabs.Tab>
+          <Tabs.Tab value="content">Контент</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="team">
@@ -36,6 +38,10 @@ export default function WorkspaceSettingsPage() {
 
         <Tabs.Panel value="invitations">
           <InvitationsTab workspaceId={workspaceId} />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="content">
+          <ContentSettingsTab workspaceId={workspaceId} />
         </Tabs.Panel>
       </Tabs>
     </Stack>

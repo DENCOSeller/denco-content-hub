@@ -58,13 +58,12 @@ class KnowledgeNodeCreate(BaseModel):
     position_x: float = 0.0
     position_y: float = 0.0
 
-    @field_validator("content")
-    @classmethod
-    def validate_content(cls, v: dict | None) -> dict | None:
-        if v is not None and not validate_tiptap(v):
+    @model_validator(mode="after")
+    def validate_content(self) -> Self:
+        if self.content is not None and self.node_type != NodeType.SPEAKER and not validate_tiptap(self.content):
             msg = "Invalid TipTap document structure"
             raise ValueError(msg)
-        return v
+        return self
 
 
 class KnowledgeNodeUpdate(BaseModel):
@@ -78,7 +77,7 @@ class KnowledgeNodeUpdate(BaseModel):
     @field_validator("content")
     @classmethod
     def validate_content(cls, v: dict | None) -> dict | None:
-        if v is not None and not validate_tiptap(v):
+        if v is not None and v.get("type") == "doc" and not validate_tiptap(v):
             msg = "Invalid TipTap document structure"
             raise ValueError(msg)
         return v

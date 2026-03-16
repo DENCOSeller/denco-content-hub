@@ -58,8 +58,17 @@ register_exception_handlers(app)
 @app.exception_handler(RequestValidationError)
 async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     body = await request.body()
-    logger.error("Validation error", errors=exc.errors(), body=body.decode("utf-8", errors="replace")[:500])
-    return JSONResponse(status_code=422, content={"detail": exc.errors()})
+    errors = exc.errors()
+    logger.error("Validation error", errors=errors, body=body.decode("utf-8", errors="replace")[:500])
+    safe_errors = [
+        {
+            "type": e.get("type", "unknown"),
+            "loc": e.get("loc", []),
+            "msg": e.get("msg", "Validation error"),
+        }
+        for e in errors
+    ]
+    return JSONResponse(status_code=422, content={"detail": safe_errors})
 
 
 # Routers

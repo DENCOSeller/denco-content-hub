@@ -10,6 +10,10 @@ import {
   Timeline,
   Loader,
   SegmentedControl,
+  TextInput,
+  Select,
+  Textarea,
+  Stack,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { IconTrash } from '@tabler/icons-react'
@@ -64,6 +68,15 @@ const CHANGE_TYPE_ICONS: Record<string, string> = {
 }
 
 type SaveState = 'saved' | 'saving' | 'dirty' | 'idle'
+
+const SPEAKER_STYLE_OPTIONS = [
+  { value: 'expert', label: 'Экспертный' },
+  { value: 'lively', label: 'Живой' },
+  { value: 'provocative', label: 'Провокационный' },
+  { value: 'motivational', label: 'Мотивационный' },
+  { value: 'analytical', label: 'Аналитический' },
+  { value: 'conversational', label: 'Разговорный' },
+]
 
 export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: NodeEditorDrawerProps) {
   const [internalNodeId, setInternalNodeId] = useState(nodeId)
@@ -218,6 +231,22 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
     [title, doSave],
   )
 
+  const handleSpeakerFieldChange = useCallback(
+    (field: string, value: string | null) => {
+      const updated = { ...(content ?? {}), [field]: value ?? '' }
+      setContent(updated)
+      setIsDirty(true)
+      setSaveState('dirty')
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        doSave(title, updated)
+      }, 2000)
+    },
+    [title, content, doSave],
+  )
+
+  const isSpeaker = node?.node_type === 'speaker'
+
   const handleToolbarTitleChange = useCallback(
     (newTitle: string) => {
       setTitle(newTitle)
@@ -340,14 +369,57 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                 style={isMobile && activePanel !== 'editor' ? { display: 'none' } : undefined}
               >
                 <div className={styles.editorContent}>
-                  <TipTapEditor
-                    content={content}
-                    onChange={handleContentChange}
-                    onEditorReady={handleEditorReady}
-                    accentGradient={typeConfig?.gradient}
-                    placeholder="Начните описывать этот узел..."
-                    borderless
-                  />
+                  {isSpeaker ? (
+                    <Stack gap="md" p="md">
+                      <TextInput
+                        label="Должность"
+                        placeholder="Например: CEO, Маркетолог"
+                        value={(content?.position as string) ?? ''}
+                        onChange={(e) => handleSpeakerFieldChange('position', e.currentTarget.value)}
+                      />
+                      <Select
+                        label="Стиль подачи"
+                        placeholder="Выберите стиль"
+                        data={SPEAKER_STYLE_OPTIONS}
+                        value={(content?.style as string) ?? null}
+                        onChange={(val) => handleSpeakerFieldChange('style', val)}
+                        clearable
+                      />
+                      <Textarea
+                        label="Особенности"
+                        placeholder="Особенности спикера для написания сценариев..."
+                        autosize
+                        minRows={3}
+                        maxRows={6}
+                        value={(content?.notes as string) ?? ''}
+                        onChange={(e) => handleSpeakerFieldChange('notes', e.currentTarget.value)}
+                      />
+                      <Textarea
+                        label="Описание для AI"
+                        placeholder="Инструкция для AI при генерации контента..."
+                        autosize
+                        minRows={3}
+                        maxRows={6}
+                        value={(content?.ai_description as string) ?? ''}
+                        onChange={(e) => handleSpeakerFieldChange('ai_description', e.currentTarget.value)}
+                      />
+                      <TextInput
+                        label="Фото URL"
+                        placeholder="https://example.com/photo.jpg"
+                        value={(content?.photo_url as string) ?? ''}
+                        onChange={(e) => handleSpeakerFieldChange('photo_url', e.currentTarget.value)}
+                      />
+                    </Stack>
+                  ) : (
+                    <TipTapEditor
+                      content={content}
+                      onChange={handleContentChange}
+                      onEditorReady={handleEditorReady}
+                      accentGradient={typeConfig?.gradient}
+                      placeholder="Начните описывать этот узел..."
+                      borderless
+                    />
+                  )}
                 </div>
 
                 {/* Relations */}
