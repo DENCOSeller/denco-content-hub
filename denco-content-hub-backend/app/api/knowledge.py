@@ -19,8 +19,16 @@ from app.schemas.knowledge import (
     KnowledgeNodeUpdate,
     KnowledgeNodeVersionResponse,
 )
+from app.schemas.public_knowledge import (
+    KgPublicLinkCreate,
+    KgPublicLinkCreateRequest,
+    KgPublicLinkNodeAdd,
+    KgPublicLinkResponse,
+    KgPublicLinkUpdate,
+)
 from app.services.kg_conflict_service import KgConflictService
 from app.services.knowledge_service import KnowledgeService
+from app.services.public_knowledge_service import PublicKnowledgeService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -282,3 +290,133 @@ async def get_graph(
     workspace, _member = workspace_ctx
     service = KnowledgeService(db)
     return await service.get_workspace_graph(workspace.id)
+
+
+# --- Public Links ---
+
+
+@router.post(
+    "/public-links",
+    response_model=KgPublicLinkResponse,
+    summary="Create workspace public link",
+    status_code=201,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Workspace not found"},
+    },
+)
+async def create_workspace_public_link(
+    data: KgPublicLinkCreateRequest,
+    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> KgPublicLinkResponse:
+    workspace, member = workspace_ctx
+    require_role(member, WRITE_ROLES)
+    service = PublicKnowledgeService(db)
+    create_data = KgPublicLinkCreate(scope_type="workspace", scope_id=workspace.id, **data.model_dump())
+    return await service.create_public_link(create_data, current_user.id)
+
+
+@router.get(
+    "/public-links",
+    response_model=list[KgPublicLinkResponse],
+    summary="List workspace public links",
+    status_code=200,
+    responses={404: {"description": "Workspace not found"}},
+)
+async def list_workspace_public_links(
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> list[KgPublicLinkResponse]:
+    workspace, _member = workspace_ctx
+    service = PublicKnowledgeService(db)
+    return await service.list_public_links("workspace", workspace.id)
+
+
+@router.patch(
+    "/public-links/{link_id}",
+    response_model=KgPublicLinkResponse,
+    summary="Update workspace public link",
+    status_code=200,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def update_workspace_public_link(
+    link_id: int,
+    data: KgPublicLinkUpdate,
+    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> KgPublicLinkResponse:
+    workspace, member = workspace_ctx
+    require_role(member, WRITE_ROLES)
+    service = PublicKnowledgeService(db)
+    return await service.update_public_link(link_id, data, current_user.id, "workspace", workspace.id)
+
+
+@router.delete(
+    "/public-links/{link_id}",
+    summary="Delete workspace public link",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def delete_workspace_public_link(
+    link_id: int,
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    workspace, member = workspace_ctx
+    require_role(member, WRITE_ROLES)
+    service = PublicKnowledgeService(db)
+    await service.delete_public_link(link_id, "workspace", workspace.id)
+    return Response(status_code=204)
+
+
+@router.post(
+    "/public-links/{link_id}/nodes",
+    summary="Add node to workspace public link (режим selected)",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def add_node_to_workspace_public_link(
+    link_id: int,
+    data: KgPublicLinkNodeAdd,
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    workspace, member = workspace_ctx
+    require_role(member, WRITE_ROLES)
+    service = PublicKnowledgeService(db)
+    await service.add_node_to_link(link_id, data.node_id, "workspace", workspace.id)
+    return Response(status_code=204)
+
+
+@router.delete(
+    "/public-links/{link_id}/nodes/{node_id}",
+    summary="Remove node from workspace public link",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link or node not found"},
+    },
+)
+async def remove_node_from_workspace_public_link(
+    link_id: int,
+    node_id: int,
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    workspace, member = workspace_ctx
+    require_role(member, WRITE_ROLES)
+    service = PublicKnowledgeService(db)
+    await service.remove_node_from_link(link_id, node_id, "workspace", workspace.id)
+    return Response(status_code=204)

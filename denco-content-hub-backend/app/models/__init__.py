@@ -17,6 +17,7 @@ from app.models.knowledge import (
     KnowledgeNodeVersion,
     ScopeType,
 )
+from app.models.public_knowledge import KgPublicLink, KgPublicLinkNode, VisibilityMode
 from app.models.library_item import (
     Category,
     ContentType,
@@ -51,9 +52,12 @@ __all__ = [
     "KgConflict",
     "KgEdgeTypeDef",
     "KgNodeTypeDef",
+    "KgPublicLink",
+    "KgPublicLinkNode",
     "KnowledgeEdge",
     "KnowledgeNode",
     "KnowledgeNodeVersion",
+    "VisibilityMode",
     "LibraryItem",
     "LibrarySourceType",
     "LibraryStatus",

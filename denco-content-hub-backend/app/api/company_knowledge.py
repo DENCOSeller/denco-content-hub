@@ -16,7 +16,15 @@ from app.schemas.knowledge import (
     KnowledgeNodeUpdate,
     KnowledgeNodeVersionResponse,
 )
+from app.schemas.public_knowledge import (
+    KgPublicLinkCreate,
+    KgPublicLinkCreateRequest,
+    KgPublicLinkNodeAdd,
+    KgPublicLinkResponse,
+    KgPublicLinkUpdate,
+)
 from app.services.knowledge_service import KnowledgeService
+from app.services.public_knowledge_service import PublicKnowledgeService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -228,3 +236,125 @@ async def get_graph(
 ) -> KnowledgeGraphResponse:
     service = KnowledgeService(db)
     return await service.get_company_graph(company_id)
+
+
+# --- Public Links ---
+
+
+@router.post(
+    "/public-links",
+    response_model=KgPublicLinkResponse,
+    summary="Create company public link",
+    status_code=201,
+    responses={403: {"description": "Insufficient permissions"}},
+)
+async def create_company_public_link(
+    company_id: int,
+    data: KgPublicLinkCreateRequest,
+    current_user: User = Depends(get_current_user),
+    _admin: CompanyMember = Depends(require_company_admin),
+    db: AsyncSession = Depends(get_db),
+) -> KgPublicLinkResponse:
+    service = PublicKnowledgeService(db)
+    create_data = KgPublicLinkCreate(scope_type="company", scope_id=company_id, **data.model_dump())
+    return await service.create_public_link(create_data, current_user.id)
+
+
+@router.get(
+    "/public-links",
+    response_model=list[KgPublicLinkResponse],
+    summary="List company public links",
+    status_code=200,
+    responses={403: {"description": "Not a company member"}},
+)
+async def list_company_public_links(
+    company_id: int,
+    _member: CompanyMember = Depends(get_company_member),
+    db: AsyncSession = Depends(get_db),
+) -> list[KgPublicLinkResponse]:
+    service = PublicKnowledgeService(db)
+    return await service.list_public_links("company", company_id)
+
+
+@router.patch(
+    "/public-links/{link_id}",
+    response_model=KgPublicLinkResponse,
+    summary="Update company public link",
+    status_code=200,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def update_company_public_link(
+    company_id: int,
+    link_id: int,
+    data: KgPublicLinkUpdate,
+    current_user: User = Depends(get_current_user),
+    _admin: CompanyMember = Depends(require_company_admin),
+    db: AsyncSession = Depends(get_db),
+) -> KgPublicLinkResponse:
+    service = PublicKnowledgeService(db)
+    return await service.update_public_link(link_id, data, current_user.id, "company", company_id)
+
+
+@router.delete(
+    "/public-links/{link_id}",
+    summary="Delete company public link",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def delete_company_public_link(
+    company_id: int,
+    link_id: int,
+    _admin: CompanyMember = Depends(require_company_admin),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    service = PublicKnowledgeService(db)
+    await service.delete_public_link(link_id, "company", company_id)
+    return Response(status_code=204)
+
+
+@router.post(
+    "/public-links/{link_id}/nodes",
+    summary="Add node to company public link (режим selected)",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def add_node_to_company_public_link(
+    company_id: int,
+    link_id: int,
+    data: KgPublicLinkNodeAdd,
+    _admin: CompanyMember = Depends(require_company_admin),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    service = PublicKnowledgeService(db)
+    await service.add_node_to_link(link_id, data.node_id, "company", company_id)
+    return Response(status_code=204)
+
+
+@router.delete(
+    "/public-links/{link_id}/nodes/{node_id}",
+    summary="Remove node from company public link",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link or node not found"},
+    },
+)
+async def remove_node_from_company_public_link(
+    company_id: int,
+    link_id: int,
+    node_id: int,
+    _admin: CompanyMember = Depends(require_company_admin),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    service = PublicKnowledgeService(db)
+    await service.remove_node_from_link(link_id, node_id, "company", company_id)
+    return Response(status_code=204)

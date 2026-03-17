@@ -46,6 +46,19 @@ class KgPublicLinkResponse(BaseModel):
         return f"{settings.frontend_url}/public/graph/{self.token}"
 
 
+class KgPublicLinkCreateRequest(BaseModel):
+    """Тело запроса для создания ссылки — scope задаётся из path."""
+
+    visibility_mode: str = "active"
+    title: str | None = None
+    description: str | None = None
+    expires_at: datetime | None = None
+
+
+class KgPublicLinkNodeAdd(BaseModel):
+    node_id: int
+
+
 class PublicKnowledgeNodeResponse(BaseModel):
     id: int
     title: str
