@@ -80,6 +80,14 @@ const SLASH_COMMANDS: SlashCommandItem[] = [
       editor.chain().focus().deleteRange(range).setCodeBlock().run()
     },
   },
+  {
+    title: 'Выделение',
+    description: 'Маркер текста',
+    icon: 'highlight',
+    command: ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).toggleHighlight().run()
+    },
+  },
 ]
 
 export const SlashCommandsExtension = Extension.create({

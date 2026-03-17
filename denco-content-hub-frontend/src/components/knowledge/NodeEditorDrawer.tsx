@@ -510,6 +510,34 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                   )}
                 </div>
 
+                {/* ── Connections section ── */}
+                {connectedNodes.length > 0 && (
+                  <div className={styles.connectionsSection}>
+                    <div className={styles.connectionsSectionHeader}>
+                      <span className={styles.connectionsSectionTitle}>Связи</span>
+                      <span className={styles.connectionsSectionCount}>{connectedNodes.length}</span>
+                    </div>
+                    <div className={styles.connectionsList}>
+                      {connectedNodes.map((rel) => {
+                        const relConfig = getNodeTypeConfig(rel.nodeType)
+                        const RelIcon = relConfig.icon
+                        return (
+                          <button
+                            key={rel.edgeId}
+                            type="button"
+                            className={styles.connectionItem}
+                            onClick={() => setInternalNodeId(rel.nodeId)}
+                          >
+                            <RelIcon size={13} color={relConfig.color} stroke={1.8} />
+                            <span className={styles.connectionItemTitle}>{rel.title}</span>
+                            <span className={styles.connectionItemLabel}>{rel.label}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Status Bar (footer) */}
                 <div className={styles.statusBar}>
                   <span className={styles.statusBarText}>{saveStatusText}</span>

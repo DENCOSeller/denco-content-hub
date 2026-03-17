@@ -17,6 +17,7 @@ import {
   IconBlockquote,
   IconMinus,
   IconCode,
+  IconHighlight,
 } from '@tabler/icons-react'
 import type { Editor, Range } from '@tiptap/core'
 
@@ -44,6 +45,7 @@ const ICON_MAP: Record<string, typeof IconTypography> = {
   blockquote: IconBlockquote,
   horizontalRule: IconMinus,
   codeBlock: IconCode,
+  highlight: IconHighlight,
 }
 
 export const SlashCommandsList = forwardRef<
