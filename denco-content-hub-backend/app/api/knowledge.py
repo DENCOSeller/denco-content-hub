@@ -10,6 +10,8 @@ from app.models.knowledge import NodeType  # noqa: TC001 — runtime for FastAPI
 from app.models.workspace import WorkspaceRole
 from app.schemas.knowledge import (
     BatchPositionUpdateRequest,
+    KgConflictResolve,
+    KgConflictResponse,
     KnowledgeEdgeCreate,
     KnowledgeEdgeResponse,
     KnowledgeGraphResponse,
@@ -18,6 +20,7 @@ from app.schemas.knowledge import (
     KnowledgeNodeUpdate,
     KnowledgeNodeVersionResponse,
 )
+from app.services.kg_conflict_service import KgConflictService
 from app.services.knowledge_service import KnowledgeService
 
 if TYPE_CHECKING:
@@ -222,6 +225,48 @@ async def delete_edge(
 
 
 # --- Graph ---
+
+
+# --- Conflicts ---
+
+
+@router.get(
+    "/conflicts",
+    response_model=list[KgConflictResponse],
+    summary="List open knowledge graph conflicts",
+    status_code=200,
+    responses={404: {"description": "Workspace not found"}},
+)
+async def list_conflicts(
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> list[KgConflictResponse]:
+    workspace, _member = workspace_ctx
+    service = KgConflictService(db)
+    return await service.get_open_conflicts(workspace.id)
+
+
+@router.patch(
+    "/conflicts/{conflict_id}",
+    summary="Resolve or dismiss a knowledge graph conflict",
+    status_code=200,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Conflict not found"},
+    },
+)
+async def resolve_conflict(
+    conflict_id: int,
+    data: KgConflictResolve,
+    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, str]:
+    workspace, member = workspace_ctx
+    require_role(member, WRITE_ROLES)
+    service = KgConflictService(db)
+    await service.resolve_conflict(conflict_id, current_user.id, data, workspace.id)
+    return {"detail": "ok"}
 
 
 @router.get(

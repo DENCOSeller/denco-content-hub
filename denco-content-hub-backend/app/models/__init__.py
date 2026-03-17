@@ -9,6 +9,7 @@ from app.models.content_plan_item import ContentPlanItem, PlanItemStatus
 from app.models.invitation import InvitationStatus, WorkspaceInvitation
 from app.models.knowledge import (
     ChangeType,
+    KgConflict,
     KgEdgeTypeDef,
     KgNodeTypeDef,
     KnowledgeEdge,
@@ -48,6 +49,7 @@ __all__ = [
     "ContentStatus",
     "ContentType",
     "InvitationStatus",
+    "KgConflict",
     "KgEdgeTypeDef",
     "KgNodeTypeDef",
     "KnowledgeEdge",

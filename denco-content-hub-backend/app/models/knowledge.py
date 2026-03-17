@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime  # noqa: TC003
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 from sqlalchemy import (
     CheckConstraint,
@@ -245,3 +249,37 @@ class KnowledgeNodeVersion(Base, TimestampMixin):
     confidence: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     __table_args__ = (Index("ix_knv_node_version", "node_id", text("version_number DESC")),)
+
+
+class KgConflict(Base, TimestampMixin):
+    __tablename__ = "kg_conflicts"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    company_node_id: Mapped[int] = mapped_column(ForeignKey("knowledge_nodes.id", ondelete="CASCADE"), nullable=False)
+    workspace_node_id: Mapped[int] = mapped_column(ForeignKey("knowledge_nodes.id", ondelete="CASCADE"), nullable=False)
+    conflict_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="open")
+    resolved_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # --- Relationships ---
+    company_node: Mapped[KnowledgeNode] = relationship("KnowledgeNode", foreign_keys=[company_node_id], lazy="selectin")
+    workspace_node: Mapped[KnowledgeNode] = relationship(
+        "KnowledgeNode", foreign_keys=[workspace_node_id], lazy="selectin"
+    )
+    resolved_by: Mapped[User | None] = relationship("User", lazy="selectin")
+
+    __table_args__ = (
+        Index("ix_kgc_company_node", "company_node_id"),
+        Index("ix_kgc_workspace_node", "workspace_node_id"),
+        Index("ix_kgc_status", "status", postgresql_where=text("status = 'open'")),
+        Index(
+            "uq_kgc_pair_type_open",
+            "company_node_id",
+            "workspace_node_id",
+            "conflict_type",
+            unique=True,
+            postgresql_where=text("status = 'open'"),
+        ),
+    )

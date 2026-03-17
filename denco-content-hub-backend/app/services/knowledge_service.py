@@ -21,6 +21,7 @@ from app.schemas.knowledge import (
     KnowledgeNodeUpdate,
     KnowledgeNodeVersionResponse,
 )
+from app.services.kg_conflict_service import KgConflictService
 from app.utils.tiptap import tiptap_to_text
 
 if TYPE_CHECKING:
@@ -80,6 +81,10 @@ class KnowledgeService:
         await self.version_repo.create_snapshot(node, changed_by_user_id=user_id, change_type=ChangeType.CREATED)
         await self.db.commit()
         logger.info("Knowledge node created", node_id=node.id, scope=scope_type)
+
+        if scope_type == ScopeType.WORKSPACE and workspace_id:
+            await self._run_conflict_detection(workspace_id)
+
         return KnowledgeNodeResponse.model_validate(node)
 
     async def update_node(self, node_id: int, data: KnowledgeNodeUpdate, user_id: int) -> KnowledgeNodeResponse:
@@ -91,9 +96,15 @@ class KnowledgeService:
             update_data["content_text"] = tiptap_to_text(update_data["content"])
         update_data["updated_by_user_id"] = user_id
 
+        needs_conflict_check = "title" in update_data or "node_type_def_id" in update_data
+
         node = await self.node_repo.update(node_id, **update_data)
         await self.db.commit()
         logger.info("Knowledge node updated", node_id=node_id)
+
+        if needs_conflict_check and node.scope_type == ScopeType.WORKSPACE and node.workspace_id:
+            await self._run_conflict_detection(node.workspace_id)
+
         return KnowledgeNodeResponse.model_validate(node)
 
     async def delete_node(self, node_id: int) -> None:
@@ -216,6 +227,14 @@ class KnowledgeService:
         return [KnowledgeNodeVersionResponse.model_validate(v) for v in versions]
 
     # --- Private ---
+
+    async def _run_conflict_detection(self, workspace_id: int) -> None:
+        """Запускает детекцию конфликтов как side-effect. Не блокирует основной flow."""
+        try:
+            conflict_service = KgConflictService(self.db)
+            await conflict_service.detect_conflicts(workspace_id)
+        except Exception:
+            logger.exception("Conflict detection failed", workspace_id=workspace_id)
 
     async def _resolve_node_type_def_id(
         self,

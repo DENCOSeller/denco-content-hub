@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -249,3 +249,26 @@ class NodePositionUpdate(BaseModel):
 
 class BatchPositionUpdateRequest(BaseModel):
     positions: list[NodePositionUpdate] = Field(max_length=500)
+
+
+# --- KgConflict ---
+
+
+class KgConflictResponse(BaseModel):
+    id: int
+    company_node_id: int
+    workspace_node_id: int
+    conflict_type: str
+    description: str | None = None
+    status: str
+    resolved_by_user_id: int | None = None
+    resolved_at: datetime | None = None
+    created_at: datetime
+    company_node: KnowledgeNodeResponse | None = None
+    workspace_node: KnowledgeNodeResponse | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class KgConflictResolve(BaseModel):
+    status: Literal["resolved", "dismissed"]
