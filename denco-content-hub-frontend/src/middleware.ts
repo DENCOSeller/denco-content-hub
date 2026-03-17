@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server'
 const authRoutes = ['/login', '/register']
 
 // Маршруты открытые для всех — не редиректим никого
-const openRoutes = ['/invite']
+const openRoutes = ['/invite', '/public']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
