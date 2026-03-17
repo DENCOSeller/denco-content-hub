@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from sqlalchemy import Column, func, or_, select, update
 
-from app.models.knowledge import KnowledgeNode, NodeType
+from app.models.knowledge import KgNodeTypeDef, KnowledgeNode
 from app.models.library_item import LibraryItem
 from app.models.workspace import Workspace
 from app.repositories.base import BaseRepository
@@ -24,7 +24,7 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
     async def get_by_workspace(
         self,
         workspace_id: int,
-        node_type: NodeType | None = None,
+        node_type_def_id: int | None = None,
         search: str | None = None,
         company_id: int | None = None,
     ) -> list[KnowledgeNode]:
@@ -36,7 +36,7 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         else:
             scope_filter = KnowledgeNode.workspace_id == workspace_id
         query = self._base_query().where(scope_filter)
-        query = self._apply_filters(query, node_type, search)
+        query = self._apply_filters(query, node_type_def_id, search)
         query = query.order_by(KnowledgeNode.created_at.desc())
         result = await self.db.execute(query)
         return list(result.scalars().all())
@@ -44,11 +44,11 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
     async def get_by_company(
         self,
         company_id: int,
-        node_type: NodeType | None = None,
+        node_type_def_id: int | None = None,
         search: str | None = None,
     ) -> list[KnowledgeNode]:
         query = self._base_query().where(KnowledgeNode.company_id == company_id)
-        query = self._apply_filters(query, node_type, search)
+        query = self._apply_filters(query, node_type_def_id, search)
         query = query.order_by(KnowledgeNode.created_at.desc())
         result = await self.db.execute(query)
         return list(result.scalars().all())
@@ -138,7 +138,7 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
     async def search_nodes(
         self,
         search: str | None,
-        node_type: NodeType | None,
+        node_type_def_id: int | None,
         workspace_ids: list[int] | None,
         company_ids: list[int] | None,
         workspace_id: int | None = None,
@@ -161,13 +161,13 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         if scope_filters:
             query = query.where(or_(*scope_filters))
 
-        query = self._apply_filters(query, node_type, search)
+        query = self._apply_filters(query, node_type_def_id, search)
         query = query.order_by(KnowledgeNode.created_at.desc()).limit(limit)
         result = await self.db.execute(query)
         return list(result.scalars().all())
 
     async def get_workspace_overview(self, workspace_id: int, company_id: int | None = None) -> dict:
-        """Node counts by type + lightweight node list (no content_text)."""
+        """Node counts by type_def slug + lightweight node list (no content_text)."""
         if company_id is not None:
             scope_filter = or_(
                 KnowledgeNode.workspace_id == workspace_id,
@@ -176,7 +176,8 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         else:
             scope_filter = KnowledgeNode.workspace_id == workspace_id
         query = (
-            select(KnowledgeNode.id, KnowledgeNode.title, KnowledgeNode.node_type)
+            select(KnowledgeNode.id, KnowledgeNode.title, KgNodeTypeDef.slug)
+            .outerjoin(KgNodeTypeDef, KnowledgeNode.node_type_def_id == KgNodeTypeDef.id)
             .where(scope_filter, KnowledgeNode.deleted_at.is_(None))
             .order_by(KnowledgeNode.created_at.desc())
         )
@@ -186,7 +187,7 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         nodes_by_type: dict[str, int] = {}
         node_list: list[dict] = []
         for row in rows:
-            type_str = str(row.node_type)
+            type_str = row.slug or "unknown"
             nodes_by_type[type_str] = nodes_by_type.get(type_str, 0) + 1
             node_list.append({"id": row.id, "title": row.title, "type": type_str})
         return {
@@ -197,9 +198,10 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         }
 
     async def get_company_overview(self, company_id: int) -> dict:
-        """Node counts by type + lightweight node list for company scope."""
+        """Node counts by type_def slug + lightweight node list for company scope."""
         query = (
-            select(KnowledgeNode.id, KnowledgeNode.title, KnowledgeNode.node_type)
+            select(KnowledgeNode.id, KnowledgeNode.title, KgNodeTypeDef.slug)
+            .outerjoin(KgNodeTypeDef, KnowledgeNode.node_type_def_id == KgNodeTypeDef.id)
             .where(
                 KnowledgeNode.company_id == company_id,
                 KnowledgeNode.deleted_at.is_(None),
@@ -212,7 +214,7 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         nodes_by_type: dict[str, int] = {}
         node_list: list[dict] = []
         for row in rows:
-            type_str = str(row.node_type)
+            type_str = row.slug or "unknown"
             nodes_by_type[type_str] = nodes_by_type.get(type_str, 0) + 1
             node_list.append({"id": row.id, "title": row.title, "type": type_str})
         return {
@@ -226,7 +228,7 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         self,
         search: str,
         workspace_ids: list[int],
-        node_type: NodeType | None = None,
+        node_type_def_id: int | None = None,
         limit: int = 10,
     ) -> list[tuple[KnowledgeNode, str]]:
         """Search nodes with workspace name join. Returns (node, workspace_name)."""
@@ -248,13 +250,13 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
                 KnowledgeNode.content_text.ilike(pattern, escape="\\"),
             )
         )
-        if node_type is not None:
-            query = query.where(KnowledgeNode.node_type == node_type)
+        if node_type_def_id is not None:
+            query = query.where(KnowledgeNode.node_type_def_id == node_type_def_id)
         query = query.order_by(KnowledgeNode.created_at.desc()).limit(limit)
         result = await self.db.execute(query)
         return list(result.tuples().all())
 
-    # Маппинг node_type → FK поле в library_items
+    # Маппинг node_type_def slug → FK поле в library_items
     _NODE_TYPE_FK_MAP: ClassVar[dict[str, Column]] = {  # type: ignore[type-arg]
         "speaker": LibraryItem.speaker_node_id,
         "content_goal": LibraryItem.content_goal_node_id,
@@ -264,9 +266,9 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         "product_focus": LibraryItem.product_node_id,
     }
 
-    async def get_usage_counts(self, node_ids: list[int], node_type: str) -> dict[int, int]:
+    async def get_usage_counts(self, node_ids: list[int], node_type_slug: str) -> dict[int, int]:
         """Count how many non-deleted library_items reference each node."""
-        fk_col = self._NODE_TYPE_FK_MAP.get(node_type)
+        fk_col = self._NODE_TYPE_FK_MAP.get(node_type_slug)
         if not fk_col or not node_ids:
             return {}
         query = (
@@ -276,9 +278,9 @@ class KnowledgeNodeRepository(BaseRepository[KnowledgeNode]):
         return dict(result.tuples().all())
 
     @staticmethod
-    def _apply_filters(query, node_type: NodeType | None, search: str | None):
-        if node_type is not None:
-            query = query.where(KnowledgeNode.node_type == node_type)
+    def _apply_filters(query, node_type_def_id: int | None, search: str | None):
+        if node_type_def_id is not None:
+            query = query.where(KnowledgeNode.node_type_def_id == node_type_def_id)
         if search:
             pattern = f"%{_escape_like(search)}%"
             query = query.where(

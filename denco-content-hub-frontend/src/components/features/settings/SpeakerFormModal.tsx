@@ -9,6 +9,8 @@ import { z } from 'zod'
 
 import { useCreateNodeMutation, useUpdateNodeMutation } from '@/api/hooks/useKnowledge'
 import type { KnowledgeNodeResponse } from '@/api/client/types.gen'
+import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
+import { useCompanyStore } from '@/stores/company-store'
 
 const speakerSchema = z.object({
   title: z.string().min(1, 'Имя спикера обязательно'),
@@ -63,6 +65,9 @@ export function SpeakerFormModal({
   onClose,
   editingNode,
 }: SpeakerFormModalProps) {
+  const activeCompany = useCompanyStore((s) => s.activeCompany)
+  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+
   const createNode = useCreateNodeMutation(workspaceId)
   const updateNode = useUpdateNodeMutation(workspaceId)
 
@@ -125,7 +130,7 @@ export function SpeakerFormModal({
       )
     } else {
       createNode.mutate(
-        { node_type: 'speaker', title: values.title, content },
+        { node_type_def_id: getTypeDefId('speaker'), title: values.title, content } as never,
         {
           onSuccess: () => {
             notifications.show({ title: 'Создано', message: 'Спикер добавлен', color: 'green' })

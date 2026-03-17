@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import or_, select, update
 
-from app.models.knowledge import KnowledgeEdge, KnowledgeNode
+from app.models.knowledge import KgNodeTypeDef, KnowledgeEdge, KnowledgeNode
 from app.repositories.base import BaseRepository
 
 if TYPE_CHECKING:
@@ -61,8 +61,9 @@ class KnowledgeEdgeRepository(BaseRepository[KnowledgeEdge]):
 
     async def get_edges_for_node(self, node_id: int) -> list[dict]:
         """Get edges with connected node info for a single node."""
-        source_node = select(KnowledgeNode).subquery("src")
         target_node = select(KnowledgeNode).subquery("tgt")
+        source_node = select(KnowledgeNode).subquery("src")
+        type_def = select(KgNodeTypeDef).subquery("td")
 
         # Outgoing edges: this node is source
         out_query = (
@@ -71,9 +72,10 @@ class KnowledgeEdgeRepository(BaseRepository[KnowledgeEdge]):
                 KnowledgeEdge.label,
                 target_node.c.id.label("connected_node_id"),
                 target_node.c.title.label("connected_node_title"),
-                target_node.c.node_type.label("connected_node_type"),
+                type_def.c.slug.label("connected_node_type"),
             )
             .join(target_node, KnowledgeEdge.target_node_id == target_node.c.id)
+            .outerjoin(type_def, target_node.c.node_type_def_id == type_def.c.id)
             .where(
                 KnowledgeEdge.source_node_id == node_id,
                 KnowledgeEdge.deleted_at.is_(None),
@@ -87,22 +89,24 @@ class KnowledgeEdgeRepository(BaseRepository[KnowledgeEdge]):
                 "label": r.label,
                 "connected_node_id": r.connected_node_id,
                 "connected_node_title": r.connected_node_title,
-                "connected_node_type": str(r.connected_node_type),
+                "connected_node_type": r.connected_node_type or "unknown",
                 "direction": "outgoing",
             }
             for r in out_result.all()
         ]
 
         # Incoming edges: this node is target
+        type_def2 = select(KgNodeTypeDef).subquery("td2")
         in_query = (
             select(
                 KnowledgeEdge.id,
                 KnowledgeEdge.label,
                 source_node.c.id.label("connected_node_id"),
                 source_node.c.title.label("connected_node_title"),
-                source_node.c.node_type.label("connected_node_type"),
+                type_def2.c.slug.label("connected_node_type"),
             )
             .join(source_node, KnowledgeEdge.source_node_id == source_node.c.id)
+            .outerjoin(type_def2, source_node.c.node_type_def_id == type_def2.c.id)
             .where(
                 KnowledgeEdge.target_node_id == node_id,
                 KnowledgeEdge.deleted_at.is_(None),
@@ -116,7 +120,7 @@ class KnowledgeEdgeRepository(BaseRepository[KnowledgeEdge]):
                 "label": r.label,
                 "connected_node_id": r.connected_node_id,
                 "connected_node_title": r.connected_node_title,
-                "connected_node_type": str(r.connected_node_type),
+                "connected_node_type": r.connected_node_type or "unknown",
                 "direction": "incoming",
             }
             for r in in_result.all()

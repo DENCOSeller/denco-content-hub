@@ -133,7 +133,7 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
           edgeId: e.id,
           nodeId: connectedId,
           title: connectedNode.title,
-          nodeType: connectedNode.node_type as string,
+          nodeType: (connectedNode.node_type_def?.slug ?? 'note') as string,
           label: e.label,
           direction: isSource ? ('outgoing' as const) : ('incoming' as const),
         }
@@ -300,7 +300,7 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
     [title, content, doSave],
   )
 
-  const isSpeaker = node?.node_type === 'speaker'
+  const isSpeaker = node?.node_type_def?.slug === 'speaker'
 
   const handleToolbarTitleChange = useCallback(
     (newTitle: string) => {
@@ -354,7 +354,7 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
   const isMobile = useMediaQuery('(max-width: 767px)')
   const [activePanel, setActivePanel] = useState<'editor' | 'chat'>('editor')
 
-  const typeConfig = node ? getNodeTypeConfig(node.node_type as string) : null
+  const typeConfig = node ? getNodeTypeConfig(node.node_type_def?.slug ?? 'note') : null
 
   const saveStatusText =
     saveState === 'saving'
@@ -638,7 +638,7 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                   scopeId={scopeId}
                   nodeId={activeNodeId}
                   nodeTitle={title}
-                  nodeType={(node?.node_type as string) ?? 'note'}
+                  nodeType={node?.node_type_def?.slug ?? 'note'}
                   connectedCount={connectedNodes.length}
                   onInsertToEditor={handleInsertToEditor}
                   onReplaceEditorContent={handleReplaceEditorContent}

@@ -212,7 +212,7 @@ async def _build_workspace_summary(
         return "\n".join(lines)
 
     node_title = focused_node.title or "Untitled"
-    node_type = str(focused_node.node_type) if focused_node.node_type else "unknown"
+    node_type = focused_node.node_type_def.slug if focused_node.node_type_def else "unknown"
     lines.append(f'📌 Focused node: "{node_title}" ({node_type})')
 
     content_text = getattr(focused_node, "content_text", None)

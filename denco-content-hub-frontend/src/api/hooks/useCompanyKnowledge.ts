@@ -20,7 +20,6 @@ import type {
   KnowledgeNodeUpdate,
   KnowledgeEdgeCreate,
   BatchPositionUpdateRequest,
-  NodeType,
 } from '@/api/client/types.gen'
 
 // ---------------------------------------------------------------------------
@@ -58,20 +57,20 @@ export function useCompanyGraphQuery(companyId: number) {
 
 interface UseCompanyNodeListParams {
   companyId: number
-  nodeType?: NodeType | null
+  nodeTypeDefId?: number | null
   search?: string | null
 }
 
-export function useCompanyNodeListQuery({ companyId, nodeType, search }: UseCompanyNodeListParams) {
+export function useCompanyNodeListQuery({ companyId, nodeTypeDefId, search }: UseCompanyNodeListParams) {
   return useQuery({
-    queryKey: [...companyKnowledgeKeys.nodes(companyId), { nodeType, search }],
+    queryKey: [...companyKnowledgeKeys.nodes(companyId), { nodeTypeDefId, search }],
     queryFn: async () => {
       const result = await listNodesApiV1CompaniesCompanyIdKnowledgeNodesGet({
         path: { company_id: companyId },
         query: {
-          ...(nodeType ? { node_type: nodeType } : {}),
+          ...(nodeTypeDefId ? { node_type_def_id: nodeTypeDefId } : {}),
           ...(search ? { search } : {}),
-        },
+        } as Record<string, unknown>,
         throwOnError: true,
       })
       return result.data

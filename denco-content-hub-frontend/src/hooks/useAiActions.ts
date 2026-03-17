@@ -52,7 +52,7 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
         if (action.action_type === 'create_node') {
           const body = {
             title: action.payload.title as string,
-            node_type: action.payload.node_type as string,
+            node_type_def_id: action.payload.node_type_def_id as number,
             content: action.payload.content ? textToTiptap(action.payload.content as string) : undefined,
           }
           if (workspaceId) {

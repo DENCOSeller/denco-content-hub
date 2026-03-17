@@ -30,7 +30,6 @@ class KnowledgeVersionRepository(BaseRepository[KnowledgeNodeVersion]):
             title=node.title,
             content=node.content,
             content_text=node.content_text,
-            node_type=node.node_type,
             changed_by_user_id=changed_by_user_id,
             change_type=change_type,
             change_summary=change_summary,

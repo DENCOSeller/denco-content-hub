@@ -8,7 +8,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from app.models.knowledge import NodeType
 from app.utils.ai_tool_executor import ReadToolExecutor
 
 # ---------------------------------------------------------------------------
@@ -80,11 +79,11 @@ async def test_search_nodes_by_type():
 
     await executor.execute(
         "search_knowledge_nodes",
-        {"node_type": "target_audience", "limit": 5},
+        {"node_type_def_id": 42, "limit": 5},
     )
 
     call_kwargs = executor._node_repo.search_nodes.call_args
-    assert call_kwargs.kwargs["node_type"] == NodeType.TARGET_AUDIENCE
+    assert call_kwargs.kwargs["node_type_def_id"] == 42
     assert call_kwargs.kwargs["limit"] == 5
 
 

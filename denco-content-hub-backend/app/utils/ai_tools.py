@@ -2,17 +2,6 @@
 
 from __future__ import annotations
 
-NODE_TYPES = [
-    "target_audience",
-    "meaning",
-    "channel",
-    "funnel",
-    "competitor",
-    "seo",
-    "brand",
-    "note",
-]
-
 KNOWLEDGE_TOOLS: list[dict] = [
     {
         "name": "create_node",
@@ -21,17 +10,16 @@ KNOWLEDGE_TOOLS: list[dict] = [
             "type": "object",
             "properties": {
                 "title": {"type": "string", "description": "Node title"},
-                "node_type": {
-                    "type": "string",
-                    "enum": NODE_TYPES,
-                    "description": "Type of knowledge node",
+                "node_type_def_id": {
+                    "type": "integer",
+                    "description": "ID of the node type definition (from get_workspace_overview)",
                 },
                 "content": {
                     "type": "string",
                     "description": "Plain text content for the node",
                 },
             },
-            "required": ["title", "node_type"],
+            "required": ["title"],
         },
     },
     {
@@ -79,10 +67,9 @@ READ_TOOLS: list[dict] = [
                     "type": "string",
                     "description": "Search text (matches title and content). Optional if filtering by type.",
                 },
-                "node_type": {
-                    "type": "string",
-                    "enum": NODE_TYPES,
-                    "description": "Filter by node type",
+                "node_type_def_id": {
+                    "type": "integer",
+                    "description": "Filter by node type definition ID (from get_workspace_overview)",
                 },
                 "workspace_id": {
                     "type": "integer",
@@ -146,10 +133,9 @@ READ_TOOLS: list[dict] = [
                     "type": "string",
                     "description": "Search text",
                 },
-                "node_type": {
-                    "type": "string",
-                    "enum": NODE_TYPES,
-                    "description": "Filter by node type",
+                "node_type_def_id": {
+                    "type": "integer",
+                    "description": "Filter by node type definition ID",
                 },
                 "limit": {
                     "type": "integer",

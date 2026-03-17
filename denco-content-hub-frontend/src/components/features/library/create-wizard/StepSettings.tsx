@@ -1,7 +1,9 @@
 'use client'
 
 import { SimpleGrid, Stack, Select, Text } from '@mantine/core'
-import { useKnowledgeNodesByType } from '@/api/hooks/useKnowledge'
+import { useKnowledgeNodesByTypeDefId } from '@/api/hooks/useKnowledge'
+import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
+import { useCompanyStore } from '@/stores/company-store'
 import { HUNT_LEVEL_OPTIONS } from './wizard-types'
 import type { WizardState } from './wizard-types'
 
@@ -12,12 +14,15 @@ interface StepSettingsProps {
 }
 
 export function StepSettings({ state, onChange, workspaceId }: StepSettingsProps) {
-  const { data: speakers } = useKnowledgeNodesByType(workspaceId, 'speaker')
-  const { data: goals } = useKnowledgeNodesByType(workspaceId, 'content_goal')
-  const { data: narratives } = useKnowledgeNodesByType(workspaceId, 'narrative_format')
-  const { data: hooks } = useKnowledgeNodesByType(workspaceId, 'hook_type')
-  const { data: tones } = useKnowledgeNodesByType(workspaceId, 'tone_of_voice')
-  const { data: products } = useKnowledgeNodesByType(workspaceId, 'product_focus')
+  const activeCompany = useCompanyStore((s) => s.activeCompany)
+  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+
+  const { data: speakers } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('speaker') ?? 0)
+  const { data: goals } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('content_goal') ?? 0)
+  const { data: narratives } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('narrative_format') ?? 0)
+  const { data: hooks } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('hook_type') ?? 0)
+  const { data: tones } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('tone_of_voice') ?? 0)
+  const { data: products } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('product_focus') ?? 0)
 
   function toSelectData(data: typeof speakers) {
     if (!data) return []

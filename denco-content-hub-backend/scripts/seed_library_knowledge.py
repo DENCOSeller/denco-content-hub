@@ -23,7 +23,7 @@ from sqlalchemy import select
 from app.database import async_session_factory
 from app.models.company import Company
 from app.models.company_member import CompanyMember
-from app.models.knowledge import KnowledgeEdge, KnowledgeNode, NodeType, ScopeType
+from app.models.knowledge import KgNodeTypeDef, KnowledgeEdge, KnowledgeNode, ScopeType
 
 logger = structlog.get_logger(__name__)
 
@@ -34,7 +34,7 @@ logger = structlog.get_logger(__name__)
 SEED_NODES: list[dict] = [
     # ── PLATFORM ──────────────────────────────────────────────────────────
     {
-        "node_type": NodeType.PLATFORM,
+        "node_type_slug": "platform",
         "title": "YouTube",
         "content_text": (
             "Платформа для длинных видео и Shorts.\n"
@@ -46,7 +46,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PLATFORM,
+        "node_type_slug": "platform",
         "title": "Instagram",
         "content_text": (
             "Визуал первичен — качество фото и видео критично.\n"
@@ -58,7 +58,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PLATFORM,
+        "node_type_slug": "platform",
         "title": "Telegram",
         "content_text": (
             "Текстовый контент — основа платформы.\n"
@@ -71,7 +71,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PLATFORM,
+        "node_type_slug": "platform",
         "title": "VK",
         "content_text": (
             "Клипы (короткие видео) активно растут по охватам.\n"
@@ -84,7 +84,7 @@ SEED_NODES: list[dict] = [
     },
     # ── CONTENT_FORMAT ────────────────────────────────────────────────────
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Shorts",
         "content_text": (
             "Вертикальный формат 9:16.\n"
@@ -97,7 +97,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Long Video",
         "content_text": (
             "Горизонтальный формат 16:9.\n"
@@ -110,7 +110,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Reels",
         "content_text": (
             "Вертикальный формат 9:16.\n"
@@ -123,7 +123,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Post (Instagram)",
         "content_text": (
             "Формат: квадрат 1:1 или вертикаль 4:5.\n"
@@ -135,7 +135,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Carousel",
         "content_text": (
             "До 10 слайдов в одной публикации.\n"
@@ -148,7 +148,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Stories",
         "content_text": (
             "Вертикальный формат 9:16, длительность 15 секунд.\n"
@@ -161,7 +161,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Telegram Post",
         "content_text": (
             "Текст до 4096 символов.\n"
@@ -174,7 +174,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "Telegram Article",
         "content_text": (
             "Формат Telegraph или Instant View.\n"
@@ -186,7 +186,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "VK Post",
         "content_text": (
             "Текст + картинка — базовый формат.\n"
@@ -198,7 +198,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_FORMAT,
+        "node_type_slug": "content_format",
         "title": "VK Clip",
         "content_text": (
             "Вертикальный формат 9:16.\n"
@@ -212,7 +212,7 @@ SEED_NODES: list[dict] = [
     },
     # ── HUNT_LEVEL ────────────────────────────────────────────────────────
     {
-        "node_type": NodeType.HUNT_LEVEL,
+        "node_type_slug": "hunt_level",
         "title": "Уровень 1: Нет проблемы",
         "content_text": (
             "Лестница Ханта, уровень 1 — аудитория не осознаёт потребность.\n"
@@ -224,7 +224,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HUNT_LEVEL,
+        "node_type_slug": "hunt_level",
         "title": "Уровень 2: Есть проблема",
         "content_text": (
             "Лестница Ханта, уровень 2 — аудитория осознала боль.\n"
@@ -236,7 +236,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HUNT_LEVEL,
+        "node_type_slug": "hunt_level",
         "title": "Уровень 3: Ищет решение",
         "content_text": (
             "Лестница Ханта, уровень 3 — аудитория сравнивает варианты.\n"
@@ -248,7 +248,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HUNT_LEVEL,
+        "node_type_slug": "hunt_level",
         "title": "Уровень 4: Знает о продукте",
         "content_text": (
             "Лестница Ханта, уровень 4 — аудитория знает о продукте.\n"
@@ -260,7 +260,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HUNT_LEVEL,
+        "node_type_slug": "hunt_level",
         "title": "Уровень 5: Готов купить",
         "content_text": (
             "Лестница Ханта, уровень 5 — аудитория готова к покупке.\n"
@@ -274,7 +274,7 @@ SEED_NODES: list[dict] = [
     },
     # ── AUDIENCE_SEGMENT ──────────────────────────────────────────────────
     {
-        "node_type": NodeType.AUDIENCE_SEGMENT,
+        "node_type_slug": "audience_segment",
         "title": "ИП и самозанятые",
         "content_text": (
             "Сегмент: начинающие предприниматели, ИП и самозанятые.\n"
@@ -287,7 +287,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.AUDIENCE_SEGMENT,
+        "node_type_slug": "audience_segment",
         "title": "Малый бизнес (ООО)",
         "content_text": (
             "Сегмент: малый бизнес, уже торгующие компании (ООО).\n"
@@ -300,7 +300,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.AUDIENCE_SEGMENT,
+        "node_type_slug": "audience_segment",
         "title": "Селлеры маркетплейсов",
         "content_text": (
             "Сегмент: продавцы на Wildberries, Ozon и других маркетплейсах.\n"
@@ -314,7 +314,7 @@ SEED_NODES: list[dict] = [
     },
     # ── SPEAKER ──────────────────────────────────────────────────────────
     {
-        "node_type": NodeType.SPEAKER,
+        "node_type_slug": "speaker",
         "title": "Один эксперт",
         "content_text": (
             "Формат «talking head», один спикер на камеру.\n"
@@ -326,7 +326,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.SPEAKER,
+        "node_type_slug": "speaker",
         "title": "Два спикера",
         "content_text": (
             "Диалог, интервью, подкаст-формат.\n"
@@ -338,7 +338,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.SPEAKER,
+        "node_type_slug": "speaker",
         "title": "Группа/команда",
         "content_text": (
             "Показ команды, корпоративный контент, бэкстейдж.\n"
@@ -349,7 +349,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.SPEAKER,
+        "node_type_slug": "speaker",
         "title": "Без людей",
         "content_text": (
             "Скринкасты, анимация, текст на экране.\n"
@@ -360,7 +360,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.SPEAKER,
+        "node_type_slug": "speaker",
         "title": "Клиент/кейс",
         "content_text": (
             "Кейс клиента, UGC, отзыв.\n"
@@ -373,7 +373,7 @@ SEED_NODES: list[dict] = [
     },
     # ── CONTENT_GOAL ────────────────────────────────────────────────────
     {
-        "node_type": NodeType.CONTENT_GOAL,
+        "node_type_slug": "content_goal",
         "title": "Охват/Виральность",
         "content_text": (
             "Цель: максимум просмотров, попадание в рекомендации.\n"
@@ -385,7 +385,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_GOAL,
+        "node_type_slug": "content_goal",
         "title": "Прогрев/Доверие",
         "content_text": (
             "Цель: выстраивание отношений с аудиторией.\n"
@@ -397,7 +397,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_GOAL,
+        "node_type_slug": "content_goal",
         "title": "Продажа",
         "content_text": (
             "Цель: прямая конверсия в заявку/покупку.\n"
@@ -409,7 +409,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_GOAL,
+        "node_type_slug": "content_goal",
         "title": "Удержание/Подписка",
         "content_text": (
             "Цель: удержать существующую аудиторию.\n"
@@ -421,7 +421,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.CONTENT_GOAL,
+        "node_type_slug": "content_goal",
         "title": "SEO/Поиск",
         "content_text": (
             "Цель: контент оптимизированный под поиск.\n"
@@ -434,7 +434,7 @@ SEED_NODES: list[dict] = [
     },
     # ── NARRATIVE_FORMAT ────────────────────────────────────────────────
     {
-        "node_type": NodeType.NARRATIVE_FORMAT,
+        "node_type_slug": "narrative_format",
         "title": "История/Сторителлинг",
         "content_text": (
             "Нарратив с героем, конфликтом и развязкой.\n"
@@ -446,7 +446,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.NARRATIVE_FORMAT,
+        "node_type_slug": "narrative_format",
         "title": "Проблема-Решение",
         "content_text": (
             "Обозначить боль → показать решение.\n"
@@ -458,7 +458,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.NARRATIVE_FORMAT,
+        "node_type_slug": "narrative_format",
         "title": "До/После",
         "content_text": (
             "Визуальная трансформация, результат.\n"
@@ -470,7 +470,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.NARRATIVE_FORMAT,
+        "node_type_slug": "narrative_format",
         "title": "Список/Топ",
         "content_text": (
             "«5 способов...», «10 ошибок...», «3 правила...».\n"
@@ -482,7 +482,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.NARRATIVE_FORMAT,
+        "node_type_slug": "narrative_format",
         "title": "Вопрос-Ответ",
         "content_text": (
             "FAQ формат, ответы на вопросы подписчиков.\n"
@@ -494,7 +494,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.NARRATIVE_FORMAT,
+        "node_type_slug": "narrative_format",
         "title": "За кулисами",
         "content_text": (
             "Процесс работы, офис, склад, команда.\n"
@@ -506,7 +506,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.NARRATIVE_FORMAT,
+        "node_type_slug": "narrative_format",
         "title": "Провокация",
         "content_text": (
             "Спорное утверждение, разрушение мифов.\n"
@@ -519,7 +519,7 @@ SEED_NODES: list[dict] = [
     },
     # ── HOOK_TYPE ───────────────────────────────────────────────────────
     {
-        "node_type": NodeType.HOOK_TYPE,
+        "node_type_slug": "hook_type",
         "title": "Шокирующий факт",
         "content_text": (
             "«90% селлеров теряют деньги на логистике».\n"
@@ -531,7 +531,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HOOK_TYPE,
+        "node_type_slug": "hook_type",
         "title": "Личная история",
         "content_text": (
             "«Когда я начинал, я потерял 500к на...».\n"
@@ -543,7 +543,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HOOK_TYPE,
+        "node_type_slug": "hook_type",
         "title": "Вопрос к зрителю",
         "content_text": (
             "«А вы знали, что...?», «Как часто вы...?».\n"
@@ -555,7 +555,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HOOK_TYPE,
+        "node_type_slug": "hook_type",
         "title": "Провокационное утверждение",
         "content_text": (
             "«Маркетплейсы убивают малый бизнес».\n"
@@ -567,7 +567,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HOOK_TYPE,
+        "node_type_slug": "hook_type",
         "title": "Обещание результата",
         "content_text": (
             "«После этого видео вы сэкономите 100к на логистике».\n"
@@ -579,7 +579,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.HOOK_TYPE,
+        "node_type_slug": "hook_type",
         "title": "Визуальный крючок",
         "content_text": (
             "Яркий визуал, необычный ракурс, B-roll.\n"
@@ -592,7 +592,7 @@ SEED_NODES: list[dict] = [
     },
     # ── PRODUCT_FOCUS ──────────────────────────────────────────────────
     {
-        "node_type": NodeType.PRODUCT_FOCUS,
+        "node_type_slug": "product_focus",
         "title": "Фулфилмент",
         "content_text": (
             "Приёмка, хранение, сборка, упаковка, отправка.\n"
@@ -604,7 +604,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PRODUCT_FOCUS,
+        "node_type_slug": "product_focus",
         "title": "Дропшиппинг",
         "content_text": (
             "Продажи без своего склада, DENCO = партнёр.\n"
@@ -616,7 +616,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PRODUCT_FOCUS,
+        "node_type_slug": "product_focus",
         "title": "Wildberries",
         "content_text": (
             "Крупнейший маркетплейс РФ, специфика работы с WB.\n"
@@ -628,7 +628,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PRODUCT_FOCUS,
+        "node_type_slug": "product_focus",
         "title": "Ozon",
         "content_text": (
             "Второй по размеру маркетплейс, специфика Ozon.\n"
@@ -640,7 +640,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PRODUCT_FOCUS,
+        "node_type_slug": "product_focus",
         "title": "Яндекс.Маркет",
         "content_text": (
             "Маркетплейс Яндекса, специфика площадки.\n"
@@ -652,7 +652,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PRODUCT_FOCUS,
+        "node_type_slug": "product_focus",
         "title": "Личный бренд",
         "content_text": (
             "Бренд основателя/эксперта DENCO.\n"
@@ -664,7 +664,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.PRODUCT_FOCUS,
+        "node_type_slug": "product_focus",
         "title": "DENCO в целом",
         "content_text": (
             "Компания как бренд, миссия, команда.\n"
@@ -677,7 +677,7 @@ SEED_NODES: list[dict] = [
     },
     # ── TONE_OF_VOICE ──────────────────────────────────────────────────
     {
-        "node_type": NodeType.TONE_OF_VOICE,
+        "node_type_slug": "tone_of_voice",
         "title": "Экспертный",
         "content_text": (
             "Профессиональная лексика, цифры, данные.\n"
@@ -689,7 +689,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.TONE_OF_VOICE,
+        "node_type_slug": "tone_of_voice",
         "title": "Дружеский/Живой",
         "content_text": (
             "Разговорный стиль, «ты» а не «вы».\n"
@@ -701,7 +701,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.TONE_OF_VOICE,
+        "node_type_slug": "tone_of_voice",
         "title": "Провокационный",
         "content_text": (
             "Спорные тезисы, вызов стереотипам.\n"
@@ -713,7 +713,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.TONE_OF_VOICE,
+        "node_type_slug": "tone_of_voice",
         "title": "Вдохновляющий",
         "content_text": (
             "Мотивация, истории успеха, «ты можешь».\n"
@@ -725,7 +725,7 @@ SEED_NODES: list[dict] = [
         ),
     },
     {
-        "node_type": NodeType.TONE_OF_VOICE,
+        "node_type_slug": "tone_of_voice",
         "title": "Образовательный",
         "content_text": (
             "Пошаговые инструкции, разборы, объяснения.\n"
@@ -925,21 +925,37 @@ async def seed() -> None:
         company_id = await _get_company_id(session, args.company_id)
         user_id = await _get_user_id(session, company_id, args.user_id)
 
+        # Загружаем маппинг slug → id для KgNodeTypeDef
+        result = await session.execute(select(KgNodeTypeDef))
+        all_type_defs = result.scalars().all()
+        slug_to_type_def_id: dict[str, int] = {td.slug: td.id for td in all_type_defs}
+        logger.info("Загружены типы узлов", slugs=list(slug_to_type_def_id.keys()))
+
         for node_data in SEED_NODES:
-            node_type = node_data["node_type"]
+            node_type_slug = node_data["node_type_slug"]
             title = node_data["title"]
+
+            type_def_id = slug_to_type_def_id.get(node_type_slug)
+            if type_def_id is None:
+                logger.warning(
+                    "KgNodeTypeDef не найден, пропуск",
+                    slug=node_type_slug,
+                    title=title,
+                )
+                nodes_skipped += 1
+                continue
 
             # Проверка на дубликат
             result = await session.execute(
                 select(KnowledgeNode.id).where(
-                    KnowledgeNode.node_type == node_type,
+                    KnowledgeNode.node_type_def_id == type_def_id,
                     KnowledgeNode.title == title,
                     KnowledgeNode.company_id == company_id,
                     KnowledgeNode.deleted_at.is_(None),
                 )
             )
             if result.scalar_one_or_none() is not None:
-                logger.info("Пропуск (уже существует)", type=node_type, title=title)
+                logger.info("Пропуск (уже существует)", slug=node_type_slug, title=title)
                 nodes_skipped += 1
                 continue
 
@@ -947,7 +963,7 @@ async def seed() -> None:
             content = _make_tiptap_doc(content_text)
 
             node = KnowledgeNode(
-                node_type=node_type,
+                node_type_def_id=type_def_id,
                 title=title,
                 content=content,
                 content_text=content_text,
@@ -958,7 +974,7 @@ async def seed() -> None:
                 updated_by_user_id=user_id,
             )
             session.add(node)
-            logger.info("Создан узел", type=node_type, title=title)
+            logger.info("Создан узел", slug=node_type_slug, title=title)
             nodes_created += 1
 
         await session.flush()

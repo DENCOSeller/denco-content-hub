@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 import structlog
 
 from app.models.company_member import CompanyMember
-from app.models.knowledge import KnowledgeNode, NodeType
+from app.models.knowledge import KnowledgeNode
 from app.models.workspace import WorkspaceMember
 from app.repositories.knowledge_edge_repository import KnowledgeEdgeRepository
 from app.repositories.knowledge_node_repository import KnowledgeNodeRepository
@@ -62,7 +62,7 @@ class ReadToolExecutor:
 
     async def _search_nodes(self, inp: dict) -> dict:
         workspace_ids, company_ids = await self._get_allowed_scopes()
-        node_type = NodeType(inp["node_type"]) if inp.get("node_type") else None
+        node_type_def_id = inp.get("node_type_def_id")
         workspace_id = inp.get("workspace_id") or self.page_context.get("workspace_id")
         company_id = inp.get("company_id") or self.page_context.get("company_id")
 
@@ -73,7 +73,7 @@ class ReadToolExecutor:
 
         nodes = await self._node_repo.search_nodes(
             search=inp.get("query"),
-            node_type=node_type,
+            node_type_def_id=node_type_def_id,
             workspace_ids=workspace_ids,
             company_ids=company_ids,
             workspace_id=workspace_id,
@@ -100,7 +100,7 @@ class ReadToolExecutor:
         return {
             "id": node.id,
             "title": node.title,
-            "node_type": str(node.node_type),
+            "node_type": node.node_type_def.slug if node.node_type_def else "unknown",
             "content_text": node.content_text or "",
             "edges": edges,
         }
@@ -124,12 +124,12 @@ class ReadToolExecutor:
 
     async def _search_across_workspaces(self, inp: dict) -> dict:
         workspace_ids, _ = await self._get_allowed_scopes()
-        node_type = NodeType(inp["node_type"]) if inp.get("node_type") else None
+        node_type_def_id = inp.get("node_type_def_id")
 
         results = await self._node_repo.search_across_workspaces(
             search=inp["query"],
             workspace_ids=workspace_ids,
-            node_type=node_type,
+            node_type_def_id=node_type_def_id,
             limit=inp.get("limit", 10),
         )
         logger.info("search_across_workspaces", user_id=self.user_id, count=len(results))
@@ -167,7 +167,7 @@ def _node_preview(node: KnowledgeNode) -> dict[str, Any]:
     return {
         "id": node.id,
         "title": node.title,
-        "node_type": str(node.node_type),
+        "node_type": node.node_type_def.slug if node.node_type_def else "unknown",
         "content_preview": (node.content_text or "")[:200],
         "workspace_id": node.workspace_id,
         "company_id": node.company_id,

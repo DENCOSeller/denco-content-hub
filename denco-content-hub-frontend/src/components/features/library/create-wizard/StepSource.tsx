@@ -106,7 +106,7 @@ export function StepSource({ state, onChange, workspaceId }: StepSourceProps) {
           {nodesItems.map((node) => (
             <Checkbox
               key={node.id}
-              label={`${node.title} (${node.node_type})`}
+              label={`${node.title} (${node.node_type_def?.slug ?? 'note'})`}
               checked={state.sourceNodeIds.includes(node.id)}
               onChange={() => handleNodeToggle(node.id)}
             />

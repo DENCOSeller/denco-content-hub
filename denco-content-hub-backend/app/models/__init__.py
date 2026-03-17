@@ -15,7 +15,6 @@ from app.models.knowledge import (
     KnowledgeEdge,
     KnowledgeNode,
     KnowledgeNodeVersion,
-    NodeType,
     ScopeType,
 )
 from app.models.library_item import (
@@ -58,7 +57,6 @@ __all__ = [
     "LibraryItem",
     "LibrarySourceType",
     "LibraryStatus",
-    "NodeType",
     "PlanItemStatus",
     "Platform",
     "ScopeType",

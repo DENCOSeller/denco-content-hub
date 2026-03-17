@@ -19,6 +19,8 @@ interface UseNodeTypeConfigResult {
   typeOptions: Array<{ value: string; label: string }>
   /** Получить конфиг конкретного типа с fallback */
   getConfig: (nodeType: string) => NodeTypeConfig
+  /** Получить node_type_def_id по slug */
+  getTypeDefId: (slug: string) => number | undefined
   /** Данные из API загружены */
   isReady: boolean
   /** Идёт загрузка из API */
@@ -42,10 +44,16 @@ export function useNodeTypeConfig(companyId: number): UseNodeTypeConfigResult {
     [config],
   )
 
+  const getTypeDefId = useMemo(
+    () => (slug: string) => apiTypes?.find((t) => t.slug === slug)?.id,
+    [apiTypes],
+  )
+
   return {
     config,
     typeOptions,
     getConfig,
+    getTypeDefId,
     isReady: !!apiTypes,
     isLoading,
   }
@@ -60,6 +68,7 @@ export function useNodeTypeConfigFallback(): UseNodeTypeConfigResult {
     config: NODE_TYPE_CONFIG as Record<string, NodeTypeConfig>,
     typeOptions: FALLBACK_OPTIONS,
     getConfig: fallbackGetConfig,
+    getTypeDefId: () => undefined,
     isReady: true,
     isLoading: false,
   }

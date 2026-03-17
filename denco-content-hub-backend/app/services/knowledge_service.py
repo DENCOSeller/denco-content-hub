@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import structlog
 
 from app.exceptions import ConflictException, ForbiddenException
-from app.models.knowledge import ChangeType, KnowledgeNode, NodeType, ScopeType
+from app.models.knowledge import ChangeType, KnowledgeNode, ScopeType
 from app.repositories.kg_edge_type_repository import KgEdgeTypeRepository
 from app.repositories.kg_node_type_repository import KgNodeTypeRepository
 from app.repositories.knowledge_edge_repository import KnowledgeEdgeRepository
@@ -55,13 +55,11 @@ class KnowledgeService:
 
         node_type_def_id = await self._resolve_node_type_def_id(
             data.node_type_def_id,
-            data.node_type,
             workspace_id,
             company_id,
         )
 
         node = await self.node_repo.create(
-            node_type=data.node_type,
             title=data.title,
             content=data.content,
             content_text=content_text,
@@ -121,26 +119,26 @@ class KnowledgeService:
     async def get_workspace_nodes(
         self,
         workspace_id: int,
-        node_type: NodeType | None = None,
+        node_type_def_id: int | None = None,
         search: str | None = None,
     ) -> list[KnowledgeNodeResponse]:
         workspace = await self.workspace_repo.get_by_id(workspace_id)
         nodes = await self.node_repo.get_by_workspace(
             workspace_id,
-            node_type,
+            node_type_def_id,
             search,
             company_id=workspace.company_id,
         )
-        return await self._enrich_with_usage(nodes, node_type)
+        return await self._enrich_with_usage(nodes)
 
     async def get_company_nodes(
         self,
         company_id: int,
-        node_type: NodeType | None = None,
+        node_type_def_id: int | None = None,
         search: str | None = None,
     ) -> list[KnowledgeNodeResponse]:
-        nodes = await self.node_repo.get_by_company(company_id, node_type, search)
-        return await self._enrich_with_usage(nodes, node_type)
+        nodes = await self.node_repo.get_by_company(company_id, node_type_def_id, search)
+        return await self._enrich_with_usage(nodes)
 
     # --- Graph ---
 
@@ -239,19 +237,13 @@ class KnowledgeService:
     async def _resolve_node_type_def_id(
         self,
         explicit_id: int | None,
-        node_type: NodeType,
         workspace_id: int | None,
         company_id: int | None,
     ) -> int | None:
-        """Резолв node_type_def_id: если передан явно — возвращаем, иначе ищем по slug."""
+        """Резолв node_type_def_id: если передан явно — возвращаем."""
         if explicit_id is not None:
             return explicit_id
-        resolved_company_id = company_id
-        if resolved_company_id is None and workspace_id is not None:
-            workspace = await self.workspace_repo.get_by_id(workspace_id)
-            resolved_company_id = workspace.company_id
-        type_def = await self.node_type_repo.get_by_slug(node_type.value, resolved_company_id)
-        return type_def.id if type_def else None
+        return None
 
     async def _resolve_edge_type_def_id(
         self,
@@ -273,28 +265,19 @@ class KnowledgeService:
     async def _enrich_with_usage(
         self,
         nodes: list[KnowledgeNode],
-        node_type: NodeType | None,
     ) -> list[KnowledgeNodeResponse]:
         """Добавляет usage_count к списку узлов."""
         if not nodes:
             return []
-        # Если фильтр по конкретному типу — один запрос на все узлы
-        if node_type is not None:
-            node_ids = [n.id for n in nodes]
-            counts = await self.node_repo.get_usage_counts(node_ids, node_type.value)
-            result = []
-            for n in nodes:
-                resp = KnowledgeNodeResponse.model_validate(n)
-                resp.usage_count = counts.get(n.id, 0)
-                result.append(resp)
-            return result
-        # Без фильтра — группируем по типу, один запрос на тип
+        # Группируем по node_type_def slug для подсчёта usage
         by_type: dict[str, list[int]] = {}
         for n in nodes:
-            by_type.setdefault(n.node_type.value, []).append(n.id)
+            slug = n.node_type_def.slug if n.node_type_def else None
+            if slug:
+                by_type.setdefault(slug, []).append(n.id)
         all_counts: dict[int, int] = {}
-        for nt, ids in by_type.items():
-            counts = await self.node_repo.get_usage_counts(ids, nt)
+        for slug, ids in by_type.items():
+            counts = await self.node_repo.get_usage_counts(ids, slug)
             all_counts.update(counts)
         result = []
         for n in nodes:

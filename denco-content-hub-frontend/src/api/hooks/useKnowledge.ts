@@ -20,7 +20,6 @@ import type {
   KnowledgeNodeUpdate,
   KnowledgeEdgeCreate,
   BatchPositionUpdateRequest,
-  NodeType,
 } from '@/api/client/types.gen'
 
 // ---------------------------------------------------------------------------
@@ -58,20 +57,20 @@ export function useWorkspaceGraphQuery(workspaceId: number) {
 
 interface UseNodeListParams {
   workspaceId: number
-  nodeType?: NodeType | null
+  nodeTypeDefId?: number | null
   search?: string | null
 }
 
-export function useNodeListQuery({ workspaceId, nodeType, search }: UseNodeListParams) {
+export function useNodeListQuery({ workspaceId, nodeTypeDefId, search }: UseNodeListParams) {
   return useQuery({
-    queryKey: [...knowledgeKeys.nodes(workspaceId), { nodeType, search }],
+    queryKey: [...knowledgeKeys.nodes(workspaceId), { nodeTypeDefId, search }],
     queryFn: async () => {
       const result = await listNodesApiV1WorkspacesWorkspaceIdKnowledgeNodesGet({
         path: { workspace_id: workspaceId },
         query: {
-          ...(nodeType ? { node_type: nodeType } : {}),
+          ...(nodeTypeDefId ? { node_type_def_id: nodeTypeDefId } : {}),
           ...(search ? { search } : {}),
-        },
+        } as Record<string, unknown>,
         throwOnError: true,
       })
       return result.data
@@ -210,8 +209,8 @@ export function useDeleteEdgeMutation(workspaceId: number) {
 // Nodes by type (convenience wrapper)
 // ---------------------------------------------------------------------------
 
-export function useKnowledgeNodesByType(workspaceId: number, nodeType: NodeType) {
-  return useNodeListQuery({ workspaceId, nodeType })
+export function useKnowledgeNodesByTypeDefId(workspaceId: number, nodeTypeDefId: number) {
+  return useNodeListQuery({ workspaceId, nodeTypeDefId })
 }
 
 // ---------------------------------------------------------------------------

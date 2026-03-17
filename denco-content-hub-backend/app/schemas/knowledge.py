@@ -4,7 +4,7 @@ from typing import Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models.company_member import CompanyRole
-from app.models.knowledge import ChangeType, NodeType, ScopeType
+from app.models.knowledge import ChangeType, ScopeType
 from app.utils.tiptap import validate_tiptap
 
 # --- CompanyMember ---
@@ -102,7 +102,6 @@ class KgEdgeTypeDefResponse(BaseModel):
 
 
 class KnowledgeNodeCreate(BaseModel):
-    node_type: NodeType
     title: str = Field(min_length=1, max_length=500)
     content: dict | None = None
     color: str | None = Field(default=None, max_length=7)
@@ -116,7 +115,7 @@ class KnowledgeNodeCreate(BaseModel):
 
     @model_validator(mode="after")
     def validate_content(self) -> Self:
-        if self.content is not None and self.node_type != NodeType.SPEAKER and not validate_tiptap(self.content):
+        if self.content is not None and not validate_tiptap(self.content):
             msg = "Invalid TipTap document structure"
             raise ValueError(msg)
         return self
@@ -147,7 +146,6 @@ class KnowledgeNodeUpdate(BaseModel):
 
 class KnowledgeNodeResponse(BaseModel):
     id: int
-    node_type: NodeType
     title: str
     content: dict | None = None
     content_text: str | None = None
@@ -227,7 +225,7 @@ class KnowledgeNodeVersionResponse(BaseModel):
     title: str
     content: dict | None = None
     content_text: str | None = None
-    node_type: NodeType
+    node_type: str | None = None
     change_type: ChangeType
     change_summary: str | None = None
     changed_by_user_id: int | None = None

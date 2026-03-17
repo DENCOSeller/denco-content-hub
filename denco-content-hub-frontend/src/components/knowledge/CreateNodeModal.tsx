@@ -57,7 +57,7 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
 
   const activeCompany = useCompanyStore((s) => s.activeCompany)
   const companyId = scope === 'company' ? scopeId : (activeCompany?.id ?? 0)
-  const { config, getConfig, isLoading: isTypesLoading } = useNodeTypeConfig(companyId)
+  const { config, getConfig, getTypeDefId, isLoading: isTypesLoading } = useNodeTypeConfig(companyId)
 
   const nodeTypes = Object.entries(config) as [NodeType, (typeof config)[string]][]
 
@@ -91,12 +91,13 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
 
   const handleSubmit = () => {
     if (!title.trim()) return
+    const typeDefId = getTypeDefId(selectedType)
     createNode.mutate(
       {
-        node_type: selectedType,
+        node_type_def_id: typeDefId,
         title: title.trim(),
         content: content ?? undefined,
-      },
+      } as never,
       { onSuccess: handleClose },
     )
   }

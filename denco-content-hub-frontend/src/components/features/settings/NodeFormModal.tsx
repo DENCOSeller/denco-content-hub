@@ -8,7 +8,8 @@ import { notifications } from '@mantine/notifications'
 import { z } from 'zod'
 
 import { useCreateNodeMutation, useUpdateNodeMutation } from '@/api/hooks/useKnowledge'
-import type { NodeType } from '@/api/client/types.gen'
+import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
+import { useCompanyStore } from '@/stores/company-store'
 
 const nodeFormSchema = z.object({
   title: z.string().min(1, 'Название обязательно'),
@@ -25,7 +26,7 @@ interface EditingNode {
 
 interface NodeFormModalProps {
   workspaceId: number
-  nodeType: NodeType
+  nodeType: string
   nodeLabel: string
   opened: boolean
   onClose: () => void
@@ -47,6 +48,9 @@ export function NodeFormModal({
   onClose,
   editingNode,
 }: NodeFormModalProps) {
+  const activeCompany = useCompanyStore((s) => s.activeCompany)
+  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+
   const createNode = useCreateNodeMutation(workspaceId)
   const updateNode = useUpdateNodeMutation(workspaceId)
 
@@ -91,7 +95,7 @@ export function NodeFormModal({
       )
     } else {
       createNode.mutate(
-        { node_type: nodeType, title: values.title, content },
+        { node_type_def_id: getTypeDefId(nodeType), title: values.title, content } as never,
         {
           onSuccess: () => {
             notifications.show({ title: 'Создано', message: `${nodeLabel} добавлен`, color: 'green' })

@@ -33,7 +33,8 @@ export interface KnowledgeEdgeData extends Record<string, unknown> {
 
 export function toFlowNodes(nodes: KnowledgeNodeResponse[]): Node<KnowledgeNodeData>[] {
   return nodes.map((n) => {
-    const config = getNodeTypeConfig(n.node_type)
+    const nodeSlug = n.node_type_def?.slug ?? 'note'
+    const config = getNodeTypeConfig(nodeSlug)
     const preview = n.content_text?.slice(0, 80) ?? ''
     return {
       id: String(n.id),
@@ -42,7 +43,7 @@ export function toFlowNodes(nodes: KnowledgeNodeResponse[]): Node<KnowledgeNodeD
       data: {
         nodeId: n.id,
         title: n.title,
-        nodeType: n.node_type,
+        nodeType: nodeSlug,
         color: config.color,
         gradient: config.gradient,
         contentPreview: preview,
@@ -65,7 +66,7 @@ export function toFlowEdges(
 ): Edge<KnowledgeEdgeData>[] {
   return edges.map((e) => {
     const sourceNode = nodeMap.get(e.source_node_id)
-    const sourceConfig = sourceNode ? getNodeTypeConfig(sourceNode.node_type) : null
+    const sourceConfig = sourceNode ? getNodeTypeConfig(sourceNode.node_type_def?.slug ?? 'note') : null
     return {
       id: String(e.id),
       source: String(e.source_node_id),

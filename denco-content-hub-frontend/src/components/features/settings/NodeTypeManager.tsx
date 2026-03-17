@@ -17,25 +17,30 @@ import { notifications } from '@mantine/notifications'
 import { IconEdit, IconTrash, IconPlus, IconAlertTriangle } from '@tabler/icons-react'
 
 import {
-  useKnowledgeNodesByType,
+  useKnowledgeNodesByTypeDefId,
   useDeleteNodeMutation,
 } from '@/api/hooks/useKnowledge'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
+import { useCompanyStore } from '@/stores/company-store'
 import { NodeFormModal } from './NodeFormModal'
 import { SpeakerFormModal } from './SpeakerFormModal'
 import { SpeakerCards } from './SpeakerCards'
-import type { NodeType, KnowledgeNodeResponse } from '@/api/client/types.gen'
+import type { KnowledgeNodeResponse } from '@/api/client/types.gen'
 
 interface NodeTypeManagerProps {
   workspaceId: number
-  nodeType: NodeType
+  nodeType: string
   nodeLabel: string
 }
 
 export function NodeTypeManager({ workspaceId, nodeType, nodeLabel }: NodeTypeManagerProps) {
-  const { data, isLoading, isError, refetch } = useKnowledgeNodesByType(workspaceId, nodeType)
+  const activeCompany = useCompanyStore((s) => s.activeCompany)
+  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+  const typeDefId = getTypeDefId(nodeType) ?? 0
+  const { data, isLoading, isError, refetch } = useKnowledgeNodesByTypeDefId(workspaceId, typeDefId)
   const deleteNode = useDeleteNodeMutation(workspaceId)
 
   const isSpeaker = nodeType === 'speaker'

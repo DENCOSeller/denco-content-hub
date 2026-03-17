@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, Query, Response
 
 from app.database import get_db
 from app.dependencies import get_company_member, get_current_user, require_company_admin
-from app.models.knowledge import NodeType  # noqa: TC001 — runtime for FastAPI query param
 from app.schemas.knowledge import (
     BatchPositionUpdateRequest,
     KnowledgeEdgeCreate,
@@ -40,13 +39,13 @@ router = APIRouter(prefix="/companies/{company_id}/knowledge", tags=["company-kn
 )
 async def list_nodes(
     company_id: int,
-    node_type: NodeType | None = Query(default=None),
+    node_type_def_id: int | None = Query(default=None),
     search: str | None = Query(default=None, max_length=255),
     _member: CompanyMember = Depends(get_company_member),
     db: AsyncSession = Depends(get_db),
 ) -> list[KnowledgeNodeResponse]:
     service = KnowledgeService(db)
-    return await service.get_company_nodes(company_id, node_type, search)
+    return await service.get_company_nodes(company_id, node_type_def_id, search)
 
 
 @router.post(

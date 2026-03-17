@@ -24,27 +24,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, SoftDeleteMixin, TimestampMixin
 
 
-class NodeType(enum.StrEnum):
-    TARGET_AUDIENCE = "target_audience"
-    MEANING = "meaning"
-    CHANNEL = "channel"
-    FUNNEL = "funnel"
-    COMPETITOR = "competitor"
-    SEO = "seo"
-    BRAND = "brand"
-    NOTE = "note"
-    PLATFORM = "platform"
-    CONTENT_FORMAT = "content_format"
-    HUNT_LEVEL = "hunt_level"
-    AUDIENCE_SEGMENT = "audience_segment"
-    SPEAKER = "speaker"
-    CONTENT_GOAL = "content_goal"
-    NARRATIVE_FORMAT = "narrative_format"
-    HOOK_TYPE = "hook_type"
-    PRODUCT_FOCUS = "product_focus"
-    TONE_OF_VOICE = "tone_of_voice"
-
-
 class ScopeType(enum.StrEnum):
     COMPANY = "company"
     WORKSPACE = "workspace"
@@ -61,7 +40,6 @@ class KnowledgeNode(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "knowledge_nodes"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    node_type: Mapped[NodeType] = mapped_column(String(30), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     content: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     content_text: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -115,18 +93,6 @@ class KnowledgeNode(Base, TimestampMixin, SoftDeleteMixin):
         ),
         Index(
             "ix_kn_workspace",
-            "workspace_id",
-            postgresql_where=text("deleted_at IS NULL"),
-        ),
-        Index(
-            "ix_kn_type_company",
-            "node_type",
-            "company_id",
-            postgresql_where=text("deleted_at IS NULL"),
-        ),
-        Index(
-            "ix_kn_type_workspace",
-            "node_type",
             "workspace_id",
             postgresql_where=text("deleted_at IS NULL"),
         ),
@@ -239,7 +205,7 @@ class KnowledgeNodeVersion(Base, TimestampMixin):
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     content: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     content_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    node_type: Mapped[NodeType] = mapped_column(String(30), nullable=False)
+    node_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
     changed_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     change_type: Mapped[ChangeType] = mapped_column(String(20), nullable=False)
     change_summary: Mapped[str | None] = mapped_column(String(500), nullable=True)

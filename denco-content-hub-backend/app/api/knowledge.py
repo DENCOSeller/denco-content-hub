@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, Query, Response
 
 from app.database import get_db
 from app.dependencies import get_current_user, get_workspace_from_path, require_role
-from app.models.knowledge import NodeType  # noqa: TC001 — runtime for FastAPI query param
 from app.models.workspace import WorkspaceRole
 from app.schemas.knowledge import (
     BatchPositionUpdateRequest,
@@ -45,14 +44,14 @@ WRITE_ROLES = [WorkspaceRole.OWNER, WorkspaceRole.ADMIN]
     responses={404: {"description": "Workspace not found"}},
 )
 async def list_nodes(
-    node_type: NodeType | None = Query(default=None),
+    node_type_def_id: int | None = Query(default=None),
     search: str | None = Query(default=None, max_length=255),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
     db: AsyncSession = Depends(get_db),
 ) -> list[KnowledgeNodeResponse]:
     workspace, _member = workspace_ctx
     service = KnowledgeService(db)
-    return await service.get_workspace_nodes(workspace.id, node_type, search)
+    return await service.get_workspace_nodes(workspace.id, node_type_def_id, search)
 
 
 @router.post(

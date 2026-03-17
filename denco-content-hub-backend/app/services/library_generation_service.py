@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.models.knowledge import KnowledgeNode, NodeType
+from app.models.knowledge import KgNodeTypeDef, KnowledgeNode
 from app.models.library_item import LibraryItem
 from app.models.workspace import Workspace
 from app.repositories.library_repository import LibraryItemRepository
@@ -127,9 +127,7 @@ class LibraryGenerationService:
         item = await self.repo.get_by_id_in_workspace(workspace_id, item_id)
 
         # Получить company_id через workspace
-        ws_result = await self.db.execute(
-            select(Workspace.company_id).where(Workspace.id == workspace_id)
-        )
+        ws_result = await self.db.execute(select(Workspace.company_id).where(Workspace.id == workspace_id))
         company_id = ws_result.scalar_one()
 
         # Собрать контекст из графа знаний
@@ -180,18 +178,16 @@ class LibraryGenerationService:
         """Собирает правила из графа знаний для промпта."""
         parts: list[str] = []
 
-        node_queries: list[tuple[str, NodeType, str | None, bool]] = [
-            ("Платформа", NodeType.PLATFORM, platform, False),
-            ("Формат контента", NodeType.CONTENT_FORMAT, content_type, False),
-            ("Уровень охоты", NodeType.HUNT_LEVEL, str(hunt_level), False),
-            ("Сегменты аудитории", NodeType.AUDIENCE_SEGMENT, None, True),
-            ("Целевая аудитория", NodeType.TARGET_AUDIENCE, None, True),
+        node_queries: list[tuple[str, str, str | None, bool]] = [
+            ("Платформа", "platform", platform, False),
+            ("Формат контента", "content_format", content_type, False),
+            ("Уровень охоты", "hunt_level", str(hunt_level), False),
+            ("Сегменты аудитории", "audience_segment", None, True),
+            ("Целевая аудитория", "target_audience", None, True),
         ]
 
-        for label, node_type, search_hint, collect_all in node_queries:
-            nodes = await self._find_nodes(
-                workspace_id, company_id, node_type, search_hint, collect_all
-            )
+        for label, type_slug, search_hint, collect_all in node_queries:
+            nodes = await self._find_nodes(workspace_id, company_id, type_slug, search_hint, collect_all)
             for node in nodes:
                 if node.content_text:
                     parts.append(f"[{label}: {node.title}]\n{node.content_text}")
@@ -202,15 +198,16 @@ class LibraryGenerationService:
         self,
         workspace_id: int,
         company_id: int,
-        node_type: NodeType,
+        type_slug: str,
         search_hint: str | None,
         collect_all: bool,
     ) -> list[KnowledgeNode]:
-        """Ищет узлы графа по типу — сначала в workspace, потом в company."""
+        """Ищет узлы графа по slug типа — сначала в workspace, потом в company."""
         base = (
             select(KnowledgeNode)
+            .join(KgNodeTypeDef, KnowledgeNode.node_type_def_id == KgNodeTypeDef.id)
             .where(KnowledgeNode.deleted_at.is_(None))
-            .where(KnowledgeNode.node_type == node_type)
+            .where(KgNodeTypeDef.slug == type_slug)
         )
 
         # Ищем сначала в workspace, потом в company
@@ -230,9 +227,7 @@ class LibraryGenerationService:
 
             # Для единичных узлов — ищем по title
             if search_hint:
-                matched = [
-                    n for n in nodes if search_hint.lower() in n.title.lower()
-                ]
+                matched = [n for n in nodes if search_hint.lower() in n.title.lower()]
                 if matched:
                     return matched[:1]
 
@@ -256,29 +251,19 @@ class LibraryGenerationService:
         sections: list[str] = []
 
         sections.append(
-            f"Ты — профессиональный копирайтер и контент-стратег. "
-            f"Создай {content_label} для платформы {item.platform}."
+            f"Ты — профессиональный копирайтер и контент-стратег. Создай {content_label} для платформы {item.platform}."
         )
 
-        sections.append(
-            f"Категория контента: {category_label}\n"
-            f"Уровень лестницы Ханта: {item.hunt_level} из 5"
-        )
+        sections.append(f"Категория контента: {category_label}\nУровень лестницы Ханта: {item.hunt_level} из 5")
 
         if context_parts:
-            sections.append(
-                "Правила и контекст из базы знаний компании:\n\n"
-                + "\n\n".join(context_parts)
-            )
+            sections.append("Правила и контекст из базы знаний компании:\n\n" + "\n\n".join(context_parts))
 
         if item.source_text:
-            sections.append(
-                f"Исходный материал для переработки:\n\n{item.source_text}"
-            )
+            sections.append(f"Исходный материал для переработки:\n\n{item.source_text}")
 
         sections.append(
-            f"Верни ответ СТРОГО в формате JSON (без markdown-обёртки, без ```json).\n"
-            f"Структура JSON:\n{json_schema}"
+            f"Верни ответ СТРОГО в формате JSON (без markdown-обёртки, без ```json).\nСтруктура JSON:\n{json_schema}"
         )
 
         return "\n\n---\n\n".join(sections)

@@ -29,8 +29,8 @@ function getActionIcon(actionType: string) {
 function getActionLabel(action: AiAction): string {
   switch (action.action_type) {
     case 'create_node': {
-      const nodeType = action.payload.node_type as string
-      const config = getNodeTypeConfig(nodeType)
+      const nodeSlug = (action.payload.node_type_def_slug ?? action.payload.node_type ?? 'note') as string
+      const config = getNodeTypeConfig(nodeSlug)
       return `Создать: ${config.label}`
     }
     case 'update_node':
@@ -57,7 +57,8 @@ function getApplyButtonLabel(actionType: string): string {
 
 function getActionColor(action: AiAction): string {
   if (action.action_type === 'create_node') {
-    return getNodeTypeConfig(action.payload.node_type as string).color
+    const nodeSlug = (action.payload.node_type_def_slug ?? action.payload.node_type ?? 'note') as string
+    return getNodeTypeConfig(nodeSlug).color
   }
   if (action.action_type === 'create_edge') return '#30D158'
   return '#0A84FF'
