@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useReactFlow } from '@xyflow/react'
 import { ActionIcon, Button, Group, Menu, Select, Text, TextInput, Tooltip, Divider } from '@mantine/core'
-import { IconPlus, IconMaximize, IconSearch, IconX, IconLayoutDashboard, IconBinaryTree, IconAtom } from '@tabler/icons-react'
+import { IconPlus, IconMaximize, IconSearch, IconX, IconLayoutDashboard, IconBinaryTree, IconAtom, IconAdjustments } from '@tabler/icons-react'
 import { motion } from 'motion/react'
 
 import type { NodeType } from '@/lib/knowledge-utils'
@@ -32,6 +32,7 @@ interface KnowledgeToolbarProps {
   onSearchChange: (value: string) => void
   onCreateClick: () => void
   onAutoLayout: (algorithm: 'dagre' | 'force') => void
+  onManageTypes?: () => void
 }
 
 export function KnowledgeToolbar({
@@ -45,6 +46,7 @@ export function KnowledgeToolbar({
   onSearchChange,
   onCreateClick,
   onAutoLayout,
+  onManageTypes,
 }: KnowledgeToolbarProps) {
   const { fitView } = useReactFlow()
   const activeCompany = useCompanyStore((s) => s.activeCompany)
@@ -146,6 +148,17 @@ export function KnowledgeToolbar({
             ) : null
           }
         />
+
+        {scope === 'company' && onManageTypes && (
+          <>
+            <Divider orientation="vertical" />
+            <Tooltip label="Управление типами" withArrow>
+              <ActionIcon size="md" variant="subtle" onClick={onManageTypes}>
+                <IconAdjustments size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </>
+        )}
 
         <Divider orientation="vertical" />
         <Menu shadow="md" width={240} position="bottom-end" withArrow>

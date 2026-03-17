@@ -12,10 +12,10 @@ import {
   useStoreApi,
   type NodeMouseHandler,
 } from '@xyflow/react'
-import { Box, Stack, Text, Center, Skeleton, Button, Group } from '@mantine/core'
+import { Box, Stack, Text, Center, Skeleton, Button, Group, Drawer, Tabs } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { useMediaQuery } from '@mantine/hooks'
-import { IconPlus } from '@tabler/icons-react'
+import { IconPlus, IconCategory, IconArrowsExchange } from '@tabler/icons-react'
 
 import { KnowledgeNodeCard } from './KnowledgeNodeCard'
 import { KnowledgeEdgeCustom } from './KnowledgeEdgeCustom'
@@ -26,6 +26,8 @@ import { NodeEditorDrawer } from './NodeEditorDrawer'
 import { NodeListView } from './NodeListView'
 import { ConflictBanner } from './ConflictBanner'
 import { ConflictModal } from './ConflictModal'
+import { NodeTypeManager } from './NodeTypeManager'
+import { EdgeTypeManager } from './EdgeTypeManager'
 import { useKnowledgeGraph, type KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 import { useDeleteNodeMutation } from '@/api/hooks/useKnowledge'
 import { useCompanyDeleteNodeMutation } from '@/api/hooks/useCompanyKnowledge'
@@ -85,6 +87,7 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null)
   const [conflictModalOpen, setConflictModalOpen] = useState(false)
+  const [typesDrawerOpen, setTypesDrawerOpen] = useState(false)
 
   const { data: conflicts } = useKgConflicts(scope === 'workspace' ? scopeId : 0)
 
@@ -260,6 +263,7 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
           onSearchChange={setSearchQuery}
           onCreateClick={() => setCreateModalOpen(true)}
           onAutoLayout={handleAutoLayout}
+          onManageTypes={scope === 'company' ? () => setTypesDrawerOpen(true) : undefined}
         />
       </Box>
 
@@ -340,6 +344,35 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
         conflicts={conflicts ?? []}
         workspaceId={scope === 'workspace' ? scopeId : 0}
       />
+
+      {scope === 'company' && (
+        <Drawer
+          opened={typesDrawerOpen}
+          onClose={() => setTypesDrawerOpen(false)}
+          position="right"
+          size={560}
+          title="Управление типами"
+          overlayProps={{ backgroundOpacity: 0.4, blur: 4 }}
+        >
+          <Tabs defaultValue="node-types">
+            <Tabs.List mb="md">
+              <Tabs.Tab value="node-types" leftSection={<IconCategory size={16} />}>
+                Типы узлов
+              </Tabs.Tab>
+              <Tabs.Tab value="edge-types" leftSection={<IconArrowsExchange size={16} />}>
+                Типы связей
+              </Tabs.Tab>
+            </Tabs.List>
+
+            <Tabs.Panel value="node-types">
+              <NodeTypeManager companyId={scopeId} />
+            </Tabs.Panel>
+            <Tabs.Panel value="edge-types">
+              <EdgeTypeManager companyId={scopeId} />
+            </Tabs.Panel>
+          </Tabs>
+        </Drawer>
+      )}
     </Stack>
   )
 }
