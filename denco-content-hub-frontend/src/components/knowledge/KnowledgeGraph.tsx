@@ -13,7 +13,7 @@ import {
   type NodeMouseHandler,
   type NodeChange,
 } from '@xyflow/react'
-import { Box, Stack, Text, Center, Skeleton, Button, Group, Drawer, Tabs } from '@mantine/core'
+import { Box, Stack, Text, Center, Skeleton, Button, Group, Drawer, Tabs, Paper, UnstyledButton } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { useMediaQuery, useLocalStorage } from '@mantine/hooks'
 import { IconPlus, IconCategory, IconArrowsExchange } from '@tabler/icons-react'
@@ -93,6 +93,7 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null)
   const [conflictModalOpen, setConflictModalOpen] = useState(false)
   const [typesDrawerOpen, setTypesDrawerOpen] = useState(false)
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
 
   const { data: conflicts } = useKgConflicts(scope === 'workspace' ? scopeId : 0)
 
@@ -267,6 +268,29 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
     [nodes, pinnedNodeIds, handleTogglePin],
   )
 
+  const closeContextMenu = useCallback(() => setContextMenu(null), [])
+
+  const handlePaneContextMenu = useCallback((event: MouseEvent | React.MouseEvent) => {
+    event.preventDefault()
+    setContextMenu({ x: event.clientX, y: event.clientY })
+  }, [])
+
+  useEffect(() => {
+    if (!contextMenu) return
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setContextMenu(null)
+    }
+    const handleScroll = () => setContextMenu(null)
+
+    window.addEventListener('keydown', handleEscape)
+    window.addEventListener('scroll', handleScroll, true)
+    return () => {
+      window.removeEventListener('keydown', handleEscape)
+      window.removeEventListener('scroll', handleScroll, true)
+    }
+  }, [contextMenu])
+
   const nodeTypes = useMemo(() => ({ knowledgeCard: KnowledgeNodeCard }), [])
   const edgeTypes = useMemo(() => ({ knowledgeEdge: KnowledgeEdgeCustom }), [])
 
@@ -341,6 +365,8 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={handleNodeClick}
+            onPaneContextMenu={handlePaneContextMenu}
+            onPaneClick={closeContextMenu}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             nodesDraggable={displayMode === 'free'}
@@ -369,6 +395,46 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
               }}
             />
           </ReactFlow>
+        )}
+
+        {contextMenu && (
+          <Paper
+            shadow="lg"
+            radius="md"
+            p={4}
+            style={{
+              position: 'fixed',
+              top: contextMenu.y,
+              left: contextMenu.x,
+              zIndex: 1000,
+              background: 'rgba(30, 30, 58, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid var(--border-subtle)',
+              minWidth: 180,
+            }}
+          >
+            <UnstyledButton
+              onClick={() => {
+                setCreateModalOpen(true)
+                setContextMenu(null)
+              }}
+              px="sm"
+              py={8}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                width: '100%',
+                borderRadius: 6,
+                color: 'var(--mantine-color-text)',
+                fontSize: 14,
+              }}
+              className="context-menu-item"
+            >
+              <IconPlus size={16} />
+              Создать узел
+            </UnstyledButton>
+          </Paper>
         )}
       </Box>
 

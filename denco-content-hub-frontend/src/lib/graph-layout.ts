@@ -26,6 +26,7 @@ export function applyDagreLayout<N extends Record<string, unknown>, E extends Re
   }
   for (const edge of edges) {
     g.setEdge(edge.source, edge.target)
+    g.setEdge(edge.target, edge.source)
   }
 
   Dagre.layout(g)
@@ -116,6 +117,7 @@ export function applyTreeLayout<N extends Record<string, unknown>, E extends Rec
   }
   for (const edge of edges) {
     g.setEdge(edge.source, edge.target)
+    g.setEdge(edge.target, edge.source)
   }
 
   Dagre.layout(g)
@@ -159,6 +161,7 @@ export function applyMindMapLayout<N extends Record<string, unknown>, E extends 
   for (const edge of edges) {
     if (!nodeIds.has(edge.source) || !nodeIds.has(edge.target)) continue
     outEdges.get(edge.source)!.push(edge.target)
+    outEdges.get(edge.target)!.push(edge.source)
     inDegree.set(edge.target, (inDegree.get(edge.target) ?? 0) + 1)
   }
 
@@ -282,7 +285,7 @@ export function animateNodePositions<N extends Record<string, unknown>>(
     if (rawProgress < 1) {
       animationId = requestAnimationFrame(animate)
     } else {
-      onComplete?.()
+      requestAnimationFrame(() => onComplete?.())
     }
   }
 

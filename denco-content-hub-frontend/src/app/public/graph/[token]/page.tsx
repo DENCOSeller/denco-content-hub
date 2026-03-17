@@ -185,7 +185,7 @@ export default function PublicGraphPage() {
         {isNotFound && <GraphUnavailable />}
         {error && !isNotFound && <GraphErrorState />}
         {data && (
-          <PublicGraphCanvas nodes={nodes} edges={edges} />
+          <PublicGraphCanvas nodes={nodes} edges={edges} rawNodes={data.nodes} />
         )}
       </Box>
     </Box>

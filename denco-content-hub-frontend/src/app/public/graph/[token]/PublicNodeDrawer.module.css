@@ -1,0 +1,71 @@
+/* PublicNodeDrawer — read-only viewer */
+
+.drawer :global(.mantine-Drawer-content) {
+  background: #0a0a0f;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.drawer :global(.mantine-Drawer-header) {
+  background: transparent;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.drawer :global(.mantine-Drawer-title) {
+  color: var(--text-primary, #f0f0ff);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.drawer :global(.mantine-Drawer-close) {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.drawer :global(.mantine-Drawer-close:hover) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.drawer :global(.mantine-Drawer-body) {
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Meta badges ── */
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+/* ── Content area ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+
+/* ── Empty state ── */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 14px;
+}
