@@ -17,6 +17,7 @@ from app.api.kg_types import router as kg_types_router
 from app.api.knowledge import router as knowledge_router
 from app.api.library import router as library_router
 from app.api.platform import router as platform_router
+from app.api.public_knowledge import router as public_knowledge_router
 from app.api.transcription import router as transcription_router
 from app.api.users import router as users_router
 from app.api.workspaces import router as workspaces_router
@@ -43,3 +44,4 @@ api_router.include_router(content_chat_router)
 api_router.include_router(library_router)
 api_router.include_router(content_plan_router)
 api_router.include_router(admin_router)
+api_router.include_router(public_knowledge_router)

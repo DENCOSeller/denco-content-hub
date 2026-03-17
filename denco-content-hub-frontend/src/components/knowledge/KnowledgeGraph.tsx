@@ -11,10 +11,11 @@ import {
   useReactFlow,
   useStoreApi,
   type NodeMouseHandler,
+  type NodeChange,
 } from '@xyflow/react'
 import { Box, Stack, Text, Center, Skeleton, Button, Group, Drawer, Tabs } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { useMediaQuery } from '@mantine/hooks'
+import { useMediaQuery, useLocalStorage } from '@mantine/hooks'
 import { IconPlus, IconCategory, IconArrowsExchange } from '@tabler/icons-react'
 
 import { KnowledgeNodeCard } from './KnowledgeNodeCard'
@@ -33,7 +34,11 @@ import { useDeleteNodeMutation } from '@/api/hooks/useKnowledge'
 import { useCompanyDeleteNodeMutation } from '@/api/hooks/useCompanyKnowledge'
 import { useKgConflicts } from '@/api/hooks/useKgConflicts'
 import { ErrorState } from '@/components/shared/ErrorState'
-import { applyDagreLayout, applyForceLayout, animateNodePositions } from '@/lib/graph-layout'
+import { applyDagreLayout, applyForceLayout, applyMindMapLayout, applyTreeLayout, animateNodePositions } from '@/lib/graph-layout'
+import type { KnowledgeNodeData } from '@/lib/knowledge-transform'
+import type { Node } from '@xyflow/react'
+
+export type DisplayMode = 'free' | 'mindmap' | 'tree'
 
 export interface KnowledgeGraphProps {
   scope: KnowledgeScope
@@ -76,7 +81,7 @@ function EmptyGraphState({ onCreateClick }: { onCreateClick: () => void }) {
 /** Desktop: ReactFlow canvas with toolbar */
 function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
   const {
-    nodes, allNodes, edges, onNodesChange, onEdgesChange,
+    nodes, allNodes, edges, allEdges, onNodesChange, onEdgesChange,
     onConnect, pendingConnection, clearPendingConnection,
     filterType, setFilterType, filterStatus, setFilterStatus,
     searchQuery, setSearchQuery,
@@ -98,9 +103,17 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
   const { getNodes, fitView: reactFlowFitView } = useReactFlow()
   const storeApi = useStoreApi()
 
+  const [displayMode, setDisplayMode] = useLocalStorage<DisplayMode>({
+    key: `knowledge-graph-display-mode-${scopeId}`,
+    defaultValue: 'free',
+  })
+  const displayModeRef = useRef<DisplayMode>(displayMode)
+  displayModeRef.current = displayMode
+
   const cancelAnimationRef = useRef<(() => void) | null>(null)
   const previousPositionsRef = useRef<Map<string, { x: number; y: number }> | null>(null)
   const previousNodesRef = useRef<typeof allNodes | null>(null)
+  const freePositionsRef = useRef<Node<KnowledgeNodeData>[] | null>(null)
   const [pinnedNodeIds, setPinnedNodeIds] = useState<Set<string>>(new Set())
 
   const handleTogglePin = useCallback((nodeId: string) => {
@@ -123,6 +136,49 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
     }
     return measured
   }, [storeApi])
+
+  const handleSwitchMode = useCallback(
+    (mode: DisplayMode) => {
+      cancelAnimationRef.current?.()
+      const measured = captureMeasuredMap()
+
+      if (mode === 'mindmap' || mode === 'tree') {
+        if (displayModeRef.current === 'free') {
+          freePositionsRef.current = [...allNodes]
+        }
+        const layoutNodes = mode === 'mindmap'
+          ? applyMindMapLayout(allNodes, allEdges)
+          : applyTreeLayout(allNodes, allEdges)
+        cancelAnimationRef.current = animateNodePositions(
+          allNodes, layoutNodes, setNodes, 300,
+          () => reactFlowFitView({ padding: 0.2, duration: 200 }),
+          measured,
+        )
+      } else {
+        const restoreNodes = freePositionsRef.current ?? allNodes
+        cancelAnimationRef.current = animateNodePositions(
+          allNodes, restoreNodes, setNodes, 300,
+          () => reactFlowFitView({ padding: 0.2, duration: 200 }),
+          measured,
+        )
+      }
+
+      setDisplayMode(mode)
+    },
+    [allNodes, allEdges, setNodes, reactFlowFitView, captureMeasuredMap, setDisplayMode],
+  )
+
+  const handleNodesChange = useCallback(
+    (changes: NodeChange<Node<KnowledgeNodeData>>[]) => {
+      if (displayModeRef.current !== 'free') {
+        const filtered = changes.filter((c) => !(c.type === 'position' && c.dragging === false))
+        if (filtered.length > 0) onNodesChange(filtered)
+        return
+      }
+      onNodesChange(changes)
+    },
+    [onNodesChange],
+  )
 
   const handleUndoLayout = useCallback(() => {
     if (!previousPositionsRef.current || !previousNodesRef.current) return
@@ -264,6 +320,8 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
           onCreateClick={() => setCreateModalOpen(true)}
           onAutoLayout={handleAutoLayout}
           onManageTypes={scope === 'company' ? () => setTypesDrawerOpen(true) : undefined}
+          displayMode={displayMode}
+          onSwitchMode={handleSwitchMode}
         />
       </Box>
 
@@ -279,13 +337,13 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
           <ReactFlow
             nodes={nodesWithPinState}
             edges={edges}
-            onNodesChange={onNodesChange}
+            onNodesChange={handleNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={handleNodeClick}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            nodesDraggable
+            nodesDraggable={displayMode === 'free'}
             fitView
             fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
             proOptions={{ hideAttribution: true }}

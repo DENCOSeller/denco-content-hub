@@ -210,6 +210,7 @@ export function useKnowledgeGraph(scopeId: number, scope: KnowledgeScope = 'work
     nodes: filteredNodes,
     allNodes: nodes,
     edges: filteredEdges,
+    allEdges: edges,
     onNodesChange,
     onEdgesChange,
     onConnect,
