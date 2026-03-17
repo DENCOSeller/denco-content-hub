@@ -243,6 +243,8 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
     <Stack gap={0} style={{ width: '100%', height: 'calc(100vh - 140px)' }}>
       <Box style={{ position: 'relative', zIndex: 5 }}>
         <KnowledgeToolbar
+          scope={scope}
+          scopeId={scopeId}
           filterType={filterType}
           onFilterChange={setFilterType}
           searchQuery={searchQuery}

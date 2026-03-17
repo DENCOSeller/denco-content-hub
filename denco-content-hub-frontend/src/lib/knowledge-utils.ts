@@ -17,7 +17,10 @@ import {
   IconLayoutGrid,
   IconStairs,
   IconUsersGroup,
+  IconQuestionMark,
 } from '@tabler/icons-react'
+
+import type { KgNodeTypeDefResponse } from '@/api/client/types.gen'
 
 export type NodeType =
   | 'target_audience'
@@ -39,12 +42,48 @@ export type NodeType =
   | 'hunt_level'
   | 'audience_segment'
 
+export type TablerIcon = typeof IconTarget
+
 export interface NodeTypeConfig {
   label: string
   color: string
   gradient: string
-  icon: typeof IconTarget
+  icon: TablerIcon
 }
+
+// ---------------------------------------------------------------------------
+// Маппинг строковых имён иконок → React-компоненты Tabler
+// ---------------------------------------------------------------------------
+
+export const ICON_MAP: Record<string, TablerIcon> = {
+  IconTarget,
+  IconBulb,
+  IconSpeakerphone,
+  IconArrowsSort,
+  IconUsers,
+  IconSearch,
+  IconBrandNotion,
+  IconNote,
+  IconMicrophone2,
+  IconFocus2,
+  IconMovie,
+  IconFishHook,
+  IconBox,
+  IconMoodSmile,
+  IconDeviceTv,
+  IconLayoutGrid,
+  IconStairs,
+  IconUsersGroup,
+  IconQuestionMark,
+}
+
+export function resolveIcon(iconName: string): TablerIcon {
+  return ICON_MAP[iconName] ?? IconQuestionMark
+}
+
+// ---------------------------------------------------------------------------
+// Hardcoded fallback — используется пока API не загрузился
+// ---------------------------------------------------------------------------
 
 export const NODE_TYPE_CONFIG: Record<NodeType, NodeTypeConfig> = {
   target_audience: {
@@ -157,6 +196,41 @@ export const NODE_TYPE_CONFIG: Record<NodeType, NodeTypeConfig> = {
   },
 }
 
+// ---------------------------------------------------------------------------
+// Построение конфига из API-ответа
+// ---------------------------------------------------------------------------
+
+function defaultGradient(color: string): string {
+  return `linear-gradient(135deg, ${color}, ${color}99)`
+}
+
+export function buildNodeTypeConfig(
+  apiTypes: KgNodeTypeDefResponse[],
+): Record<string, NodeTypeConfig> {
+  const result: Record<string, NodeTypeConfig> = {}
+  for (const t of apiTypes) {
+    if (!t.is_active) continue
+    result[t.slug] = {
+      label: t.label,
+      color: t.color,
+      gradient: t.gradient ?? defaultGradient(t.color),
+      icon: resolveIcon(t.icon),
+    }
+  }
+  return result
+}
+
+export function mergeNodeTypeConfig(
+  apiConfig: Record<string, NodeTypeConfig> | undefined,
+): Record<string, NodeTypeConfig> {
+  if (!apiConfig) return NODE_TYPE_CONFIG
+  return { ...NODE_TYPE_CONFIG, ...apiConfig }
+}
+
+// ---------------------------------------------------------------------------
+// Публичные утилиты (обратная совместимость)
+// ---------------------------------------------------------------------------
+
 export const NODE_TYPE_OPTIONS = Object.entries(NODE_TYPE_CONFIG).map(
   ([value, config]) => ({
     value,
@@ -164,6 +238,21 @@ export const NODE_TYPE_OPTIONS = Object.entries(NODE_TYPE_CONFIG).map(
   }),
 )
 
-export function getNodeTypeConfig(nodeType: string): NodeTypeConfig {
+export function buildNodeTypeOptions(
+  config: Record<string, NodeTypeConfig>,
+): Array<{ value: string; label: string }> {
+  return Object.entries(config).map(([value, c]) => ({
+    value,
+    label: c.label,
+  }))
+}
+
+export function getNodeTypeConfig(
+  nodeType: string,
+  config?: Record<string, NodeTypeConfig>,
+): NodeTypeConfig {
+  if (config) {
+    return config[nodeType] ?? config['note'] ?? NODE_TYPE_CONFIG.note
+  }
   return NODE_TYPE_CONFIG[nodeType as NodeType] ?? NODE_TYPE_CONFIG.note
 }

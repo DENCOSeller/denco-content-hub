@@ -866,6 +866,146 @@ export type InvitationResponse = {
 export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'cancelled';
 
 /**
+ * KgEdgeTypeDefCreate
+ */
+export type KgEdgeTypeDefCreate = {
+    /**
+     * Slug
+     */
+    slug: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Is Directed
+     */
+    is_directed?: boolean;
+};
+
+/**
+ * KgEdgeTypeDefResponse
+ */
+export type KgEdgeTypeDefResponse = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Slug
+     */
+    slug: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Label En
+     */
+    label_en?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Is Directed
+     */
+    is_directed: boolean;
+    /**
+     * Is System
+     */
+    is_system: boolean;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Company Id
+     */
+    company_id?: number | null;
+};
+
+/**
+ * KgNodeTypeDefCreate
+ */
+export type KgNodeTypeDefCreate = {
+    /**
+     * Slug
+     */
+    slug: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Icon
+     */
+    icon?: string;
+    /**
+     * Color
+     */
+    color?: string;
+    /**
+     * Gradient
+     */
+    gradient?: string | null;
+};
+
+/**
+ * KgNodeTypeDefResponse
+ */
+export type KgNodeTypeDefResponse = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Slug
+     */
+    slug: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Label En
+     */
+    label_en?: string | null;
+    /**
+     * Icon
+     */
+    icon: string;
+    /**
+     * Color
+     */
+    color: string;
+    /**
+     * Gradient
+     */
+    gradient?: string | null;
+    /**
+     * Sort Order
+     */
+    sort_order: number;
+    /**
+     * Is System
+     */
+    is_system: boolean;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Company Id
+     */
+    company_id?: number | null;
+};
+
+/**
  * KnowledgeEdgeCreate
  */
 export type KnowledgeEdgeCreate = {
@@ -889,6 +1029,10 @@ export type KnowledgeEdgeCreate = {
      * Weight
      */
     weight?: number;
+    /**
+     * Edge Type Def Id
+     */
+    edge_type_def_id?: number | null;
 };
 
 /**
@@ -919,6 +1063,14 @@ export type KnowledgeEdgeResponse = {
      * Weight
      */
     weight: number;
+    /**
+     * Edge Type Def Id
+     */
+    edge_type_def_id?: number | null;
+    /**
+     * Edge Type Def
+     */
+    edge_type_def?: KgEdgeTypeDefResponse | null;
     /**
      * Created By User Id
      */
@@ -970,6 +1122,26 @@ export type KnowledgeNodeCreate = {
      * Position Y
      */
     position_y?: number;
+    /**
+     * Status
+     */
+    status?: string;
+    /**
+     * Owner Role
+     */
+    owner_role?: string | null;
+    /**
+     * Source
+     */
+    source?: string | null;
+    /**
+     * Confidence
+     */
+    confidence?: string | null;
+    /**
+     * Node Type Def Id
+     */
+    node_type_def_id?: number | null;
 };
 
 /**
@@ -1033,6 +1205,38 @@ export type KnowledgeNodeResponse = {
      */
     usage_count?: number;
     /**
+     * Status
+     */
+    status?: string;
+    /**
+     * Owner Role
+     */
+    owner_role?: string | null;
+    /**
+     * Source
+     */
+    source?: string | null;
+    /**
+     * Confidence
+     */
+    confidence?: string | null;
+    /**
+     * Last Reviewed
+     */
+    last_reviewed?: string | null;
+    /**
+     * Superseded By Node Id
+     */
+    superseded_by_node_id?: number | null;
+    /**
+     * Node Type Def Id
+     */
+    node_type_def_id?: number | null;
+    /**
+     * Node Type Def
+     */
+    node_type_def?: KgNodeTypeDefResponse | null;
+    /**
      * Created At
      */
     created_at: string;
@@ -1072,6 +1276,30 @@ export type KnowledgeNodeUpdate = {
      * Is Position Fixed
      */
     is_position_fixed?: boolean | null;
+    /**
+     * Status
+     */
+    status?: string | null;
+    /**
+     * Owner Role
+     */
+    owner_role?: string | null;
+    /**
+     * Source
+     */
+    source?: string | null;
+    /**
+     * Confidence
+     */
+    confidence?: string | null;
+    /**
+     * Node Type Def Id
+     */
+    node_type_def_id?: number | null;
+    /**
+     * Last Reviewed
+     */
+    last_reviewed?: string | null;
 };
 
 /**

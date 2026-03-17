@@ -1,22 +1,21 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useReactFlow } from '@xyflow/react'
 import { ActionIcon, Button, Group, Menu, Select, Text, TextInput, Tooltip, Divider } from '@mantine/core'
 import { IconPlus, IconMaximize, IconSearch, IconX, IconLayoutDashboard, IconBinaryTree, IconAtom } from '@tabler/icons-react'
 import { motion } from 'motion/react'
 
-import { NODE_TYPE_OPTIONS } from '@/lib/knowledge-utils'
 import type { NodeType } from '@/lib/knowledge-utils'
+import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
+import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
+import { useCompanyStore } from '@/stores/company-store'
 
 const DEBOUNCE_MS = 300
 
-const FILTER_OPTIONS = [
-  { value: '__all__', label: 'Все типы' },
-  ...NODE_TYPE_OPTIONS,
-]
-
 interface KnowledgeToolbarProps {
+  scope: KnowledgeScope
+  scopeId: number
   filterType: NodeType | null
   onFilterChange: (value: NodeType | null) => void
   searchQuery: string
@@ -26,6 +25,8 @@ interface KnowledgeToolbarProps {
 }
 
 export function KnowledgeToolbar({
+  scope,
+  scopeId,
   filterType,
   onFilterChange,
   searchQuery,
@@ -34,6 +35,15 @@ export function KnowledgeToolbar({
   onAutoLayout,
 }: KnowledgeToolbarProps) {
   const { fitView } = useReactFlow()
+  const activeCompany = useCompanyStore((s) => s.activeCompany)
+  const companyId = scope === 'company' ? scopeId : (activeCompany?.id ?? 0)
+  const { typeOptions } = useNodeTypeConfig(companyId)
+
+  const filterOptions = useMemo(
+    () => [{ value: '__all__', label: 'Все типы' }, ...typeOptions],
+    [typeOptions],
+  )
+
   const [localSearch, setLocalSearch] = useState(searchQuery)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -89,7 +99,7 @@ export function KnowledgeToolbar({
           <Select
             size="xs"
             w={180}
-            data={FILTER_OPTIONS}
+            data={filterOptions}
             value={filterType ?? '__all__'}
             onChange={(v) => onFilterChange(v === '__all__' ? null : (v as NodeType))}
             allowDeselect={false}

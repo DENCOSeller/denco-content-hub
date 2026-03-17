@@ -13,10 +13,12 @@ import {
   Textarea,
 } from '@mantine/core'
 
-import { NODE_TYPE_CONFIG, type NodeType } from '@/lib/knowledge-utils'
+import type { NodeType } from '@/lib/knowledge-utils'
 import { useCreateNodeMutation } from '@/api/hooks/useKnowledge'
 import { useCompanyCreateNodeMutation } from '@/api/hooks/useCompanyKnowledge'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
+import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
+import { useCompanyStore } from '@/stores/company-store'
 
 import styles from './CreateNodeModal.module.css'
 
@@ -31,8 +33,6 @@ interface CreateNodeModalProps {
   opened: boolean
   onClose: () => void
 }
-
-const NODE_TYPES = Object.entries(NODE_TYPE_CONFIG) as [NodeType, (typeof NODE_TYPE_CONFIG)[NodeType]][]
 
 const SPEAKER_STYLE_OPTIONS = [
   { value: 'expert', label: 'Экспертный' },
@@ -55,11 +55,17 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
   const [title, setTitle] = useState('')
   const [content, setContent] = useState<Record<string, unknown> | null>(null)
 
+  const activeCompany = useCompanyStore((s) => s.activeCompany)
+  const companyId = scope === 'company' ? scopeId : (activeCompany?.id ?? 0)
+  const { config, getConfig, isLoading: isTypesLoading } = useNodeTypeConfig(companyId)
+
+  const nodeTypes = Object.entries(config) as [NodeType, (typeof config)[string]][]
+
   const workspaceCreate = useCreateNodeMutation(scope === 'workspace' ? scopeId : 0)
   const companyCreate = useCompanyCreateNodeMutation(scope === 'company' ? scopeId : 0)
   const createNode = scope === 'workspace' ? workspaceCreate : companyCreate
 
-  const selectedConfig = NODE_TYPE_CONFIG[selectedType]
+  const selectedConfig = getConfig(selectedType)
 
   const reset = () => {
     setSelectedType('note')
@@ -114,26 +120,27 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
 
             {/* Type picker */}
             <div className={styles.typeGrid}>
-              {NODE_TYPES.map(([type, config]) => {
-                const Icon = config.icon
+              {isTypesLoading && <Loader size="sm" />}
+              {nodeTypes.map(([type, cfg]) => {
+                const Icon = cfg.icon
                 const isSelected = selectedType === type
                 const cssVars = {
-                  '--type-color': config.color,
-                  '--type-color-rgb': hexToRgb(config.color),
+                  '--type-color': cfg.color,
+                  '--type-color-rgb': hexToRgb(cfg.color),
                 } as React.CSSProperties
 
                 return (
                   <UnstyledButton
                     key={type}
-                    onClick={() => { setSelectedType(type); setContent(null) }}
+                    onClick={() => { setSelectedType(type as NodeType); setContent(null) }}
                     className={`${styles.typeCard} ${isSelected ? styles.typeCardSelected : ''}`}
                     style={cssVars}
                   >
-                    <div className={styles.typeIcon} style={{ background: config.gradient }}>
+                    <div className={styles.typeIcon} style={{ background: cfg.gradient }}>
                       <Icon size={20} color="#fff" stroke={1.8} />
                     </div>
                     <span className={`${styles.typeLabel} ${isSelected ? styles.typeLabelSelected : ''}`}>
-                      {config.label}
+                      {cfg.label}
                     </span>
                   </UnstyledButton>
                 )
