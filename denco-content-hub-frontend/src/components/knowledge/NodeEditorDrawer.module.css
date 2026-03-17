@@ -33,7 +33,7 @@
 }
 
 .splitLeft {
-  width: 60%;
+  width: 65%;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -47,7 +47,7 @@
 }
 
 .splitRight {
-  width: 40%;
+  width: 35%;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -58,118 +58,74 @@
 .editorContent {
   flex: 1;
   overflow-y: auto;
-  padding: 0 24px;
+  padding: 0 20px;
+  min-height: 300px;
 }
 
-/* ── Footer ── */
-.footer {
+/* ── Status Bar (compact footer) ── */
+.statusBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  height: 24px;
+  padding: 0 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
 
-/* ── Save status ── */
-.saveStatus {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
+.statusBarText {
+  font-size: 11px;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
 }
 
-.saveStatusSaved {
-  color: #30D158;
-}
-
-.saveStatusSaving {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.saveStatusDirty {
-  color: rgba(255, 255, 255, 0.25);
-}
-
-.saveDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.saveDotSaved {
-  background: #30D158;
-}
-
-.saveDotSaving {
-  background: rgba(255, 255, 255, 0.35);
-  animation: savePulse 1s ease-in-out infinite;
-}
-
-.saveDotDirty {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-@keyframes savePulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-
-/* ── Delete button ── */
-.deleteBtn {
-  color: rgba(255, 80, 70, 0.7);
-  font-size: 13px;
+.statusBarDelete {
+  font-size: 11px;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.2);
   background: transparent;
   border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  padding: 0 4px;
+  border-radius: 3px;
+  transition: all 150ms ease;
 }
 
-.deleteBtn:hover {
-  background: rgba(255, 80, 70, 0.1);
+.statusBarDelete:hover {
+  color: rgba(255, 80, 70, 0.7);
+}
+
+.statusBarDeleteConfirm {
   color: #FF453A;
 }
 
-.deleteBtnConfirm {
-  background: rgba(255, 80, 70, 0.15);
+.statusBarDeleteConfirm:hover {
   color: #FF453A;
-}
-
-.deleteBtnConfirm:hover {
-  background: rgba(255, 80, 70, 0.25);
 }
 
 /* ── History modal ── */
-.historyModal :global(.mantine-Modal-content) {
+.historyModal :global(.mantine-Drawer-content) {
   background: #0a0a0f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.historyModal :global(.mantine-Modal-header) {
+.historyModal :global(.mantine-Drawer-header) {
   background: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.historyModal :global(.mantine-Modal-title) {
+.historyModal :global(.mantine-Drawer-title) {
   color: var(--text-primary, #f0f0ff);
   font-weight: 600;
   font-size: 15px;
 }
 
-.historyModal :global(.mantine-Modal-close) {
+.historyModal :global(.mantine-Drawer-close) {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.historyModal :global(.mantine-Modal-close:hover) {
-  background: rgba(255, 255, 255, 0.07);
+.historyModal :global(.mantine-Drawer-close:hover) {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ── History panel ── */
@@ -217,91 +173,6 @@
   letter-spacing: 0.3px;
 }
 
-/* ── Relations section ── */
-.relationsSection {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 12px 24px;
-  flex-shrink: 0;
-}
-
-.relationsHeader {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 8px;
-}
-
-.relationsList {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-height: 180px;
-  overflow-y: auto;
-}
-
-.relationRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s ease;
-  width: 100%;
-  text-align: left;
-}
-
-.relationRow:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.relationTitle {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary, #f0f0ff);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.relationArrow {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
-}
-
-.relationLabel {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.3);
-  flex-shrink: 0;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ── Metadata / Provenance section ── */
-.metadataSection {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 12px 24px;
-  flex-shrink: 0;
-}
-
-.metadataHeader {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 12px;
-}
-
 /* ── Mobile panel switcher ── */
 .mobileSwitcher {
   flex-shrink: 0;
@@ -323,19 +194,11 @@
   }
 
   .editorContent {
+    padding: 12px;
+  }
+
+  .statusBar {
     padding: 0 12px;
-  }
-
-  .relationsSection {
-    padding: 12px;
-  }
-
-  .metadataSection {
-    padding: 12px;
-  }
-
-  .footer {
-    padding: 10px 12px;
   }
 }
 

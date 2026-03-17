@@ -14,10 +14,9 @@ import {
   Select,
   Textarea,
   Stack,
-  Slider,
+  SimpleGrid,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { IconTrash } from '@tabler/icons-react'
 
 import {
   useNodeQuery,
@@ -38,6 +37,7 @@ import { markdownToHtml } from '@/lib/markdown-to-html'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 
 import { EditorToolbar } from './EditorToolbar'
+import { PropertyBar } from './PropertyBar'
 import { NodeAiChat } from './NodeAiChat'
 import styles from './NodeEditorDrawer.module.css'
 
@@ -198,7 +198,8 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
       setTitle(node.title)
       setContent((node.content as Record<string, unknown>) ?? null)
       const s = node.status ?? 'active'
-      const c = parseFloat(node.confidence ?? '') || 1
+      const parsed = parseFloat(node.confidence ?? '')
+      const c = Number.isNaN(parsed) ? 1 : parsed
       const src = node.source ?? ''
       setNodeStatus(s)
       setConfidence(c)
@@ -408,12 +409,6 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
               onBack={() => setInternalNodeId(nodeId)}
               onTitleChange={handleToolbarTitleChange}
               onHistoryClick={() => setShowHistory(true)}
-              onSave={() => {
-                if (activeNodeId && isDirty) {
-                  if (debounceRef.current) clearTimeout(debounceRef.current)
-                  doSave(title, content)
-                }
-              }}
               onClose={() => {
                 if (debounceRef.current) {
                   clearTimeout(debounceRef.current)
@@ -434,6 +429,21 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
               }}
             />
 
+            {/* ── PropertyBar ── */}
+            <PropertyBar
+              status={nodeStatus}
+              confidence={confidence}
+              ownerRole={node.owner_role}
+              source={source}
+              lastReviewed={node.last_reviewed}
+              connectedNodes={connectedNodes}
+              onStatusChange={(val) => handleProvenanceChange('status', val)}
+              onConfidenceChange={(val) => { setConfidence(val); confidenceRef.current = val }}
+              onConfidenceChangeEnd={(val) => handleProvenanceChange('confidence', val)}
+              onSourceChange={(val) => handleProvenanceChange('source', val)}
+              onNavigateToNode={(id) => setInternalNodeId(id)}
+            />
+
             {/* ── Split layout ── */}
             <div className={styles.splitLayout}>
               {/* Left: Editor */}
@@ -443,26 +453,30 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
               >
                 <div className={styles.editorContent}>
                   {isSpeaker ? (
-                    <Stack gap="md" p="md">
-                      <TextInput
-                        label="Должность"
-                        placeholder="Например: CEO, Маркетолог"
-                        value={(content?.position as string) ?? ''}
-                        onChange={(e) => handleSpeakerFieldChange('position', e.currentTarget.value)}
-                      />
-                      <Select
-                        label="Стиль подачи"
-                        placeholder="Выберите стиль"
-                        data={SPEAKER_STYLE_OPTIONS}
-                        value={(content?.style as string) ?? null}
-                        onChange={(val) => handleSpeakerFieldChange('style', val)}
-                        clearable
-                      />
+                    <Stack gap="sm" p="md">
+                      <SimpleGrid cols={2} spacing="sm">
+                        <TextInput
+                          label="Должность"
+                          placeholder="CEO, Маркетолог"
+                          size="sm"
+                          value={(content?.position as string) ?? ''}
+                          onChange={(e) => handleSpeakerFieldChange('position', e.currentTarget.value)}
+                        />
+                        <Select
+                          label="Стиль подачи"
+                          placeholder="Выберите стиль"
+                          size="sm"
+                          data={SPEAKER_STYLE_OPTIONS}
+                          value={(content?.style as string) ?? null}
+                          onChange={(val) => handleSpeakerFieldChange('style', val)}
+                          clearable
+                        />
+                      </SimpleGrid>
                       <Textarea
                         label="Особенности"
                         placeholder="Особенности спикера для написания сценариев..."
                         autosize
-                        minRows={3}
+                        minRows={2}
                         maxRows={6}
                         value={(content?.notes as string) ?? ''}
                         onChange={(e) => handleSpeakerFieldChange('notes', e.currentTarget.value)}
@@ -471,7 +485,7 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                         label="Описание для AI"
                         placeholder="Инструкция для AI при генерации контента..."
                         autosize
-                        minRows={3}
+                        minRows={2}
                         maxRows={6}
                         value={(content?.ai_description as string) ?? ''}
                         onChange={(e) => handleSpeakerFieldChange('ai_description', e.currentTarget.value)}
@@ -479,6 +493,7 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                       <TextInput
                         label="Фото URL"
                         placeholder="https://example.com/photo.jpg"
+                        size="sm"
                         value={(content?.photo_url as string) ?? ''}
                         onChange={(e) => handleSpeakerFieldChange('photo_url', e.currentTarget.value)}
                       />
@@ -489,138 +504,22 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                       onChange={handleContentChange}
                       onEditorReady={handleEditorReady}
                       accentGradient={typeConfig?.gradient}
-                      placeholder="Начните описывать этот узел..."
+                      placeholder="Начните писать..."
                       borderless
                     />
                   )}
                 </div>
 
-                {/* Relations */}
-                {connectedNodes.length > 0 && (
-                  <div className={styles.relationsSection}>
-                    <div className={styles.relationsHeader}>
-                      Связи ({connectedNodes.length})
-                    </div>
-                    <div className={styles.relationsList}>
-                      {connectedNodes.map((rel) => {
-                        const relConfig = getNodeTypeConfig(rel.nodeType)
-                        const RelIcon = relConfig.icon
-                        return (
-                          <button
-                            key={rel.edgeId}
-                            type="button"
-                            className={styles.relationRow}
-                            onClick={() => setInternalNodeId(rel.nodeId)}
-                          >
-                            <RelIcon size={14} color={relConfig.color} stroke={1.8} />
-                            <span className={styles.relationTitle}>{rel.title}</span>
-                            <span className={styles.relationArrow}>
-                              {rel.direction === 'outgoing' ? '→' : '←'}
-                            </span>
-                            <span className={styles.relationLabel}>{rel.label}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Metadata / Provenance */}
-                <div className={styles.metadataSection}>
-                  <div className={styles.metadataHeader}>Метаданные</div>
-                  <Stack gap="sm">
-                    <Select
-                      label="Статус"
-                      size="xs"
-                      value={nodeStatus}
-                      onChange={(val) => {
-                        if (val) handleProvenanceChange('status', val)
-                      }}
-                      data={[
-                        { value: 'active', label: 'Активный' },
-                        { value: 'draft', label: 'Черновик' },
-                        { value: 'deprecated', label: 'Устаревший' },
-                        { value: 'archived', label: 'Архив' },
-                      ]}
-                    />
-                    <div>
-                      <Text size="xs" fw={500} mb={4}>
-                        Уверенность: {Math.round(confidence * 100)}%
-                      </Text>
-                      <Slider
-                        size="xs"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={confidence}
-                        onChange={(val) => setConfidence(val)}
-                        onChangeEnd={(val) => handleProvenanceChange('confidence', val)}
-                        label={(val) => `${Math.round(val * 100)}%`}
-                      />
-                    </div>
-                    <div>
-                      <Text size="xs" fw={500} mb={4}>Владелец</Text>
-                      <Badge size="sm" variant="light" color="gray">
-                        {node.owner_role === 'company'
-                          ? 'Компания'
-                          : 'Рабочее пространство'}
-                      </Badge>
-                    </div>
-                    <TextInput
-                      label="Источник"
-                      size="xs"
-                      placeholder="URL или описание источника"
-                      value={source}
-                      onChange={(e) => handleProvenanceChange('source', e.currentTarget.value)}
-                    />
-                    <div>
-                      <Text size="xs" fw={500} mb={4}>Последняя проверка</Text>
-                      <Text size="xs" c="dimmed">
-                        {node.last_reviewed
-                          ? new Date(node.last_reviewed).toLocaleString('ru-RU', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : 'Не проверялся'}
-                      </Text>
-                    </div>
-                  </Stack>
-                </div>
-
-                {/* Footer */}
-                <div className={styles.footer}>
-                  <div
-                    className={`${styles.saveStatus} ${
-                      saveState === 'saved'
-                        ? styles.saveStatusSaved
-                        : saveState === 'saving'
-                          ? styles.saveStatusSaving
-                          : styles.saveStatusDirty
-                    }`}
-                  >
-                    <div
-                      className={`${styles.saveDot} ${
-                        saveState === 'saved'
-                          ? styles.saveDotSaved
-                          : saveState === 'saving'
-                            ? styles.saveDotSaving
-                            : styles.saveDotDirty
-                      }`}
-                    />
-                    <span>{saveStatusText}</span>
-                  </div>
-
+                {/* Status Bar (footer) */}
+                <div className={styles.statusBar}>
+                  <span className={styles.statusBarText}>{saveStatusText}</span>
                   <button
                     type="button"
-                    className={`${styles.deleteBtn} ${confirmDelete ? styles.deleteBtnConfirm : ''}`}
+                    className={`${styles.statusBarDelete} ${confirmDelete ? styles.statusBarDeleteConfirm : ''}`}
                     onClick={handleDelete}
                     disabled={deleteMutation.isPending}
                   >
-                    <IconTrash size={14} stroke={1.8} />
-                    {confirmDelete ? 'Подтвердить' : 'Удалить'}
+                    {confirmDelete ? 'Подтвердить удаление' : 'Удалить'}
                   </button>
                 </div>
               </div>

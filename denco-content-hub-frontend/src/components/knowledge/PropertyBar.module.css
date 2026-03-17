@@ -1,0 +1,173 @@
+/* PropertyBar — compact metadata strip */
+
+.propertyBar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 28px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.propertyBar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Chip ── */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 150ms ease;
+  user-select: none;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+}
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.chipReadonly {
+  cursor: default;
+}
+
+.chipReadonly:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.chipDimmed {
+  color: rgba(255, 255, 255, 0.25);
+  cursor: default;
+}
+
+.chipDimmed:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Status dot ── */
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color 200ms ease;
+}
+
+.statusActive { background: #30D158; }
+.statusDraft { background: #FF9F0A; }
+.statusDeprecated { background: #FF453A; }
+.statusArchived { background: rgba(255, 255, 255, 0.3); }
+
+/* ── Divider ── */
+.divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* ── Popover ── */
+.popoverDropdown {
+  background: rgba(30, 30, 35, 0.95) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ── Relations collapse ── */
+.relationsCollapse {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.relationsCollapseInner {
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 4px 0 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.relationsCollapseInner::-webkit-scrollbar {
+  width: 4px;
+}
+
+.relationsCollapseInner::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.relationsCollapseInner::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+
+.relationRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 20px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 100ms ease;
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+}
+
+.relationRow:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.relationTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.relationLabel {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Mobile ── */
+@media (max-width: 767px) {
+  .propertyBar {
+    padding: 0 12px;
+  }
+
+  .relationRow {
+    padding: 0 12px;
+  }
+}

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { TextInput } from '@mantine/core'
-import { IconArrowLeft, IconHistory, IconDeviceFloppy, IconX } from '@tabler/icons-react'
+import { IconArrowLeft, IconHistory, IconX } from '@tabler/icons-react'
 import styles from './EditorToolbar.module.css'
 
 type SaveState = 'saved' | 'saving' | 'dirty' | 'idle'
@@ -14,7 +14,6 @@ interface EditorToolbarProps {
   onBack: () => void
   onTitleChange: (newTitle: string) => void
   onHistoryClick: () => void
-  onSave: () => void
   onClose: () => void
 }
 
@@ -25,7 +24,6 @@ export function EditorToolbar({
   onBack,
   onTitleChange,
   onHistoryClick,
-  onSave,
   onClose,
 }: EditorToolbarProps) {
   const [isEditing, setIsEditing] = useState(false)
@@ -125,16 +123,8 @@ export function EditorToolbar({
           <IconHistory size={18} stroke={1.5} />
         </button>
 
-        <div className={styles.saveGroup}>
+        <div className={styles.saveGroup} title={isDirty ? 'Не сохранено' : 'Сохранено'}>
           <div className={`${styles.saveIndicator} ${indicatorClass}`} />
-          <button
-            type="button"
-            className={`${styles.ghostButton} ${isDirty ? styles.saveDirty : ''}`}
-            onClick={onSave}
-            aria-label="Сохранить"
-          >
-            <IconDeviceFloppy size={18} stroke={1.5} />
-          </button>
         </div>
 
         <div className={styles.divider} />

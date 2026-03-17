@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 48px;
+  height: 40px;
   padding: 0 12px;
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -132,19 +132,10 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-.saveDirty {
-  color: #ff9f0a;
-}
-
-.saveDirty:hover {
-  color: #ffb340;
-  background: rgba(255, 159, 10, 0.1);
-}
-
 .divider {
   width: 1px;
   height: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
   margin: 0 2px;
 }
