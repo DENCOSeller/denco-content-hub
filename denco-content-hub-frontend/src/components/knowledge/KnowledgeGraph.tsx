@@ -24,9 +24,12 @@ import { CreateNodeModal } from './CreateNodeModal'
 import { CreateEdgeModal } from './CreateEdgeModal'
 import { NodeEditorDrawer } from './NodeEditorDrawer'
 import { NodeListView } from './NodeListView'
+import { ConflictBanner } from './ConflictBanner'
+import { ConflictModal } from './ConflictModal'
 import { useKnowledgeGraph, type KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 import { useDeleteNodeMutation } from '@/api/hooks/useKnowledge'
 import { useCompanyDeleteNodeMutation } from '@/api/hooks/useCompanyKnowledge'
+import { useKgConflicts } from '@/api/hooks/useKgConflicts'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { applyDagreLayout, applyForceLayout, animateNodePositions } from '@/lib/graph-layout'
 
@@ -81,6 +84,9 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
 
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null)
+  const [conflictModalOpen, setConflictModalOpen] = useState(false)
+
+  const { data: conflicts } = useKgConflicts(scope === 'workspace' ? scopeId : 0)
 
   const workspaceDelete = useDeleteNodeMutation(scope === 'workspace' ? scopeId : 0)
   const companyDelete = useCompanyDeleteNodeMutation(scope === 'company' ? scopeId : 0)
@@ -257,6 +263,11 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
         />
       </Box>
 
+      <ConflictBanner
+        conflictCount={conflicts?.length ?? 0}
+        onReviewClick={() => setConflictModalOpen(true)}
+      />
+
       <Box style={{ flex: 1, minHeight: 0, height: '100%' }}>
         {isEmpty ? (
           <EmptyGraphState onCreateClick={() => setCreateModalOpen(true)} />
@@ -321,6 +332,13 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
         nodeId={selectedNodeId}
         opened={selectedNodeId !== null}
         onClose={() => setSelectedNodeId(null)}
+      />
+
+      <ConflictModal
+        opened={conflictModalOpen}
+        onClose={() => setConflictModalOpen(false)}
+        conflicts={conflicts ?? []}
+        workspaceId={scope === 'workspace' ? scopeId : 0}
       />
     </Stack>
   )
