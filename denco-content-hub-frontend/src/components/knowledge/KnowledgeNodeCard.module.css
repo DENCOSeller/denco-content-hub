@@ -10,3 +10,8 @@
 .cardAppear {
   animation: nodeAppear 0.25s ease-out;
 }
+
+.cardSelected {
+  box-shadow: 0 0 0 2px var(--selection-color), 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  border-color: var(--selection-color) !important;
+}

@@ -46,10 +46,11 @@ function KnowledgeNodeCardComponent({ data, selected }: NodeProps & { data: Know
     <>
       <Handle type="target" position={Position.Top} style={HANDLE_STYLE} />
       <Box
-          className={`${styles.cardAppear} knowledge-node-card`}
+          className={`${styles.cardAppear} knowledge-node-card${selected ? ` ${styles.cardSelected}` : ''}`}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           style={{
+            '--selection-color': data.color,
             width: 260,
             position: 'relative',
             background: 'var(--card-bg)',
@@ -64,11 +65,9 @@ function KnowledgeNodeCardComponent({ data, selected }: NodeProps & { data: Know
             padding: '12px 14px',
             cursor: 'grab',
             transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-            boxShadow: selected
-              ? `0 0 0 1px ${data.color}33, 0 4px 12px rgba(0,0,0,0.3)`
-              : '0 2px 8px rgba(0,0,0,0.2)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
             opacity: isDeprecated ? 0.6 : undefined,
-          }}
+          } as React.CSSProperties}
         >
           {(hovered || isPinned) && (
             <ActionIcon

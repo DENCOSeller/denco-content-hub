@@ -8,15 +8,17 @@ import {
   Controls,
   MiniMap,
   BackgroundVariant,
+  SelectionMode,
   useReactFlow,
   useStoreApi,
   type NodeMouseHandler,
   type NodeChange,
 } from '@xyflow/react'
-import { Box, Stack, Text, Center, Skeleton, Button, Group, Drawer, Tabs, Paper, UnstyledButton } from '@mantine/core'
+import { ActionIcon, Box, Group, Stack, Text, Center, Skeleton, Drawer, Tabs, Paper, Tooltip, UnstyledButton } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
 import { useMediaQuery, useLocalStorage } from '@mantine/hooks'
-import { IconPlus, IconCategory, IconArrowsExchange } from '@tabler/icons-react'
+import { IconPlus, IconCategory, IconArrowsExchange, IconBinaryTree, IconArrowDown, IconArrowRight, IconArrowUp, IconArrowLeft } from '@tabler/icons-react'
 
 import { KnowledgeNodeCard } from './KnowledgeNodeCard'
 import { KnowledgeEdgeCustom } from './KnowledgeEdgeCustom'
@@ -34,11 +36,11 @@ import { useDeleteNodeMutation } from '@/api/hooks/useKnowledge'
 import { useCompanyDeleteNodeMutation } from '@/api/hooks/useCompanyKnowledge'
 import { useKgConflicts } from '@/api/hooks/useKgConflicts'
 import { ErrorState } from '@/components/shared/ErrorState'
-import { applyDagreLayout, applyForceLayout, applyMindMapLayout, applyTreeLayout, animateNodePositions } from '@/lib/graph-layout'
+import { applyClusterLayout, applySubtreeDagreLayout, animateNodePositions, type DagreDirection } from '@/lib/graph-layout'
 import type { KnowledgeNodeData } from '@/lib/knowledge-transform'
 import type { Node } from '@xyflow/react'
 
-export type DisplayMode = 'free' | 'mindmap' | 'tree'
+export type DisplayMode = 'free' | 'clusters'
 
 export interface KnowledgeGraphProps {
   scope: KnowledgeScope
@@ -85,7 +87,8 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
     onConnect, pendingConnection, clearPendingConnection,
     filterType, setFilterType, filterStatus, setFilterStatus,
     searchQuery, setSearchQuery,
-    setNodes, savePositions,
+    setNodes,
+    savePositions,
     isLoading, isError,
   } = useKnowledgeGraph(scopeId, scope)
 
@@ -94,6 +97,7 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
   const [conflictModalOpen, setConflictModalOpen] = useState(false)
   const [typesDrawerOpen, setTypesDrawerOpen] = useState(false)
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
+  const [nodeContextMenu, setNodeContextMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null)
 
   const { data: conflicts } = useKgConflicts(scope === 'workspace' ? scopeId : 0)
 
@@ -108,12 +112,12 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
     key: `knowledge-graph-display-mode-${scopeId}`,
     defaultValue: 'free',
   })
-  const displayModeRef = useRef<DisplayMode>(displayMode)
-  displayModeRef.current = displayMode
+  // Fallback: old values (orgchart, mindmap, tree) → free
+  const safeDisplayMode: DisplayMode = (displayMode === 'free' || displayMode === 'clusters') ? displayMode : 'free'
+  const displayModeRef = useRef<DisplayMode>(safeDisplayMode)
+  displayModeRef.current = safeDisplayMode
 
   const cancelAnimationRef = useRef<(() => void) | null>(null)
-  const previousPositionsRef = useRef<Map<string, { x: number; y: number }> | null>(null)
-  const previousNodesRef = useRef<typeof allNodes | null>(null)
   const freePositionsRef = useRef<Node<KnowledgeNodeData>[] | null>(null)
   const [pinnedNodeIds, setPinnedNodeIds] = useState<Set<string>>(new Set())
 
@@ -143,13 +147,11 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
       cancelAnimationRef.current?.()
       const measured = captureMeasuredMap()
 
-      if (mode === 'mindmap' || mode === 'tree') {
+      if (mode === 'clusters') {
         if (displayModeRef.current === 'free') {
           freePositionsRef.current = [...allNodes]
         }
-        const layoutNodes = mode === 'mindmap'
-          ? applyMindMapLayout(allNodes, allEdges)
-          : applyTreeLayout(allNodes, allEdges)
+        const layoutNodes = applyClusterLayout(allNodes, allEdges, pinnedNodeIds)
         cancelAnimationRef.current = animateNodePositions(
           allNodes, layoutNodes, setNodes, 300,
           () => reactFlowFitView({ padding: 0.2, duration: 200 }),
@@ -166,7 +168,25 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
 
       setDisplayMode(mode)
     },
-    [allNodes, allEdges, setNodes, reactFlowFitView, captureMeasuredMap, setDisplayMode],
+    [allNodes, allEdges, pinnedNodeIds, setNodes, reactFlowFitView, captureMeasuredMap, setDisplayMode],
+  )
+
+  const handleSubtreeOrgchart = useCallback(
+    (nodeId: string, direction: DagreDirection) => {
+      cancelAnimationRef.current?.()
+      const measured = captureMeasuredMap()
+      const layoutNodes = applySubtreeDagreLayout(allNodes, allEdges, nodeId, direction, pinnedNodeIds)
+      cancelAnimationRef.current = animateNodePositions(
+        allNodes, layoutNodes, setNodes, 300,
+        () => {
+          reactFlowFitView({ padding: 0.2, duration: 200 })
+          savePositions(layoutNodes)
+        },
+        measured,
+      )
+      setNodeContextMenu(null)
+    },
+    [allNodes, allEdges, pinnedNodeIds, setNodes, reactFlowFitView, captureMeasuredMap, savePositions],
   )
 
   const handleNodesChange = useCallback(
@@ -181,79 +201,7 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
     [onNodesChange],
   )
 
-  const handleUndoLayout = useCallback(() => {
-    if (!previousPositionsRef.current || !previousNodesRef.current) return
-    const prevPositions = previousPositionsRef.current
-    const snapshotNodes = previousNodesRef.current
 
-    const restoredNodes = snapshotNodes.map((n) => {
-      const prev = prevPositions.get(n.id)
-      if (!prev) return n
-      return { ...n, position: prev }
-    })
-
-    cancelAnimationRef.current?.()
-    const measured = captureMeasuredMap()
-    cancelAnimationRef.current = animateNodePositions(
-      allNodes,
-      restoredNodes,
-      setNodes,
-      300,
-      () => {
-        reactFlowFitView({ padding: 0.2, duration: 200 })
-        savePositions(restoredNodes)
-      },
-      measured,
-    )
-
-    previousPositionsRef.current = null
-    previousNodesRef.current = null
-    notifications.hide('layout-undo')
-  }, [allNodes, setNodes, savePositions, reactFlowFitView, captureMeasuredMap])
-
-  const undoRef = useRef(handleUndoLayout)
-  undoRef.current = handleUndoLayout
-
-  const handleAutoLayout = useCallback((algorithm: 'dagre' | 'force') => {
-    cancelAnimationRef.current?.()
-
-    previousPositionsRef.current = new Map(allNodes.map((n) => [n.id, { x: n.position.x, y: n.position.y }]))
-    previousNodesRef.current = [...allNodes]
-
-    const pinned = pinnedNodeIds
-
-    const layoutNodes = algorithm === 'dagre'
-      ? applyDagreLayout(allNodes, edges, pinned)
-      : applyForceLayout(allNodes, edges, pinned)
-
-    const measured = captureMeasuredMap()
-    cancelAnimationRef.current = animateNodePositions(
-      allNodes,
-      layoutNodes,
-      setNodes,
-      300,
-      () => {
-        reactFlowFitView({ padding: 0.2, duration: 200 })
-        savePositions(layoutNodes)
-      },
-      measured,
-    )
-
-    notifications.show({
-      id: 'layout-undo',
-      message: (
-        <Group gap="xs" justify="space-between">
-          <Text size="sm">Раскладка применена</Text>
-          <Button size="xs" variant="subtle" onClick={() => undoRef.current()}>
-            Отменить
-          </Button>
-        </Group>
-      ),
-      autoClose: 5000,
-      withCloseButton: true,
-      color: 'blue',
-    })
-  }, [allNodes, edges, pinnedNodeIds, setNodes, savePositions, reactFlowFitView, captureMeasuredMap])
 
   const nodesWithPinState = useMemo(
     () =>
@@ -268,20 +216,36 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
     [nodes, pinnedNodeIds, handleTogglePin],
   )
 
-  const closeContextMenu = useCallback(() => setContextMenu(null), [])
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(null)
+    setNodeContextMenu(null)
+  }, [])
 
   const handlePaneContextMenu = useCallback((event: MouseEvent | React.MouseEvent) => {
     event.preventDefault()
+    setNodeContextMenu(null)
     setContextMenu({ x: event.clientX, y: event.clientY })
   }, [])
 
+  const handleNodeContextMenu = useCallback((event: React.MouseEvent, node: Node<KnowledgeNodeData>) => {
+    event.preventDefault()
+    setContextMenu(null)
+    setNodeContextMenu({ x: event.clientX, y: event.clientY, nodeId: node.id })
+  }, [])
+
   useEffect(() => {
-    if (!contextMenu) return
+    if (!contextMenu && !nodeContextMenu) return
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setContextMenu(null)
+      if (e.key === 'Escape') {
+        setContextMenu(null)
+        setNodeContextMenu(null)
+      }
     }
-    const handleScroll = () => setContextMenu(null)
+    const handleScroll = () => {
+      setContextMenu(null)
+      setNodeContextMenu(null)
+    }
 
     window.addEventListener('keydown', handleEscape)
     window.addEventListener('scroll', handleScroll, true)
@@ -289,13 +253,14 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
       window.removeEventListener('keydown', handleEscape)
       window.removeEventListener('scroll', handleScroll, true)
     }
-  }, [contextMenu])
+  }, [contextMenu, nodeContextMenu])
 
   const nodeTypes = useMemo(() => ({ knowledgeCard: KnowledgeNodeCard }), [])
   const edgeTypes = useMemo(() => ({ knowledgeEdge: KnowledgeEdgeCustom }), [])
 
   const handleNodeClick: NodeMouseHandler = useCallback(
-    (_event, node) => {
+    (event, node) => {
+      if (event.shiftKey) return // multi-select — не открываем редактор
       const nodeId = node.data.nodeId as number
       setSelectedNodeId(nodeId)
     },
@@ -304,25 +269,73 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (selectedNodeId !== null) return
       const target = e.target as HTMLElement
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
 
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        const selectedNodes = getNodes().filter((n) => n.selected)
-        if (selectedNodes.length !== 1) return
-        const node = selectedNodes[0]
-        const nodeId = (node.data as { nodeId: number }).nodeId
-        const title = (node.data as { title: string }).title
+      // Ctrl+A / Cmd+A — выделить все узлы
+      if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
+        e.preventDefault()
+        setNodes((nds) => nds.map((n) => ({ ...n, selected: true })))
+        return
+      }
 
-        if (window.confirm(`Удалить узел «${title}»? Все связи тоже будут удалены.`)) {
-          deleteMutation.mutate(nodeId)
+      if (selectedNodeId !== null) return
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selected = getNodes().filter((n) => n.selected)
+        if (selected.length === 0) return
+
+        if (selected.length === 1) {
+          const node = selected[0]
+          const nodeId = (node.data as { nodeId: number }).nodeId
+          const title = (node.data as { title: string }).title
+
+          modals.openConfirmModal({
+            title: 'Удалить узел?',
+            centered: true,
+            children: (
+              <Text size="sm">
+                Удалить узел «{title}»? Все связи тоже будут удалены.
+              </Text>
+            ),
+            labels: { confirm: 'Удалить', cancel: 'Отмена' },
+            confirmProps: { color: 'red' },
+            onConfirm: () => deleteMutation.mutate(nodeId),
+          })
+        } else {
+          modals.openConfirmModal({
+            title: 'Удалить узлы?',
+            centered: true,
+            children: (
+              <Text size="sm">
+                Удалить {selected.length} узлов? Все связи тоже будут удалены.
+              </Text>
+            ),
+            labels: { confirm: 'Удалить', cancel: 'Отмена' },
+            confirmProps: { color: 'red' },
+            onConfirm: async () => {
+              const results = await Promise.allSettled(
+                selected.map((node) => {
+                  const nodeId = (node.data as { nodeId: number }).nodeId
+                  return deleteMutation.mutateAsync(nodeId)
+                }),
+              )
+              const failed = results.filter((r) => r.status === 'rejected')
+              if (failed.length > 0) {
+                notifications.show({
+                  title: 'Ошибка удаления',
+                  message: `Не удалось удалить ${failed.length} из ${selected.length} узлов`,
+                  color: 'red',
+                })
+              }
+            },
+          })
         }
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [selectedNodeId, getNodes, deleteMutation])
+  }, [selectedNodeId, getNodes, setNodes, deleteMutation])
 
   if (isLoading) return <LoadingSkeleton />
   if (isError) return <ErrorState message="Не удалось загрузить граф знаний" />
@@ -342,9 +355,8 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onCreateClick={() => setCreateModalOpen(true)}
-          onAutoLayout={handleAutoLayout}
           onManageTypes={scope === 'company' ? () => setTypesDrawerOpen(true) : undefined}
-          displayMode={displayMode}
+          displayMode={safeDisplayMode}
           onSwitchMode={handleSwitchMode}
         />
       </Box>
@@ -365,11 +377,15 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={handleNodeClick}
+            onNodeContextMenu={handleNodeContextMenu}
             onPaneContextMenu={handlePaneContextMenu}
             onPaneClick={closeContextMenu}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            nodesDraggable={displayMode === 'free'}
+            nodesDraggable={safeDisplayMode === 'free'}
+            selectionOnDrag
+            multiSelectionKeyCode="Shift"
+            selectionMode={SelectionMode.Partial}
             fitView
             fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
             proOptions={{ hideAttribution: true }}
@@ -434,6 +450,67 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
               <IconPlus size={16} />
               Создать узел
             </UnstyledButton>
+          </Paper>
+        )}
+
+        {nodeContextMenu && (
+          <Paper
+            shadow="lg"
+            radius="md"
+            p={4}
+            style={{
+              position: 'fixed',
+              top: nodeContextMenu.y,
+              left: nodeContextMenu.x,
+              zIndex: 1000,
+              background: 'rgba(30, 30, 58, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid var(--border-subtle)',
+              minWidth: 180,
+            }}
+          >
+            <Text size="xs" c="dimmed" px="sm" py={4} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <IconBinaryTree size={14} />
+              Орг. схема
+            </Text>
+            <Group gap={2} px="sm" pb={4}>
+              <Tooltip label="Сверху вниз" withArrow>
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  onClick={() => handleSubtreeOrgchart(nodeContextMenu.nodeId, 'TB')}
+                >
+                  <IconArrowDown size={14} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Слева направо" withArrow>
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  onClick={() => handleSubtreeOrgchart(nodeContextMenu.nodeId, 'LR')}
+                >
+                  <IconArrowRight size={14} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Снизу вверх" withArrow>
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  onClick={() => handleSubtreeOrgchart(nodeContextMenu.nodeId, 'BT')}
+                >
+                  <IconArrowUp size={14} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Справа налево" withArrow>
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  onClick={() => handleSubtreeOrgchart(nodeContextMenu.nodeId, 'RL')}
+                >
+                  <IconArrowLeft size={14} />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
           </Paper>
         )}
       </Box>

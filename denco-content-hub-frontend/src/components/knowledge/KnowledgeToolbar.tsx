@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useReactFlow } from '@xyflow/react'
-import { ActionIcon, Button, Group, Menu, Select, Text, TextInput, Tooltip, Divider } from '@mantine/core'
-import { IconPlus, IconMaximize, IconSearch, IconX, IconLayoutDashboard, IconBinaryTree, IconAtom, IconAdjustments, IconLayoutGrid, IconBrain, IconShare } from '@tabler/icons-react'
+import { ActionIcon, Button, Group, Select, TextInput, Tooltip, Divider } from '@mantine/core'
+import { IconPlus, IconMaximize, IconSearch, IconX, IconAdjustments, IconLayoutGrid, IconAtom, IconShare } from '@tabler/icons-react'
 import { motion } from 'motion/react'
 
 import type { NodeType } from '@/lib/knowledge-utils'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 import type { DisplayMode } from './KnowledgeGraph'
+
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
 import { useCompanyStore } from '@/stores/company-store'
 import { ShareGraphModal } from './ShareGraphModal'
@@ -33,7 +34,6 @@ interface KnowledgeToolbarProps {
   searchQuery: string
   onSearchChange: (value: string) => void
   onCreateClick: () => void
-  onAutoLayout: (algorithm: 'dagre' | 'force') => void
   onManageTypes?: () => void
   displayMode?: DisplayMode
   onSwitchMode?: (mode: DisplayMode) => void
@@ -49,7 +49,6 @@ export function KnowledgeToolbar({
   searchQuery,
   onSearchChange,
   onCreateClick,
-  onAutoLayout,
   onManageTypes,
   displayMode = 'free',
   onSwitchMode,
@@ -164,18 +163,16 @@ export function KnowledgeToolbar({
         </Tooltip>
 
         {scope === 'company' && onManageTypes && (
-          <>
-            <Tooltip label="Управление типами" withArrow>
-              <ActionIcon size="md" variant="subtle" onClick={onManageTypes}>
-                <IconAdjustments size={16} />
-              </ActionIcon>
-            </Tooltip>
-          </>
+          <Tooltip label="Управление типами" withArrow>
+            <ActionIcon size="md" variant="subtle" onClick={onManageTypes}>
+              <IconAdjustments size={16} />
+            </ActionIcon>
+          </Tooltip>
         )}
 
         <Divider orientation="vertical" />
         <Group gap={4}>
-          <Tooltip label="Свободный режим" withArrow>
+          <Tooltip label="Свободный" withArrow>
             <ActionIcon
               size="md"
               variant={displayMode === 'free' ? 'filled' : 'subtle'}
@@ -184,57 +181,16 @@ export function KnowledgeToolbar({
               <IconLayoutGrid size={16} />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label="Дерево" withArrow>
+          <Tooltip label="Кластеры" withArrow>
             <ActionIcon
               size="md"
-              variant={displayMode === 'tree' ? 'filled' : 'subtle'}
-              onClick={() => onSwitchMode?.('tree')}
+              variant={displayMode === 'clusters' ? 'filled' : 'subtle'}
+              onClick={() => onSwitchMode?.('clusters')}
             >
-              <IconBinaryTree size={16} />
-            </ActionIcon>
-          </Tooltip>
-          <Tooltip label="Карта идей" withArrow>
-            <ActionIcon
-              size="md"
-              variant={displayMode === 'mindmap' ? 'filled' : 'subtle'}
-              onClick={() => onSwitchMode?.('mindmap')}
-            >
-              <IconBrain size={16} />
+              <IconAtom size={16} />
             </ActionIcon>
           </Tooltip>
         </Group>
-
-        <Divider orientation="vertical" />
-        <Menu shadow="md" width={240} position="bottom-end" withArrow>
-          <Menu.Target>
-            <Tooltip label="Авто-раскладка" withArrow>
-              <ActionIcon size="md" variant="subtle">
-                <IconLayoutDashboard size={16} />
-              </ActionIcon>
-            </Tooltip>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Label>Авто-раскладка</Menu.Label>
-            <Menu.Item
-              leftSection={<IconBinaryTree size={16} />}
-              onClick={() => onAutoLayout('dagre')}
-            >
-              <div>
-                <Text size="sm">Иерархическая</Text>
-                <Text size="xs" c="dimmed">Сверху вниз по связям</Text>
-              </div>
-            </Menu.Item>
-            <Menu.Item
-              leftSection={<IconAtom size={16} />}
-              onClick={() => onAutoLayout('force')}
-            >
-              <div>
-                <Text size="sm">Органическая</Text>
-                <Text size="xs" c="dimmed">Кластеры по связности</Text>
-              </div>
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
 
         <Tooltip label="Вместить всё" withArrow>
           <ActionIcon
