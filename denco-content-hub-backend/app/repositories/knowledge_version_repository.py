@@ -34,6 +34,8 @@ class KnowledgeVersionRepository(BaseRepository[KnowledgeNodeVersion]):
             changed_by_user_id=changed_by_user_id,
             change_type=change_type,
             change_summary=change_summary,
+            status=node.status,
+            confidence=node.confidence,
         )
 
     async def get_versions(self, node_id: int, limit: int = 20) -> list[KnowledgeNodeVersion]:

@@ -1,18 +1,21 @@
 from __future__ import annotations
 
 import enum
+from datetime import datetime  # noqa: TC003
 
 from sqlalchemy import (
     CheckConstraint,
+    DateTime,
     Float,
     ForeignKey,
     Index,
+    Integer,
     String,
     Text,
     text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, SoftDeleteMixin, TimestampMixin
 
@@ -71,6 +74,31 @@ class KnowledgeNode(Base, TimestampMixin, SoftDeleteMixin):
     is_position_fixed: Mapped[bool] = mapped_column(default=False, nullable=False)
     color: Mapped[str | None] = mapped_column(String(7), nullable=True)
 
+    # --- Provenance fields (Phase 2) ---
+    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="active")
+    owner_role: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    source: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    confidence: Mapped[str | None] = mapped_column(String(10), nullable=True, server_default="medium")
+    last_reviewed: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    superseded_by_node_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("knowledge_nodes.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    # --- Type definition reference (Phase 2) ---
+    node_type_def_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("kg_node_type_defs.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    # --- Relationships ---
+    node_type_def: Mapped[KgNodeTypeDef | None] = relationship("KgNodeTypeDef", lazy="selectin")
+    superseded_by: Mapped[KnowledgeNode | None] = relationship(
+        "KnowledgeNode", remote_side="KnowledgeNode.id", lazy="selectin"
+    )
+
     __table_args__ = (
         CheckConstraint(
             "(company_id IS NOT NULL AND workspace_id IS NULL) OR (company_id IS NULL AND workspace_id IS NOT NULL)",
@@ -111,6 +139,16 @@ class KnowledgeEdge(Base, TimestampMixin, SoftDeleteMixin):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     weight: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
     created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+
+    # --- Type definition reference (Phase 2) ---
+    edge_type_def_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("kg_edge_type_defs.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    # --- Relationships ---
+    edge_type_def: Mapped[KgEdgeTypeDef | None] = relationship("KgEdgeTypeDef", lazy="selectin")
 
     __table_args__ = (
         Index(
@@ -201,5 +239,9 @@ class KnowledgeNodeVersion(Base, TimestampMixin):
     changed_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     change_type: Mapped[ChangeType] = mapped_column(String(20), nullable=False)
     change_summary: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+    # --- Provenance fields (Phase 2) ---
+    status: Mapped[str | None] = mapped_column(String(20), nullable=True, server_default="active")
+    confidence: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     __table_args__ = (Index("ix_knv_node_version", "node_id", text("version_number DESC")),)

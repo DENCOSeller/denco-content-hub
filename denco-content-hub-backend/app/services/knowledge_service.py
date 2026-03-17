@@ -6,6 +6,8 @@ import structlog
 
 from app.exceptions import ConflictException, ForbiddenException
 from app.models.knowledge import ChangeType, KnowledgeNode, NodeType, ScopeType
+from app.repositories.kg_edge_type_repository import KgEdgeTypeRepository
+from app.repositories.kg_node_type_repository import KgNodeTypeRepository
 from app.repositories.knowledge_edge_repository import KnowledgeEdgeRepository
 from app.repositories.knowledge_node_repository import KnowledgeNodeRepository
 from app.repositories.knowledge_version_repository import KnowledgeVersionRepository
@@ -34,6 +36,8 @@ class KnowledgeService:
         self.edge_repo = KnowledgeEdgeRepository(db)
         self.version_repo = KnowledgeVersionRepository(db)
         self.workspace_repo = WorkspaceRepository(db)
+        self.node_type_repo = KgNodeTypeRepository(db)
+        self.edge_type_repo = KgEdgeTypeRepository(db)
 
     # --- Nodes ---
 
@@ -48,6 +52,13 @@ class KnowledgeService:
         scope_type, scope_kwargs = self._resolve_scope(workspace_id, company_id)
         content_text = tiptap_to_text(data.content) if data.content else None
 
+        node_type_def_id = await self._resolve_node_type_def_id(
+            data.node_type_def_id,
+            data.node_type,
+            workspace_id,
+            company_id,
+        )
+
         node = await self.node_repo.create(
             node_type=data.node_type,
             title=data.title,
@@ -59,6 +70,11 @@ class KnowledgeService:
             position_x=data.position_x,
             position_y=data.position_y,
             color=data.color,
+            status=data.status,
+            owner_role=data.owner_role,
+            source=data.source,
+            confidence=data.confidence,
+            node_type_def_id=node_type_def_id,
             **scope_kwargs,
         )
         await self.version_repo.create_snapshot(node, changed_by_user_id=user_id, change_type=ChangeType.CREATED)
@@ -145,6 +161,12 @@ class KnowledgeService:
         if duplicate:
             raise ConflictException("Edge with this label already exists between these nodes")
 
+        edge_type_def_id = await self._resolve_edge_type_def_id(
+            data.edge_type_def_id,
+            data.label,
+            source,
+        )
+
         edge = await self.edge_repo.create(
             source_node_id=data.source_node_id,
             target_node_id=data.target_node_id,
@@ -152,6 +174,7 @@ class KnowledgeService:
             description=data.description,
             weight=data.weight,
             created_by_user_id=user_id,
+            edge_type_def_id=edge_type_def_id,
         )
         await self.db.commit()
         logger.info("Knowledge edge created", edge_id=edge.id)
@@ -193,6 +216,40 @@ class KnowledgeService:
         return [KnowledgeNodeVersionResponse.model_validate(v) for v in versions]
 
     # --- Private ---
+
+    async def _resolve_node_type_def_id(
+        self,
+        explicit_id: int | None,
+        node_type: NodeType,
+        workspace_id: int | None,
+        company_id: int | None,
+    ) -> int | None:
+        """Резолв node_type_def_id: если передан явно — возвращаем, иначе ищем по slug."""
+        if explicit_id is not None:
+            return explicit_id
+        resolved_company_id = company_id
+        if resolved_company_id is None and workspace_id is not None:
+            workspace = await self.workspace_repo.get_by_id(workspace_id)
+            resolved_company_id = workspace.company_id
+        type_def = await self.node_type_repo.get_by_slug(node_type.value, resolved_company_id)
+        return type_def.id if type_def else None
+
+    async def _resolve_edge_type_def_id(
+        self,
+        explicit_id: int | None,
+        label: str,
+        source_node: KnowledgeNode,
+    ) -> int | None:
+        """Резолв edge_type_def_id: если передан — возвращаем, иначе ищем по label→slug."""
+        if explicit_id is not None:
+            return explicit_id
+        slug = label.lower().replace(" ", "_")
+        company_id = source_node.company_id
+        if company_id is None and source_node.workspace_id is not None:
+            workspace = await self.workspace_repo.get_by_id(source_node.workspace_id)
+            company_id = workspace.company_id
+        type_def = await self.edge_type_repo.get_by_slug(slug, company_id)
+        return type_def.id if type_def else None
 
     async def _enrich_with_usage(
         self,
