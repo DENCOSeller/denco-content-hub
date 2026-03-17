@@ -2,7 +2,7 @@
 
 import { memo, useState } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
-import { Text, Group, Box, Stack, ActionIcon } from '@mantine/core'
+import { Text, Group, Box, Stack, ActionIcon, Badge } from '@mantine/core'
 import { IconLock, IconPin, IconPinFilled } from '@tabler/icons-react'
 import { getNodeTypeConfig } from '@/lib/knowledge-utils'
 import styles from './KnowledgeNodeCard.module.css'
@@ -16,11 +16,26 @@ const HANDLE_STYLE = {
   transition: 'all 0.15s ease',
 }
 
+const STATUS_BADGE: Record<string, { label: string; color: string } | null> = {
+  active: null,
+  draft: { label: 'Черновик', color: 'yellow' },
+  deprecated: { label: 'Устарел', color: 'red' },
+  archived: { label: 'Архив', color: 'gray' },
+}
+
+function getConfidenceColor(confidence: number): string {
+  if (confidence >= 0.8) return 'var(--mantine-color-green-5)'
+  if (confidence >= 0.5) return 'var(--mantine-color-yellow-5)'
+  return 'var(--mantine-color-red-5)'
+}
+
 function KnowledgeNodeCardComponent({ data, selected }: NodeProps & { data: KnowledgeNodeData }) {
   const config = getNodeTypeConfig(data.nodeType)
   const Icon = config.icon
   const [hovered, setHovered] = useState(false)
   const isPinned = data.isPinned
+  const isDeprecated = data.status === 'deprecated'
+  const badgeConfig = STATUS_BADGE[data.status] ?? null
 
   const handlePinClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -52,6 +67,7 @@ function KnowledgeNodeCardComponent({ data, selected }: NodeProps & { data: Know
             boxShadow: selected
               ? `0 0 0 1px ${data.color}33, 0 4px 12px rgba(0,0,0,0.3)`
               : '0 2px 8px rgba(0,0,0,0.2)',
+            opacity: isDeprecated ? 0.6 : undefined,
           }}
         >
           {(hovered || isPinned) && (
@@ -73,6 +89,23 @@ function KnowledgeNodeCardComponent({ data, selected }: NodeProps & { data: Know
                 <IconPin size={12} color="var(--text-muted)" />
               )}
             </ActionIcon>
+          )}
+          {badgeConfig && (
+            <Badge
+              size="xs"
+              color={badgeConfig.color}
+              variant="filled"
+              style={{
+                position: 'absolute',
+                top: -8,
+                left: 10,
+                fontSize: 9,
+                textTransform: 'none',
+                pointerEvents: 'none',
+              }}
+            >
+              {badgeConfig.label}
+            </Badge>
           )}
           <Stack gap={6}>
             <Group gap={8} wrap="nowrap" justify="space-between">
@@ -96,10 +129,24 @@ function KnowledgeNodeCardComponent({ data, selected }: NodeProps & { data: Know
                   fw={600}
                   c="var(--text-primary)"
                   lineClamp={1}
-                  style={{ lineHeight: 1.3 }}
+                  style={{
+                    lineHeight: 1.3,
+                    textDecoration: isDeprecated ? 'line-through' : undefined,
+                  }}
                 >
                   {data.title}
                 </Text>
+                {data.confidence != null && (
+                  <Box
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background: getConfidenceColor(data.confidence),
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
               </Group>
               {data.isCompanyNode && (
                 <IconLock size={13} color="var(--text-muted)" style={{ flexShrink: 0 }} />

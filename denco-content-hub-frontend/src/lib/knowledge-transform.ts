@@ -17,6 +17,11 @@ export interface KnowledgeNodeData extends Record<string, unknown> {
   isCompanyNode: boolean
   isPositionFixed: boolean
   isPinned: boolean
+  status: string
+  confidence: number | null
+  ownerRole: string | null
+  source: string | null
+  lastReviewed: string | null
   onTogglePin?: () => void
 }
 
@@ -44,6 +49,11 @@ export function toFlowNodes(nodes: KnowledgeNodeResponse[]): Node<KnowledgeNodeD
         isCompanyNode: n.scope_type === 'company',
         isPositionFixed: n.is_position_fixed,
         isPinned: false,
+        status: n.status ?? 'active',
+        confidence: n.confidence != null ? Number(n.confidence) : null,
+        ownerRole: n.owner_role ?? null,
+        source: n.source ?? null,
+        lastReviewed: n.last_reviewed ?? null,
       },
     }
   })

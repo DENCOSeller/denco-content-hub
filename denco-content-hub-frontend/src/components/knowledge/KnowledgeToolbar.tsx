@@ -13,11 +13,21 @@ import { useCompanyStore } from '@/stores/company-store'
 
 const DEBOUNCE_MS = 300
 
+const STATUS_OPTIONS = [
+  { value: '__all__', label: 'Все статусы' },
+  { value: 'active', label: 'Активные' },
+  { value: 'draft', label: 'Черновики' },
+  { value: 'deprecated', label: 'Устаревшие' },
+  { value: 'archived', label: 'Архив' },
+]
+
 interface KnowledgeToolbarProps {
   scope: KnowledgeScope
   scopeId: number
   filterType: NodeType | null
   onFilterChange: (value: NodeType | null) => void
+  filterStatus: string | null
+  onFilterStatusChange: (value: string | null) => void
   searchQuery: string
   onSearchChange: (value: string) => void
   onCreateClick: () => void
@@ -29,6 +39,8 @@ export function KnowledgeToolbar({
   scopeId,
   filterType,
   onFilterChange,
+  filterStatus,
+  onFilterStatusChange,
   searchQuery,
   onSearchChange,
   onCreateClick,
@@ -102,6 +114,18 @@ export function KnowledgeToolbar({
             data={filterOptions}
             value={filterType ?? '__all__'}
             onChange={(v) => onFilterChange(v === '__all__' ? null : (v as NodeType))}
+            allowDeselect={false}
+            comboboxProps={{ withinPortal: true }}
+          />
+        </Tooltip>
+
+        <Tooltip label="Фильтр по статусу" withArrow>
+          <Select
+            size="xs"
+            w={160}
+            data={STATUS_OPTIONS}
+            value={filterStatus ?? '__all__'}
+            onChange={(v) => onFilterStatusChange(v === '__all__' ? null : v)}
             allowDeselect={false}
             comboboxProps={{ withinPortal: true }}
           />

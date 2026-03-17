@@ -24,6 +24,7 @@ export type KnowledgeScope = 'workspace' | 'company'
 
 export function useKnowledgeGraph(scopeId: number, scope: KnowledgeScope = 'workspace') {
   const [filterType, setFilterType] = useState<NodeType | null>(null)
+  const [filterStatus, setFilterStatus] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   const workspaceGraph = useWorkspaceGraphQuery(scope === 'workspace' ? scopeId : 0)
@@ -140,12 +141,15 @@ export function useKnowledgeGraph(scopeId: number, scope: KnowledgeScope = 'work
     if (filterType) {
       result = result.filter((n) => n.data.nodeType === filterType)
     }
+    if (filterStatus) {
+      result = result.filter((n) => n.data.status === filterStatus)
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase()
       result = result.filter((n) => n.data.title.toLowerCase().includes(q))
     }
     return result
-  }, [nodes, filterType, searchQuery])
+  }, [nodes, filterType, filterStatus, searchQuery])
 
   const visibleNodeIds = useMemo(
     () => new Set(filteredNodes.map((n) => n.id)),
@@ -213,6 +217,8 @@ export function useKnowledgeGraph(scopeId: number, scope: KnowledgeScope = 'work
     clearPendingConnection,
     filterType,
     setFilterType,
+    filterStatus,
+    setFilterStatus,
     searchQuery,
     setSearchQuery,
     setNodes,

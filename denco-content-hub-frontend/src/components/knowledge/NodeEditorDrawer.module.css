@@ -286,6 +286,22 @@
   white-space: nowrap;
 }
 
+/* ── Metadata / Provenance section ── */
+.metadataSection {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px 24px;
+  flex-shrink: 0;
+}
+
+.metadataHeader {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 12px;
+}
+
 /* ── Mobile panel switcher ── */
 .mobileSwitcher {
   flex-shrink: 0;
@@ -311,6 +327,10 @@
   }
 
   .relationsSection {
+    padding: 12px;
+  }
+
+  .metadataSection {
     padding: 12px;
   }
 

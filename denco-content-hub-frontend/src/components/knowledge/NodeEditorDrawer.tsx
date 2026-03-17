@@ -14,6 +14,7 @@ import {
   Select,
   Textarea,
   Stack,
+  Slider,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { IconTrash } from '@tabler/icons-react'
@@ -181,11 +182,30 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Provenance fields
+  const [nodeStatus, setNodeStatus] = useState<string>('active')
+  const [confidence, setConfidence] = useState<number>(1)
+  const [source, setSource] = useState<string>('')
+
+  // Refs for provenance — always up-to-date, no stale closures
+  const nodeStatusRef = useRef(nodeStatus)
+  const confidenceRef = useRef(confidence)
+  const sourceRef = useRef(source)
+
   // Sync state when node data loads
   useEffect(() => {
     if (node) {
       setTitle(node.title)
       setContent((node.content as Record<string, unknown>) ?? null)
+      const s = node.status ?? 'active'
+      const c = parseFloat(node.confidence ?? '') || 1
+      const src = node.source ?? ''
+      setNodeStatus(s)
+      setConfidence(c)
+      setSource(src)
+      nodeStatusRef.current = s
+      confidenceRef.current = c
+      sourceRef.current = src
       setIsDirty(false)
       setConfirmDelete(false)
       setSaveState('saved')
@@ -206,7 +226,16 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
       if (!activeNodeId) return
       setSaveState('saving')
       updateMutation.mutate(
-        { nodeId: activeNodeId, data: { title: t, content: c } },
+        {
+          nodeId: activeNodeId,
+          data: {
+            title: t,
+            content: c,
+            status: nodeStatusRef.current,
+            confidence: String(confidenceRef.current),
+            source: sourceRef.current || null,
+          },
+        },
         {
           onSuccess: () => {
             setIsDirty(false)
@@ -240,6 +269,32 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
       if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => {
         doSave(title, updated)
+      }, 2000)
+    },
+    [title, content, doSave],
+  )
+
+  const handleProvenanceChange = useCallback(
+    (field: 'status' | 'confidence' | 'source', value: string | number | null) => {
+      if (field === 'status') {
+        const v = value as string
+        setNodeStatus(v)
+        nodeStatusRef.current = v
+      } else if (field === 'confidence') {
+        const v = value as number
+        setConfidence(v)
+        confidenceRef.current = v
+      } else if (field === 'source') {
+        const v = (value as string) ?? ''
+        setSource(v)
+        sourceRef.current = v
+      }
+
+      setIsDirty(true)
+      setSaveState('dirty')
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        doSave(title, content)
       }, 2000)
     },
     [title, content, doSave],
@@ -318,7 +373,16 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
           if (debounceRef.current) {
             clearTimeout(debounceRef.current)
             if (activeNodeId && isDirty) {
-              updateMutation.mutate({ nodeId: activeNodeId, data: { title, content } })
+              updateMutation.mutate({
+                nodeId: activeNodeId,
+                data: {
+                  title,
+                  content,
+                  status: nodeStatusRef.current,
+                  confidence: String(confidenceRef.current),
+                  source: sourceRef.current || null,
+                },
+              })
             }
           }
           onClose()
@@ -354,7 +418,16 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                 if (debounceRef.current) {
                   clearTimeout(debounceRef.current)
                   if (activeNodeId && isDirty) {
-                    updateMutation.mutate({ nodeId: activeNodeId, data: { title, content } })
+                    updateMutation.mutate({
+                      nodeId: activeNodeId,
+                      data: {
+                        title,
+                        content,
+                        status: nodeStatusRef.current,
+                        confidence: String(confidenceRef.current),
+                        source: sourceRef.current || null,
+                      },
+                    })
                   }
                 }
                 onClose()
@@ -451,6 +524,71 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
                     </div>
                   </div>
                 )}
+
+                {/* Metadata / Provenance */}
+                <div className={styles.metadataSection}>
+                  <div className={styles.metadataHeader}>Метаданные</div>
+                  <Stack gap="sm">
+                    <Select
+                      label="Статус"
+                      size="xs"
+                      value={nodeStatus}
+                      onChange={(val) => {
+                        if (val) handleProvenanceChange('status', val)
+                      }}
+                      data={[
+                        { value: 'active', label: 'Активный' },
+                        { value: 'draft', label: 'Черновик' },
+                        { value: 'deprecated', label: 'Устаревший' },
+                        { value: 'archived', label: 'Архив' },
+                      ]}
+                    />
+                    <div>
+                      <Text size="xs" fw={500} mb={4}>
+                        Уверенность: {Math.round(confidence * 100)}%
+                      </Text>
+                      <Slider
+                        size="xs"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={confidence}
+                        onChange={(val) => setConfidence(val)}
+                        onChangeEnd={(val) => handleProvenanceChange('confidence', val)}
+                        label={(val) => `${Math.round(val * 100)}%`}
+                      />
+                    </div>
+                    <div>
+                      <Text size="xs" fw={500} mb={4}>Владелец</Text>
+                      <Badge size="sm" variant="light" color="gray">
+                        {node.owner_role === 'company'
+                          ? 'Компания'
+                          : 'Рабочее пространство'}
+                      </Badge>
+                    </div>
+                    <TextInput
+                      label="Источник"
+                      size="xs"
+                      placeholder="URL или описание источника"
+                      value={source}
+                      onChange={(e) => handleProvenanceChange('source', e.currentTarget.value)}
+                    />
+                    <div>
+                      <Text size="xs" fw={500} mb={4}>Последняя проверка</Text>
+                      <Text size="xs" c="dimmed">
+                        {node.last_reviewed
+                          ? new Date(node.last_reviewed).toLocaleString('ru-RU', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : 'Не проверялся'}
+                      </Text>
+                    </div>
+                  </Stack>
+                </div>
 
                 {/* Footer */}
                 <div className={styles.footer}>

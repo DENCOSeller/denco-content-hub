@@ -73,7 +73,8 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
   const {
     nodes, allNodes, edges, onNodesChange, onEdgesChange,
     onConnect, pendingConnection, clearPendingConnection,
-    filterType, setFilterType, searchQuery, setSearchQuery,
+    filterType, setFilterType, filterStatus, setFilterStatus,
+    searchQuery, setSearchQuery,
     setNodes, savePositions,
     isLoading, isError,
   } = useKnowledgeGraph(scopeId, scope)
@@ -247,6 +248,8 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
           scopeId={scopeId}
           filterType={filterType}
           onFilterChange={setFilterType}
+          filterStatus={filterStatus}
+          onFilterStatusChange={setFilterStatus}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onCreateClick={() => setCreateModalOpen(true)}
