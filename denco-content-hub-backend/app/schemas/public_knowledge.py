@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime  # noqa: TC003
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, computed_field
 
@@ -9,9 +10,9 @@ from app.schemas.knowledge import KgNodeTypeDefResponse  # noqa: TC001
 
 
 class KgPublicLinkCreate(BaseModel):
-    scope_type: str
+    scope_type: Literal["workspace", "company"]
     scope_id: int
-    visibility_mode: str = "active"
+    visibility_mode: Literal["all", "active", "selected"] = "active"
     title: str | None = None
     description: str | None = None
     expires_at: datetime | None = None
@@ -19,7 +20,7 @@ class KgPublicLinkCreate(BaseModel):
 
 class KgPublicLinkUpdate(BaseModel):
     is_active: bool | None = None
-    visibility_mode: str | None = None
+    visibility_mode: Literal["all", "active", "selected"] | None = None
     title: str | None = None
     description: str | None = None
     expires_at: datetime | None = None
@@ -49,7 +50,7 @@ class KgPublicLinkResponse(BaseModel):
 class KgPublicLinkCreateRequest(BaseModel):
     """Тело запроса для создания ссылки — scope задаётся из path."""
 
-    visibility_mode: str = "active"
+    visibility_mode: Literal["all", "active", "selected"] = "active"
     title: str | None = None
     description: str | None = None
     expires_at: datetime | None = None

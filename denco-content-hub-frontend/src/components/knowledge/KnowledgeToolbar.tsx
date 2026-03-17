@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useReactFlow } from '@xyflow/react'
 import { ActionIcon, Button, Group, Menu, Select, Text, TextInput, Tooltip, Divider } from '@mantine/core'
-import { IconPlus, IconMaximize, IconSearch, IconX, IconLayoutDashboard, IconBinaryTree, IconAtom, IconAdjustments } from '@tabler/icons-react'
+import { IconPlus, IconMaximize, IconSearch, IconX, IconLayoutDashboard, IconBinaryTree, IconAtom, IconAdjustments, IconLayoutGrid, IconBrain, IconShare } from '@tabler/icons-react'
 import { motion } from 'motion/react'
 
 import type { NodeType } from '@/lib/knowledge-utils'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
+import type { DisplayMode } from './KnowledgeGraph'
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
 import { useCompanyStore } from '@/stores/company-store'
+import { ShareGraphModal } from './ShareGraphModal'
 
 const DEBOUNCE_MS = 300
 
@@ -33,6 +35,8 @@ interface KnowledgeToolbarProps {
   onCreateClick: () => void
   onAutoLayout: (algorithm: 'dagre' | 'force') => void
   onManageTypes?: () => void
+  displayMode?: DisplayMode
+  onSwitchMode?: (mode: DisplayMode) => void
 }
 
 export function KnowledgeToolbar({
@@ -47,11 +51,14 @@ export function KnowledgeToolbar({
   onCreateClick,
   onAutoLayout,
   onManageTypes,
+  displayMode = 'free',
+  onSwitchMode,
 }: KnowledgeToolbarProps) {
   const { fitView } = useReactFlow()
   const activeCompany = useCompanyStore((s) => s.activeCompany)
   const companyId = scope === 'company' ? scopeId : (activeCompany?.id ?? 0)
   const { typeOptions } = useNodeTypeConfig(companyId)
+  const [shareOpened, setShareOpened] = useState(false)
 
   const filterOptions = useMemo(
     () => [{ value: '__all__', label: 'Все типы' }, ...typeOptions],
@@ -149,9 +156,15 @@ export function KnowledgeToolbar({
           }
         />
 
+        <Divider orientation="vertical" />
+        <Tooltip label="Поделиться" withArrow>
+          <ActionIcon size="md" variant="subtle" onClick={() => setShareOpened(true)}>
+            <IconShare size={16} />
+          </ActionIcon>
+        </Tooltip>
+
         {scope === 'company' && onManageTypes && (
           <>
-            <Divider orientation="vertical" />
             <Tooltip label="Управление типами" withArrow>
               <ActionIcon size="md" variant="subtle" onClick={onManageTypes}>
                 <IconAdjustments size={16} />
@@ -159,6 +172,37 @@ export function KnowledgeToolbar({
             </Tooltip>
           </>
         )}
+
+        <Divider orientation="vertical" />
+        <Group gap={4}>
+          <Tooltip label="Свободный режим" withArrow>
+            <ActionIcon
+              size="md"
+              variant={displayMode === 'free' ? 'filled' : 'subtle'}
+              onClick={() => onSwitchMode?.('free')}
+            >
+              <IconLayoutGrid size={16} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Дерево" withArrow>
+            <ActionIcon
+              size="md"
+              variant={displayMode === 'tree' ? 'filled' : 'subtle'}
+              onClick={() => onSwitchMode?.('tree')}
+            >
+              <IconBinaryTree size={16} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Карта идей" withArrow>
+            <ActionIcon
+              size="md"
+              variant={displayMode === 'mindmap' ? 'filled' : 'subtle'}
+              onClick={() => onSwitchMode?.('mindmap')}
+            >
+              <IconBrain size={16} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
 
         <Divider orientation="vertical" />
         <Menu shadow="md" width={240} position="bottom-end" withArrow>
@@ -202,6 +246,13 @@ export function KnowledgeToolbar({
           </ActionIcon>
         </Tooltip>
       </Group>
+
+      <ShareGraphModal
+        opened={shareOpened}
+        onClose={() => setShareOpened(false)}
+        scope={scope}
+        scopeId={scopeId}
+      />
     </motion.div>
   )
 }

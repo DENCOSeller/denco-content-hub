@@ -1,7 +1,7 @@
 """add kg_public_links and kg_public_link_nodes tables
 
 Revision ID: a8b9c0d1e2f3
-Revises: f6a7b8c9d1e2
+Revises: c4d5e6f7a8b9
 Create Date: 2026-03-17
 
 """
@@ -26,7 +26,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
             "token",
-            postgresql.UUID(as_uuid=True),
+            postgresql.UUID(as_uuid=False),
             nullable=False,
             server_default=sa.text("gen_random_uuid()"),
         ),

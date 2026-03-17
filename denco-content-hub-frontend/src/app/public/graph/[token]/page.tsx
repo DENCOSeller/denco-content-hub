@@ -112,7 +112,7 @@ function GraphErrorState() {
 
 export default function PublicGraphPage() {
   const params = useParams()
-  const token = params.token as string
+  const token = Array.isArray(params.token) ? params.token[0] : params.token ?? ''
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['public-graph', token],
