@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import enum
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Index, String, Text, text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, SoftDeleteMixin, TimestampMixin
@@ -46,6 +47,14 @@ class ContentItem(Base, TimestampMixin, SoftDeleteMixin):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     duration: Mapped[int | None] = mapped_column(nullable=True)
 
+    # YouTube метрики
+    view_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    like_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    comment_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    channel_name: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    thumbnail_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+
     # Извлечённый текст (для PDF, веб-страниц, manual text)
     extracted_text: Mapped[str | None] = mapped_column(Text, nullable=True)
 
@@ -63,7 +72,9 @@ class ContentItem(Base, TimestampMixin, SoftDeleteMixin):
     # Relationships
     transcription: Mapped[Transcription | None] = relationship(back_populates="content_item", uselist=False)
     analysis: Mapped[ContentAnalysis | None] = relationship(back_populates="content_item", uselist=False)
-    chat_messages: Mapped[list[ContentChatMessage]] = relationship(back_populates="content_item", order_by="ContentChatMessage.created_at")
+    chat_messages: Mapped[list[ContentChatMessage]] = relationship(
+        back_populates="content_item", order_by="ContentChatMessage.created_at"
+    )
 
     __table_args__ = (
         Index("ix_content_items_workspace_id", "workspace_id"),

@@ -29,6 +29,7 @@ class ParsedMetadata:
     channel_url: str | None = None
     view_count: int | None = None
     like_count: int | None = None
+    comment_count: int | None = None
     upload_date: date | None = None
     tags: list[str] = field(default_factory=list)
 
@@ -111,6 +112,7 @@ class YouTubeParser:
             channel_url=info.get("uploader_url") or info.get("channel_url"),
             view_count=info.get("view_count"),
             like_count=info.get("like_count"),
+            comment_count=info.get("comment_count"),
             upload_date=upload_date,
             tags=info.get("tags") or [],
         )

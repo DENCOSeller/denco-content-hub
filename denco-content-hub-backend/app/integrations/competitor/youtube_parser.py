@@ -33,9 +33,34 @@ def _parse_iso8601_duration(raw: str) -> int:
     return h * 3600 + m * 60 + s
 
 
+def _resolve_channel_id(handle_or_id: str) -> str:
+    """Резолвит @handle или username в реальный UC... channel ID."""
+    if handle_or_id.startswith("UC") and len(handle_or_id) == 24:
+        return handle_or_id
+
+    api_key = _require_api_key()
+    with httpx.Client(timeout=30) as client:
+        if handle_or_id.startswith("@"):
+            params = {"key": api_key, "forHandle": handle_or_id, "part": "id"}
+        else:
+            params = {"key": api_key, "forUsername": handle_or_id, "part": "id"}
+
+        resp = client.get(f"{BASE_URL}/channels", params=params)
+        resp.raise_for_status()
+        items = resp.json().get("items", [])
+
+    if not items:
+        raise ValueError(f"YouTube канал не найден по handle: {handle_or_id}")
+
+    resolved = items[0]["id"]
+    logger.info("YouTube: resolved handle", handle=handle_or_id, channel_id=resolved)
+    return resolved
+
+
 def fetch_channel_info(channel_id: str) -> dict[str, Any]:
     """Получить метаданные YouTube-канала (sync)."""
     api_key = _require_api_key()
+    channel_id = _resolve_channel_id(channel_id)
     with httpx.Client(timeout=30) as client:
         resp = client.get(
             f"{BASE_URL}/channels",
@@ -71,6 +96,7 @@ def fetch_latest_videos(
 ) -> list[dict[str, Any]]:
     """Получить последние видео канала с метриками."""
     api_key = _require_api_key()
+    channel_id = _resolve_channel_id(channel_id)
 
     with httpx.Client(timeout=30) as client:
         # 1. search — последние видео канала

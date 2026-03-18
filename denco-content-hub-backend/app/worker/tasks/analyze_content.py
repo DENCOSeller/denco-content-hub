@@ -16,11 +16,11 @@ logger = structlog.get_logger()
 MAX_TEXT_LENGTH = 100000
 
 ANALYSIS_PROMPT = """\
-Ты — аналитик контента. Проанализируй текст и верни результат строго в JSON формате.
+Ты — аналитик контента и помощник контент-продюсера. Проанализируй текст и верни результат строго в JSON формате.
 
 Тип источника: {source_type}
 
-Верни JSON с 4 секциями:
+Верни JSON с 7 секциями:
 
 1. "summary" (string) — краткое резюме контента в 2-3 предложениях.
 
@@ -32,6 +32,21 @@ ANALYSIS_PROMPT = """\
 
 4. "storyboard" (array) — структура контента.
    {storyboard_instruction}
+
+5. "content_ideas" (array) — список идей контента, которые можно создать на основе этого материала. \
+Думай как контент-продюсер: какие посты, видео, сторис, рилсы, подкасты можно сделать? Каждый элемент:
+   {{"title": "название идеи контента", \
+"description": "описание: формат, целевая платформа, ключевой посыл, примерный план"}}
+
+6. "audience_insights" (string) — подробный анализ аудитории: \
+на какую аудиторию рассчитан контент, какие боли и потребности закрывает, \
+какой уровень знаний предполагает у зрителя/читателя, \
+какие сегменты аудитории будут наиболее вовлечены и почему.
+
+7. "production_notes" (string) — заметки по продакшену для контент-продюсера: \
+формат подачи материала, темп повествования, монтажные приёмы (если видео), \
+что работает хорошо в этом контенте, что можно улучшить, \
+рекомендации по визуальному оформлению и структуре.
 
 Верни ТОЛЬКО валидный JSON без markdown-обёртки, без пояснений.\
 """
@@ -82,11 +97,7 @@ def analyze_content_task(self, content_item_id: int) -> dict:
 
         # Get text: for YouTube — from transcription, for others — from extracted_text
         if item.source_type == SourceType.YOUTUBE_VIDEO:
-            transcription = (
-                db.query(Transcription)
-                .filter(Transcription.content_item_id == content_item_id)
-                .first()
-            )
+            transcription = db.query(Transcription).filter(Transcription.content_item_id == content_item_id).first()
             text = transcription.text if transcription else None
         else:
             text = item.extracted_text
@@ -94,11 +105,7 @@ def analyze_content_task(self, content_item_id: int) -> dict:
         if not text or not text.strip():
             logger.warning("No text to analyze", content_item_id=content_item_id)
             # Mark existing analysis as failed so it doesn't hang in "pending"
-            analysis = (
-                db.query(ContentAnalysis)
-                .filter(ContentAnalysis.content_item_id == content_item_id)
-                .first()
-            )
+            analysis = db.query(ContentAnalysis).filter(ContentAnalysis.content_item_id == content_item_id).first()
             if analysis:
                 analysis.status = "failed"
                 analysis.error_message = "Нет текста для анализа"
@@ -106,11 +113,7 @@ def analyze_content_task(self, content_item_id: int) -> dict:
             return {"status": "skipped", "message": "No text available for analysis"}
 
         # Create or update ContentAnalysis record
-        analysis = (
-            db.query(ContentAnalysis)
-            .filter(ContentAnalysis.content_item_id == content_item_id)
-            .first()
-        )
+        analysis = db.query(ContentAnalysis).filter(ContentAnalysis.content_item_id == content_item_id).first()
         if not analysis:
             analysis = ContentAnalysis(content_item_id=content_item_id)
             db.add(analysis)
@@ -138,7 +141,7 @@ def analyze_content_task(self, content_item_id: int) -> dict:
         client = Anthropic(api_key=settings.anthropic_api_key)
         response = client.messages.create(
             model=settings.ai_model,
-            max_tokens=4096,
+            max_tokens=8192,
             messages=[{"role": "user", "content": f"{prompt}\n\n{truncated_text}"}],
         )
         raw_response = response.content[0].text
@@ -158,6 +161,9 @@ def analyze_content_task(self, content_item_id: int) -> dict:
         analysis.theses = result.get("theses")
         analysis.hooks = result.get("hooks")
         analysis.storyboard = result.get("storyboard")
+        analysis.content_ideas = result.get("content_ideas")
+        analysis.audience_insights = result.get("audience_insights")
+        analysis.production_notes = result.get("production_notes")
         analysis.status = "completed"
         analysis.error_message = None
         item.processing_step = None
@@ -171,20 +177,12 @@ def analyze_content_task(self, content_item_id: int) -> dict:
         error_msg = str(exc)[:500]
 
         try:
-            analysis = (
-                db.query(ContentAnalysis)
-                .filter(ContentAnalysis.content_item_id == content_item_id)
-                .first()
-            )
+            analysis = db.query(ContentAnalysis).filter(ContentAnalysis.content_item_id == content_item_id).first()
             if analysis:
                 analysis.status = "failed"
                 analysis.error_message = error_msg
 
-            item = (
-                db.query(ContentItem)
-                .filter(ContentItem.id == content_item_id)
-                .first()
-            )
+            item = db.query(ContentItem).filter(ContentItem.id == content_item_id).first()
             if item:
                 item.processing_step = None
             db.commit()

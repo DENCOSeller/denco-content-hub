@@ -31,26 +31,10 @@ class Settings(BaseSettings):
     audio_storage_path: str = "/var/denco/audio"
     max_video_duration_minutes: int = 180
 
-    # Claude API
-    anthropic_api_key: str | None = None
-
-    # AI Assistant defaults (overridable via DB ai_settings)
-    ai_master_prompt: str = (
-        "You are a helpful marketing assistant for DENCO Content Hub. "
-        "Use the provided knowledge graph context to give accurate, "
-        "relevant answers about the company's marketing strategy."
-    )
-    ai_max_tool_rounds: int = 5
-    ai_max_history_messages: int = 20
-    ai_rate_limit_per_hour: int = 30
-    ai_max_sessions_shown: int = 50
-    ai_provider: str = "anthropic"
-    ai_model: str = "claude-sonnet-4-20250514"
-
-    # AI Attachments
-    ai_attachments_path: str = "/var/denco/ai-attachments"
-    ai_attachment_max_size_mb: int = 10
-    ai_attachment_max_per_message: int = 3
+    # AI Chat microservice
+    ai_chat_service_url: str = "http://localhost:8011"
+    ai_chat_jwt_secret: str = "ai-chat-jwt-secret-change-me"
+    ai_chat_service_secret: str = "ai-chat-service-secret-change-me"
 
     # Competitor Intelligence — YouTube Data API v3
     youtube_api_key: str | None = None

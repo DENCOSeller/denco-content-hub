@@ -61,6 +61,14 @@ class ContentItemResponse(BaseModel):
     description: str | None = None
     duration: int | None = None
 
+    # YouTube метрики
+    view_count: int | None = None
+    like_count: int | None = None
+    comment_count: int | None = None
+    published_at: datetime | None = None
+    channel_name: str | None = None
+    thumbnail_url: str | None = None
+
     # Статус
     status: str
     processing_step: str | None = None
@@ -90,6 +98,12 @@ class ContentItemShortResponse(BaseModel):
     title: str | None = None
     video_id: str | None = None
     duration: int | None = None
+    thumbnail_url: str | None = None
+    channel_name: str | None = None
+    published_at: datetime | None = None
+    view_count: int | None = None
+    like_count: int | None = None
+    comment_count: int | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

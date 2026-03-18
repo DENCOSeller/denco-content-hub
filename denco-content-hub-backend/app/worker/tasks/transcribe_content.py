@@ -136,6 +136,25 @@ def transcribe_content_task(self, transcription_id: int) -> dict:
             language=result.language,
             duration=result.duration_seconds,
         )
+
+        # Auto-launch content analysis after successful transcription
+        if settings.anthropic_api_key:
+            try:
+                from app.worker.tasks.analyze_content import analyze_content_task
+
+                analyze_task = analyze_content_task.delay(item.id)
+                logger.info(
+                    "Auto-launched content analysis",
+                    content_item_id=item.id,
+                    celery_task_id=analyze_task.id,
+                )
+            except Exception as exc:
+                logger.warning(
+                    "Failed to auto-launch content analysis",
+                    content_item_id=item.id,
+                    error=str(exc),
+                )
+
         return {
             "status": "completed",
             "transcription_id": transcription_id,

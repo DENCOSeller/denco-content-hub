@@ -24,6 +24,11 @@ class ContentAnalysis(Base, TimestampMixin):
     hooks: Mapped[list[dict] | None] = mapped_column(JSONB, nullable=True)
     storyboard: Mapped[list[dict] | None] = mapped_column(JSONB, nullable=True)
 
+    # Расширенный AI анализ
+    content_ideas: Mapped[list[dict] | None] = mapped_column(JSONB, nullable=True)
+    audience_insights: Mapped[str | None] = mapped_column(Text, nullable=True)
+    production_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     # Статус обработки
     status: Mapped[str] = mapped_column(String(20), server_default="pending", nullable=False)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)

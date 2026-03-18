@@ -1,3 +1,5 @@
+from datetime import UTC, datetime, time
+
 import structlog
 from celery.exceptions import SoftTimeLimitExceeded
 from sqlalchemy.orm import Session
@@ -58,6 +60,14 @@ def parse_metadata_task(self, content_item_id: int) -> dict:
         item.description = metadata.description
         item.duration = metadata.duration_seconds
         item.video_id = metadata.video_id
+        item.view_count = metadata.view_count
+        item.like_count = metadata.like_count
+        item.comment_count = metadata.comment_count
+        item.channel_name = metadata.channel_name
+        item.thumbnail_url = metadata.thumbnail_url
+        item.published_at = (
+            datetime.combine(metadata.upload_date, time.min, tzinfo=UTC) if metadata.upload_date else None
+        )
         item.error_message = None
 
         # Check duration limit — skip audio pipeline for long videos

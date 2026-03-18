@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.admin import router as admin_router
-from app.api.ai import router as ai_router
+from app.api.ai_proxy import router as ai_proxy_router
 from app.api.analysis import router as analysis_router
 from app.api.auth import router as auth_router
 from app.api.companies import router as companies_router
@@ -40,7 +40,7 @@ api_router.include_router(company_members_router)
 api_router.include_router(knowledge_router)
 api_router.include_router(company_knowledge_router)
 api_router.include_router(kg_types_router)
-api_router.include_router(ai_router)
+api_router.include_router(ai_proxy_router)
 api_router.include_router(analysis_router)
 api_router.include_router(content_chat_router)
 api_router.include_router(library_router)

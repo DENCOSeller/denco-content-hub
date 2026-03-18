@@ -30,6 +30,9 @@ class ContentAnalysisResponse(BaseModel):
     theses: list[ThesisItem] | None = None
     hooks: list[HookItem] | None = None
     storyboard: list[StoryboardItem] | None = None
+    content_ideas: list[dict] | None = None
+    audience_insights: str | None = None
+    production_notes: str | None = None
     status: str
     error_message: str | None = None
     created_at: datetime
