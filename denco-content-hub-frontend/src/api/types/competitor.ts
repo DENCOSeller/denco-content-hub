@@ -1,4 +1,4 @@
-// Типы для модуля анализа конкурентов
+// Типы для модуля мониторинга каналов
 
 export type CompetitorPlatform = 'youtube' | 'instagram' | 'telegram' | 'vk'
 
