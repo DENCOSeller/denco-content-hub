@@ -15,6 +15,9 @@ import Link from 'next/link'
 import {
   IconTrash,
   IconRefresh,
+  IconEye,
+  IconThumbUp,
+  IconMessageCircle,
 } from '@tabler/icons-react'
 
 import {
@@ -22,13 +25,13 @@ import {
   useRetryContentMutation,
 } from '@/api/hooks/useContent'
 import { StatusBadge } from '@/components/shared/StatusBadge'
-import { extractYouTubeVideoId, formatDuration } from '@/lib/utils/youtube'
+import { extractYouTubeVideoId, formatDuration, formatNumber } from '@/lib/utils/youtube'
 import { getSourceType, getSourceTypeInfo } from '@/lib/utils/source-type'
-import type { ContentItemShortResponse } from '@/api/client/types.gen'
+import type { ContentItemShortWithYouTube } from '@/api/types/content'
 
 import styles from './ContentRow.module.css'
 
-type ContentItemWithProcessingStep = ContentItemShortResponse & {
+type ContentItemWithProcessingStep = ContentItemShortWithYouTube & {
   processing_step?: string | null
 }
 
@@ -46,9 +49,13 @@ export function ContentRow({ item, workspaceId, basePath }: ContentRowProps) {
 
   const sourceType = getSourceType(item.source_type)
   const sourceInfo = getSourceTypeInfo(item.source_type)
-  const videoId = sourceType === 'youtube_video'
+  const isYoutube = sourceType === 'youtube_video'
+  const videoId = isYoutube
     ? (item.video_id ?? extractYouTubeVideoId(item.url))
     : null
+  const hasYouTubeMetrics = isYoutube && (
+    item.views_count != null || item.likes_count != null || item.comments_count != null
+  )
 
   const handleDelete = () => {
     deleteContent.mutate(item.id, {
@@ -142,6 +149,31 @@ export function ContentRow({ item, workspaceId, basePath }: ContentRowProps) {
                 {new Date(item.created_at).toLocaleDateString('ru-RU')}
               </Text>
             </Group>
+            {hasYouTubeMetrics && (
+              <Group gap="md">
+                {item.views_count != null && (
+                  <Group gap={4}>
+                    <IconEye size={14} color="var(--mantine-color-dimmed)" />
+                    <Text size="xs" c="dimmed">{formatNumber(item.views_count)}</Text>
+                  </Group>
+                )}
+                {item.likes_count != null && (
+                  <Group gap={4}>
+                    <IconThumbUp size={14} color="var(--mantine-color-dimmed)" />
+                    <Text size="xs" c="dimmed">{formatNumber(item.likes_count)}</Text>
+                  </Group>
+                )}
+                {item.comments_count != null && (
+                  <Group gap={4}>
+                    <IconMessageCircle size={14} color="var(--mantine-color-dimmed)" />
+                    <Text size="xs" c="dimmed">{formatNumber(item.comments_count)}</Text>
+                  </Group>
+                )}
+                {item.channel_title && (
+                  <Text size="xs" c="dimmed">{item.channel_title}</Text>
+                )}
+              </Group>
+            )}
           </Stack>
         </Group>
 

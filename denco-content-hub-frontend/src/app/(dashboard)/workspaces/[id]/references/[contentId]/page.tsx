@@ -10,11 +10,20 @@ import {
   Box,
   Tabs,
 } from '@mantine/core'
-import { IconArrowLeft, IconExternalLink } from '@tabler/icons-react'
+import {
+  IconArrowLeft,
+  IconExternalLink,
+  IconEye,
+  IconThumbUp,
+  IconMessageCircle,
+  IconCalendar,
+  IconUser,
+} from '@tabler/icons-react'
 
 import { useContentDetailQuery, useTranscriptionQuery, useRetryContentMutation } from '@/api/hooks/useContent'
 import { useAnalysisQuery, useGenerateAnalysisMutation } from '@/api/hooks/useAnalysis'
 import type { AnalysisType } from '@/api/analysis'
+import type { ContentItemWithYouTube } from '@/api/types/content'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { LoadingState } from '@/components/shared/LoadingState'
@@ -23,7 +32,7 @@ import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { TranscriptionPanel } from '@/components/features/references/TranscriptionPanel'
 import { AnalysisTabPanel } from '@/components/features/references/AnalysisTabPanel'
 import { ContentChatTab } from '@/components/features/references/ContentChatTab'
-import { extractYouTubeVideoId, formatDuration } from '@/lib/utils/youtube'
+import { extractYouTubeVideoId, formatDuration, formatNumber } from '@/lib/utils/youtube'
 import { getSourceType, getSourceTypeInfo } from '@/lib/utils/source-type'
 
 import styles from './content-detail.module.css'
@@ -33,6 +42,12 @@ const ANALYSIS_TABS: { value: AnalysisType; label: string }[] = [
   { value: 'theses', label: 'Тезисы' },
   { value: 'hooks', label: 'Хуки' },
   { value: 'storyboard', label: 'Раскадровка' },
+]
+
+const YOUTUBE_ANALYSIS_TABS: { value: AnalysisType; label: string }[] = [
+  { value: 'content_ideas', label: 'Идеи контента' },
+  { value: 'audience_insights', label: 'Анализ аудитории' },
+  { value: 'production_notes', label: 'Заметки по продакшену' },
 ]
 
 export default function WorkspaceContentDetailPage() {
@@ -68,12 +83,16 @@ export default function WorkspaceContentDetailPage() {
   const retryMutation = useRetryContentMutation(workspaceId)
   const generateMutation = useGenerateAnalysisMutation(workspaceId, contentId)
 
+  const ytContent = content as ContentItemWithYouTube | undefined
   const sourceType = getSourceType(content?.source_type)
   const sourceInfo = getSourceTypeInfo(content?.source_type)
   const isYoutube = sourceType === 'youtube_video'
   const videoId = isYoutube
     ? (content?.video_id ?? extractYouTubeVideoId(content?.url ?? ''))
     : null
+  const hasYouTubeMetrics = isYoutube && ytContent && (
+    ytContent.views_count != null || ytContent.likes_count != null || ytContent.comments_count != null
+  )
 
   function handleRetry() {
     retryMutation.mutate(contentId, {
@@ -184,6 +203,43 @@ export default function WorkspaceContentDetailPage() {
                 <Text size="xs" c="dimmed">·</Text>
                 <Text size="xs" c="dimmed">{sourceInfo.label}</Text>
               </Group>
+
+              {hasYouTubeMetrics && ytContent && (
+                <Group gap="md" mt={8}>
+                  {ytContent.views_count != null && (
+                    <Group gap={4}>
+                      <IconEye size={14} color="var(--mantine-color-dimmed)" />
+                      <Text size="xs" c="dimmed">{formatNumber(ytContent.views_count)}</Text>
+                    </Group>
+                  )}
+                  {ytContent.likes_count != null && (
+                    <Group gap={4}>
+                      <IconThumbUp size={14} color="var(--mantine-color-dimmed)" />
+                      <Text size="xs" c="dimmed">{formatNumber(ytContent.likes_count)}</Text>
+                    </Group>
+                  )}
+                  {ytContent.comments_count != null && (
+                    <Group gap={4}>
+                      <IconMessageCircle size={14} color="var(--mantine-color-dimmed)" />
+                      <Text size="xs" c="dimmed">{formatNumber(ytContent.comments_count)}</Text>
+                    </Group>
+                  )}
+                  {ytContent.published_at && (
+                    <Group gap={4}>
+                      <IconCalendar size={14} color="var(--mantine-color-dimmed)" />
+                      <Text size="xs" c="dimmed">
+                        {new Date(ytContent.published_at).toLocaleDateString('ru-RU')}
+                      </Text>
+                    </Group>
+                  )}
+                  {ytContent.channel_title && (
+                    <Group gap={4}>
+                      <IconUser size={14} color="var(--mantine-color-dimmed)" />
+                      <Text size="xs" c="dimmed">{ytContent.channel_title}</Text>
+                    </Group>
+                  )}
+                </Group>
+              )}
             </Box>
           </Stack>
         </div>
@@ -194,6 +250,9 @@ export default function WorkspaceContentDetailPage() {
             <Tabs.List className={styles.tabsList}>
               <Tabs.Tab value="transcription">{sourceInfo.transcriptionLabel}</Tabs.Tab>
               {ANALYSIS_TABS.map((tab) => (
+                <Tabs.Tab key={tab.value} value={tab.value}>{tab.label}</Tabs.Tab>
+              ))}
+              {isYoutube && YOUTUBE_ANALYSIS_TABS.map((tab) => (
                 <Tabs.Tab key={tab.value} value={tab.value}>{tab.label}</Tabs.Tab>
               ))}
               <Tabs.Tab value="ai-chat">AI Чат</Tabs.Tab>
@@ -215,6 +274,21 @@ export default function WorkspaceContentDetailPage() {
             </Tabs.Panel>
 
             {ANALYSIS_TABS.map((tab) => (
+              <Tabs.Panel key={tab.value} value={tab.value} className={styles.tabPanel}>
+                <AnalysisTabPanel
+                  type={tab.value}
+                  label={tab.label}
+                  analysis={analysis}
+                  isAnalysisLoading={analysisLoading}
+                  isAnalysisError={analysisError}
+                  isGenerating={generateMutation.isPending}
+                  onGenerate={handleGenerate}
+                  onRefetch={analysisRefetch}
+                />
+              </Tabs.Panel>
+            ))}
+
+            {isYoutube && YOUTUBE_ANALYSIS_TABS.map((tab) => (
               <Tabs.Panel key={tab.value} value={tab.value} className={styles.tabPanel}>
                 <AnalysisTabPanel
                   type={tab.value}

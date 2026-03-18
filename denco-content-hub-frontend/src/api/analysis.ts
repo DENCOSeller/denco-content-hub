@@ -5,7 +5,7 @@
 
 import { client } from '@/api/client/client.gen'
 
-export type AnalysisType = 'summary' | 'theses' | 'hooks' | 'storyboard'
+export type AnalysisType = 'summary' | 'theses' | 'hooks' | 'storyboard' | 'content_ideas' | 'audience_insights' | 'production_notes'
 
 export interface ThesisItem {
   title: string
@@ -25,6 +25,11 @@ export interface StoryboardItem {
   block_number: number | null
 }
 
+export interface ContentIdeaItem {
+  title: string
+  description: string
+}
+
 /** Flat analysis response matching backend ContentAnalysisResponse. */
 export interface AnalysisResponse {
   id: number
@@ -33,6 +38,9 @@ export interface AnalysisResponse {
   theses: ThesisItem[] | null
   hooks: HookItem[] | null
   storyboard: StoryboardItem[] | null
+  content_ideas: ContentIdeaItem[] | null
+  audience_insights: string | null
+  production_notes: string | null
   status: string
   error_message: string | null
   created_at: string

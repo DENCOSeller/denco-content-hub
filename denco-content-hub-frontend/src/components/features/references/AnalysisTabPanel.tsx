@@ -10,6 +10,9 @@ import { SummaryTab } from '@/components/features/references/analysis/SummaryTab
 import { ThesesTab } from '@/components/features/references/analysis/ThesesTab'
 import { HooksTab } from '@/components/features/references/analysis/HooksTab'
 import { StoryboardTab } from '@/components/features/references/analysis/StoryboardTab'
+import { ContentIdeasTab } from '@/components/features/references/analysis/ContentIdeasTab'
+import { AudienceInsightsTab } from '@/components/features/references/analysis/AudienceInsightsTab'
+import { ProductionNotesTab } from '@/components/features/references/analysis/ProductionNotesTab'
 
 function AnalysisContent({ type, analysis }: { type: AnalysisType; analysis: AnalysisResponse }) {
   switch (type) {
@@ -25,6 +28,15 @@ function AnalysisContent({ type, analysis }: { type: AnalysisType; analysis: Ana
     case 'storyboard':
       if (!analysis.storyboard?.length) return <ErrorState message="Данные анализа отсутствуют" />
       return <StoryboardTab data={analysis.storyboard} />
+    case 'content_ideas':
+      if (!analysis.content_ideas?.length) return <ErrorState message="Данные анализа отсутствуют" />
+      return <ContentIdeasTab data={analysis.content_ideas} />
+    case 'audience_insights':
+      if (!analysis.audience_insights) return <ErrorState message="Данные анализа отсутствуют" />
+      return <AudienceInsightsTab data={analysis.audience_insights} />
+    case 'production_notes':
+      if (!analysis.production_notes) return <ErrorState message="Данные анализа отсутствуют" />
+      return <ProductionNotesTab data={analysis.production_notes} />
     default:
       return <Text size="sm">Неизвестный тип анализа</Text>
   }
@@ -37,6 +49,9 @@ function hasAnalysisData(analysis: AnalysisResponse, type: AnalysisType): boolea
     case 'theses': return !!analysis.theses?.length
     case 'hooks': return !!analysis.hooks?.length
     case 'storyboard': return !!analysis.storyboard?.length
+    case 'content_ideas': return !!analysis.content_ideas?.length
+    case 'audience_insights': return !!analysis.audience_insights
+    case 'production_notes': return !!analysis.production_notes
     default: return false
   }
 }

@@ -23,4 +23,9 @@ export interface StoryboardBlock {
   block_number: number | null
 }
 
+export interface AnalysisContentIdea {
+  title: string
+  description: string
+}
+
 export type AnalysisStatus = 'loading' | 'empty' | 'ready'
