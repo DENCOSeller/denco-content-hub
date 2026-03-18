@@ -4,20 +4,18 @@ from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends
 
-from app.database import get_db
-from app.dependencies import get_company_member, require_company_admin
+from app.dependencies import get_company_member, get_current_user, require_company_admin
+from app.integrations import kg_client
 from app.schemas.knowledge import (
     KgEdgeTypeDefCreate,
     KgEdgeTypeDefResponse,
     KgNodeTypeDefCreate,
     KgNodeTypeDefResponse,
 )
-from app.services.kg_type_service import KgTypeService
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     from app.models.company_member import CompanyMember
+    from app.models.user import User
 
 router = APIRouter(prefix="/companies/{company_id}/knowledge/types", tags=["kg-types"])
 
@@ -35,10 +33,9 @@ router = APIRouter(prefix="/companies/{company_id}/knowledge/types", tags=["kg-t
 async def list_node_types(
     company_id: int,
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KgNodeTypeDefResponse]:
-    service = KgTypeService(db)
-    return await service.get_node_types(company_id)
+    return await kg_client.list_node_types(company_id, current_user.id)
 
 
 @router.post(
@@ -55,10 +52,11 @@ async def create_node_type(
     company_id: int,
     data: KgNodeTypeDefCreate,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> KgNodeTypeDefResponse:
-    service = KgTypeService(db)
-    return await service.create_node_type(company_id, data)
+    return await kg_client.create_node_type(
+        company_id, current_user.id, data.model_dump(),
+    )
 
 
 @router.patch(
@@ -72,13 +70,11 @@ async def create_node_type(
     },
 )
 async def deactivate_node_type(
-    company_id: int,
     type_id: int,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> None:
-    service = KgTypeService(db)
-    await service.deactivate_node_type(type_id, company_id)
+    await kg_client.deactivate_node_type(type_id, current_user.id)
 
 
 # --- Edge types ---
@@ -94,10 +90,9 @@ async def deactivate_node_type(
 async def list_edge_types(
     company_id: int,
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KgEdgeTypeDefResponse]:
-    service = KgTypeService(db)
-    return await service.get_edge_types(company_id)
+    return await kg_client.list_edge_types(company_id, current_user.id)
 
 
 @router.post(
@@ -114,10 +109,11 @@ async def create_edge_type(
     company_id: int,
     data: KgEdgeTypeDefCreate,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> KgEdgeTypeDefResponse:
-    service = KgTypeService(db)
-    return await service.create_edge_type(company_id, data)
+    return await kg_client.create_edge_type(
+        company_id, current_user.id, data.model_dump(),
+    )
 
 
 @router.patch(
@@ -131,10 +127,8 @@ async def create_edge_type(
     },
 )
 async def deactivate_edge_type(
-    company_id: int,
     type_id: int,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> None:
-    service = KgTypeService(db)
-    await service.deactivate_edge_type(type_id, company_id)
+    await kg_client.deactivate_edge_type(type_id, current_user.id)

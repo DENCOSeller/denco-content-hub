@@ -58,6 +58,10 @@ class Settings(BaseSettings):
     # Frontend (for invitation links)
     frontend_url: str = "http://localhost:3000"
 
+    # Knowledge Graph microservice
+    kg_service_url: str = "http://localhost:8010"
+    kg_service_secret: str = "kg-service-secret-change-me"
+
     # App
     debug: bool = True
     app_name: str = "DENCO Content Hub API"

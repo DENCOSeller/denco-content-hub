@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Query, Response
 
-from app.database import get_db
 from app.dependencies import get_company_member, get_current_user, require_company_admin
+from app.integrations import kg_client
 from app.schemas.knowledge import (
     BatchPositionUpdateRequest,
     KnowledgeEdgeCreate,
@@ -17,18 +17,13 @@ from app.schemas.knowledge import (
     KnowledgeNodeVersionResponse,
 )
 from app.schemas.public_knowledge import (
-    KgPublicLinkCreate,
     KgPublicLinkCreateRequest,
     KgPublicLinkNodeAdd,
     KgPublicLinkResponse,
     KgPublicLinkUpdate,
 )
-from app.services.knowledge_service import KnowledgeService
-from app.services.public_knowledge_service import PublicKnowledgeService
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     from app.models.company_member import CompanyMember
     from app.models.user import User
 
@@ -50,10 +45,12 @@ async def list_nodes(
     node_type_def_id: int | None = Query(default=None),
     search: str | None = Query(default=None, max_length=255),
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KnowledgeNodeResponse]:
-    service = KnowledgeService(db)
-    return await service.get_company_nodes(company_id, node_type_def_id, search)
+    return await kg_client.list_nodes(
+        "company", company_id, current_user.id,
+        node_type_def_id=node_type_def_id, search=search,
+    )
 
 
 @router.post(
@@ -61,19 +58,19 @@ async def list_nodes(
     response_model=KnowledgeNodeResponse,
     summary="Create company knowledge node",
     status_code=201,
-    responses={
-        403: {"description": "Insufficient permissions"},
-    },
+    responses={403: {"description": "Insufficient permissions"}},
 )
 async def create_node(
     company_id: int,
     data: KnowledgeNodeCreate,
     current_user: User = Depends(get_current_user),
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
 ) -> KnowledgeNodeResponse:
-    service = KnowledgeService(db)
-    return await service.create_node(data, current_user.id, company_id=company_id)
+    return await kg_client.create_node(
+        "company", company_id, current_user.id,
+        data.model_dump(exclude_none=True),
+        company_scope_id=company_id,
+    )
 
 
 # --- Positions (must be before /nodes/{node_id} to avoid route conflict) ---
@@ -89,12 +86,12 @@ async def batch_update_positions(
     company_id: int,
     data: BatchPositionUpdateRequest,
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> dict[str, int]:
-    service = KnowledgeService(db)
     positions = [p.model_dump() for p in data.positions]
-    updated = await service.batch_update_company_positions(company_id, positions)
-    return {"updated": updated}
+    return await kg_client.batch_update_positions(
+        "company", company_id, current_user.id, positions,
+    )
 
 
 @router.get(
@@ -110,10 +107,9 @@ async def batch_update_positions(
 async def get_node(
     node_id: int,
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> KnowledgeNodeResponse:
-    service = KnowledgeService(db)
-    return await service.get_node(node_id)
+    return await kg_client.get_node(node_id, current_user.id)
 
 
 @router.patch(
@@ -131,10 +127,11 @@ async def update_node(
     data: KnowledgeNodeUpdate,
     current_user: User = Depends(get_current_user),
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
 ) -> KnowledgeNodeResponse:
-    service = KnowledgeService(db)
-    return await service.update_node(node_id, data, current_user.id)
+    return await kg_client.update_node(
+        node_id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.delete(
@@ -149,10 +146,9 @@ async def update_node(
 async def delete_node(
     node_id: int,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
-    service = KnowledgeService(db)
-    await service.delete_node(node_id)
+    await kg_client.delete_node(node_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -170,10 +166,9 @@ async def get_node_versions(
     node_id: int,
     limit: int = Query(default=20, ge=1, le=100),
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KnowledgeNodeVersionResponse]:
-    service = KnowledgeService(db)
-    return await service.get_node_versions(node_id, limit)
+    return await kg_client.get_node_versions(node_id, current_user.id, limit=limit)
 
 
 # --- Edges ---
@@ -191,13 +186,15 @@ async def get_node_versions(
     },
 )
 async def create_edge(
+    company_id: int,
     data: KnowledgeEdgeCreate,
     current_user: User = Depends(get_current_user),
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
 ) -> KnowledgeEdgeResponse:
-    service = KnowledgeService(db)
-    return await service.create_edge(data, current_user.id)
+    return await kg_client.create_edge(
+        "company", company_id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.delete(
@@ -212,10 +209,9 @@ async def create_edge(
 async def delete_edge(
     edge_id: int,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
-    service = KnowledgeService(db)
-    await service.delete_edge(edge_id)
+    await kg_client.delete_edge(edge_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -232,10 +228,9 @@ async def delete_edge(
 async def get_graph(
     company_id: int,
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> KnowledgeGraphResponse:
-    service = KnowledgeService(db)
-    return await service.get_company_graph(company_id)
+    return await kg_client.get_graph("company", company_id, current_user.id)
 
 
 # --- Public Links ---
@@ -253,11 +248,11 @@ async def create_company_public_link(
     data: KgPublicLinkCreateRequest,
     current_user: User = Depends(get_current_user),
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
 ) -> KgPublicLinkResponse:
-    service = PublicKnowledgeService(db)
-    create_data = KgPublicLinkCreate(scope_type="company", scope_id=company_id, **data.model_dump())
-    return await service.create_public_link(create_data, current_user.id)
+    return await kg_client.create_public_link(
+        "company", company_id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.get(
@@ -270,10 +265,9 @@ async def create_company_public_link(
 async def list_company_public_links(
     company_id: int,
     _member: CompanyMember = Depends(get_company_member),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KgPublicLinkResponse]:
-    service = PublicKnowledgeService(db)
-    return await service.list_public_links("company", company_id)
+    return await kg_client.list_public_links("company", company_id, current_user.id)
 
 
 @router.patch(
@@ -287,15 +281,15 @@ async def list_company_public_links(
     },
 )
 async def update_company_public_link(
-    company_id: int,
     link_id: int,
     data: KgPublicLinkUpdate,
     current_user: User = Depends(get_current_user),
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
 ) -> KgPublicLinkResponse:
-    service = PublicKnowledgeService(db)
-    return await service.update_public_link(link_id, data, current_user.id, "company", company_id)
+    return await kg_client.update_public_link(
+        link_id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.delete(
@@ -311,10 +305,9 @@ async def delete_company_public_link(
     company_id: int,
     link_id: int,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
-    service = PublicKnowledgeService(db)
-    await service.delete_public_link(link_id, "company", company_id)
+    await kg_client.delete_public_link(link_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -328,14 +321,12 @@ async def delete_company_public_link(
     },
 )
 async def add_node_to_company_public_link(
-    company_id: int,
     link_id: int,
     data: KgPublicLinkNodeAdd,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
-    service = PublicKnowledgeService(db)
-    await service.add_node_to_link(link_id, data.node_id, "company", company_id)
+    await kg_client.add_node_to_link(link_id, data.node_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -349,12 +340,10 @@ async def add_node_to_company_public_link(
     },
 )
 async def remove_node_from_company_public_link(
-    company_id: int,
     link_id: int,
     node_id: int,
     _admin: CompanyMember = Depends(require_company_admin),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
-    service = PublicKnowledgeService(db)
-    await service.remove_node_from_link(link_id, node_id, "company", company_id)
+    await kg_client.remove_node_from_link(link_id, node_id, current_user.id)
     return Response(status_code=204)

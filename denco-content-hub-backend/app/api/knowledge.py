@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Query, Response
 
-from app.database import get_db
 from app.dependencies import get_current_user, get_workspace_from_path, require_role
+from app.integrations import kg_client
 from app.models.workspace import WorkspaceRole
 from app.schemas.knowledge import (
     BatchPositionUpdateRequest,
@@ -20,19 +20,13 @@ from app.schemas.knowledge import (
     KnowledgeNodeVersionResponse,
 )
 from app.schemas.public_knowledge import (
-    KgPublicLinkCreate,
     KgPublicLinkCreateRequest,
     KgPublicLinkNodeAdd,
     KgPublicLinkResponse,
     KgPublicLinkUpdate,
 )
-from app.services.kg_conflict_service import KgConflictService
-from app.services.knowledge_service import KnowledgeService
-from app.services.public_knowledge_service import PublicKnowledgeService
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     from app.models.user import User
     from app.models.workspace import Workspace, WorkspaceMember
 
@@ -55,11 +49,13 @@ async def list_nodes(
     node_type_def_id: int | None = Query(default=None),
     search: str | None = Query(default=None, max_length=255),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KnowledgeNodeResponse]:
     workspace, _member = workspace_ctx
-    service = KnowledgeService(db)
-    return await service.get_workspace_nodes(workspace.id, node_type_def_id, search)
+    return await kg_client.list_nodes(
+        "workspace", workspace.id, current_user.id,
+        node_type_def_id=node_type_def_id, search=search,
+    )
 
 
 @router.post(
@@ -76,12 +72,13 @@ async def create_node(
     data: KnowledgeNodeCreate,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
 ) -> KnowledgeNodeResponse:
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = KnowledgeService(db)
-    return await service.create_node(data, current_user.id, workspace_id=workspace.id)
+    return await kg_client.create_node(
+        "workspace", workspace.id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 # --- Positions (must be before /nodes/{node_id} to avoid route conflict) ---
@@ -96,13 +93,14 @@ async def create_node(
 async def batch_update_positions(
     data: BatchPositionUpdateRequest,
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> dict[str, int]:
     workspace, _member = workspace_ctx
-    service = KnowledgeService(db)
     positions = [p.model_dump() for p in data.positions]
-    updated = await service.batch_update_positions(workspace.id, positions)
-    return {"updated": updated}
+    result = await kg_client.batch_update_positions(
+        "workspace", workspace.id, current_user.id, positions,
+    )
+    return result
 
 
 @router.get(
@@ -115,11 +113,10 @@ async def batch_update_positions(
 async def get_node(
     node_id: int,
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> KnowledgeNodeResponse:
     _workspace, _member = workspace_ctx
-    service = KnowledgeService(db)
-    return await service.get_node(node_id)
+    return await kg_client.get_node(node_id, current_user.id)
 
 
 @router.patch(
@@ -137,12 +134,13 @@ async def update_node(
     data: KnowledgeNodeUpdate,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
 ) -> KnowledgeNodeResponse:
     _workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = KnowledgeService(db)
-    return await service.update_node(node_id, data, current_user.id)
+    return await kg_client.update_node(
+        node_id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.delete(
@@ -157,12 +155,11 @@ async def update_node(
 async def delete_node(
     node_id: int,
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
     _workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = KnowledgeService(db)
-    await service.delete_node(node_id)
+    await kg_client.delete_node(node_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -177,11 +174,10 @@ async def get_node_versions(
     node_id: int,
     limit: int = Query(default=20, ge=1, le=100),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KnowledgeNodeVersionResponse]:
     _workspace, _member = workspace_ctx
-    service = KnowledgeService(db)
-    return await service.get_node_versions(node_id, limit)
+    return await kg_client.get_node_versions(node_id, current_user.id, limit=limit)
 
 
 # --- Edges ---
@@ -202,12 +198,13 @@ async def create_edge(
     data: KnowledgeEdgeCreate,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
 ) -> KnowledgeEdgeResponse:
     _workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = KnowledgeService(db)
-    return await service.create_edge(data, current_user.id)
+    return await kg_client.create_edge(
+        "workspace", workspace_ctx[0].id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.delete(
@@ -222,12 +219,11 @@ async def create_edge(
 async def delete_edge(
     edge_id: int,
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
     _workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = KnowledgeService(db)
-    await service.delete_edge(edge_id)
+    await kg_client.delete_edge(edge_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -246,11 +242,10 @@ async def delete_edge(
 )
 async def list_conflicts(
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KgConflictResponse]:
     workspace, _member = workspace_ctx
-    service = KgConflictService(db)
-    return await service.get_open_conflicts(workspace.id)
+    return await kg_client.list_conflicts("workspace", workspace.id, current_user.id)
 
 
 @router.patch(
@@ -267,12 +262,10 @@ async def resolve_conflict(
     data: KgConflictResolve,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = KgConflictService(db)
-    await service.resolve_conflict(conflict_id, current_user.id, data, workspace.id)
+    await kg_client.resolve_conflict(conflict_id, current_user.id, data.model_dump())
     return {"detail": "ok"}
 
 
@@ -285,11 +278,10 @@ async def resolve_conflict(
 )
 async def get_graph(
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> KnowledgeGraphResponse:
     workspace, _member = workspace_ctx
-    service = KnowledgeService(db)
-    return await service.get_workspace_graph(workspace.id)
+    return await kg_client.get_graph("workspace", workspace.id, current_user.id)
 
 
 # --- Public Links ---
@@ -309,13 +301,13 @@ async def create_workspace_public_link(
     data: KgPublicLinkCreateRequest,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
 ) -> KgPublicLinkResponse:
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = PublicKnowledgeService(db)
-    create_data = KgPublicLinkCreate(scope_type="workspace", scope_id=workspace.id, **data.model_dump())
-    return await service.create_public_link(create_data, current_user.id)
+    return await kg_client.create_public_link(
+        "workspace", workspace.id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.get(
@@ -327,11 +319,10 @@ async def create_workspace_public_link(
 )
 async def list_workspace_public_links(
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[KgPublicLinkResponse]:
     workspace, _member = workspace_ctx
-    service = PublicKnowledgeService(db)
-    return await service.list_public_links("workspace", workspace.id)
+    return await kg_client.list_public_links("workspace", workspace.id, current_user.id)
 
 
 @router.patch(
@@ -349,12 +340,13 @@ async def update_workspace_public_link(
     data: KgPublicLinkUpdate,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
 ) -> KgPublicLinkResponse:
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = PublicKnowledgeService(db)
-    return await service.update_public_link(link_id, data, current_user.id, "workspace", workspace.id)
+    return await kg_client.update_public_link(
+        link_id, current_user.id,
+        data.model_dump(exclude_none=True),
+    )
 
 
 @router.delete(
@@ -369,12 +361,11 @@ async def update_workspace_public_link(
 async def delete_workspace_public_link(
     link_id: int,
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = PublicKnowledgeService(db)
-    await service.delete_public_link(link_id, "workspace", workspace.id)
+    await kg_client.delete_public_link(link_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -391,12 +382,11 @@ async def add_node_to_workspace_public_link(
     link_id: int,
     data: KgPublicLinkNodeAdd,
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = PublicKnowledgeService(db)
-    await service.add_node_to_link(link_id, data.node_id, "workspace", workspace.id)
+    await kg_client.add_node_to_link(link_id, data.node_id, current_user.id)
     return Response(status_code=204)
 
 
@@ -413,10 +403,9 @@ async def remove_node_from_workspace_public_link(
     link_id: int,
     node_id: int,
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
-    service = PublicKnowledgeService(db)
-    await service.remove_node_from_link(link_id, node_id, "workspace", workspace.id)
+    await kg_client.remove_node_from_link(link_id, node_id, current_user.id)
     return Response(status_code=204)
