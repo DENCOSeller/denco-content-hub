@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING
 
 from sqlalchemy import select, update
@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.exceptions import NotFoundException
 from app.models.competitor import (
     CompetitorChannel,
+    CompetitorChannelSnapshot,
     CompetitorNotification,
     CompetitorPost,
     CompetitorPostAnalysis,
@@ -135,6 +136,23 @@ class CompetitorRepository(BaseRepository[CompetitorChannel]):
         result = await self.db.execute(stmt)
         await self.db.flush()
         return result.rowcount  # type: ignore[return-value]
+
+    async def get_channel_snapshots(
+        self,
+        channel_id: int,
+        days: int = 30,
+    ) -> list[CompetitorChannelSnapshot]:
+        threshold = datetime.now(UTC) - timedelta(days=days)
+        query = (
+            select(CompetitorChannelSnapshot)
+            .where(
+                CompetitorChannelSnapshot.channel_id == channel_id,
+                CompetitorChannelSnapshot.recorded_at >= threshold,
+            )
+            .order_by(CompetitorChannelSnapshot.recorded_at.asc())
+        )
+        result = await self.db.execute(query)
+        return list(result.scalars().all())
 
     # ------------------------------------------------------------------
     # helpers

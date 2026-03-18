@@ -107,6 +107,20 @@ class CompetitorPostFilters(BaseModel):
     min_views: int | None = None
 
 
+class CompetitorChannelSnapshotResponse(BaseModel):
+    id: int
+    channel_id: int
+    recorded_at: datetime
+    subscribers_count: int | None
+    posts_count: int | None
+    avg_views_30d: float | None
+    avg_er_30d: float | None
+    total_views_30d: int | None
+    posts_count_30d: int | None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class CompetitorNotificationResponse(BaseModel):
     id: int
     workspace_id: int

@@ -115,6 +115,72 @@ def sync_single_competitor_channel(channel_id: int) -> dict[str, Any]:
         db.close()
 
 
+@celery_app.task(
+    name="take_channel_snapshots",
+    time_limit=600,
+    soft_time_limit=580,
+)
+def take_channel_snapshots() -> dict[str, Any]:
+    """Ежедневный снапшот метрик для всех активных каналов."""
+    db = SyncSessionLocal()
+    stats = {"snapshots": 0, "errors": 0}
+
+    try:
+        channels = (
+            db.query(CompetitorChannel)
+            .filter(
+                CompetitorChannel.status == "active",
+                CompetitorChannel.deleted_at.is_(None),
+            )
+            .all()
+        )
+
+        threshold_30d = datetime.now(UTC) - timedelta(days=30)
+
+        for channel in channels:
+            try:
+                posts_30d = (
+                    db.query(CompetitorPost)
+                    .filter(
+                        CompetitorPost.channel_id == channel.id,
+                        CompetitorPost.published_at >= threshold_30d,
+                    )
+                    .all()
+                )
+
+                views = [p.views_count for p in posts_30d if p.views_count is not None]
+                total_views = sum(views) if views else None
+                avg_views = total_views / len(views) if views else None
+
+                er_values = [p.er_score for p in posts_30d if p.er_score is not None]
+                avg_er = sum(er_values) / len(er_values) if er_values else None
+
+                snapshot = CompetitorChannelSnapshot(
+                    channel_id=channel.id,
+                    subscribers_count=channel.subscribers_count,
+                    posts_count=channel.posts_count,
+                    avg_views_30d=avg_views,
+                    avg_er_30d=avg_er,
+                    total_views_30d=total_views,
+                    posts_count_30d=len(posts_30d),
+                )
+                db.add(snapshot)
+                stats["snapshots"] += 1
+            except Exception:
+                stats["errors"] += 1
+                logger.exception(
+                    "Ошибка создания снапшота",
+                    channel_id=channel.id,
+                )
+
+        db.commit()
+    finally:
+        db.close()
+
+    logger.info("Ежедневные снапшоты созданы", **stats)
+    return stats
+
+
 def _needs_sync(channel: CompetitorChannel) -> bool:
     """Проверить, пора ли парсить канал."""
     if not channel.last_parsed_at:

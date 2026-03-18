@@ -42,6 +42,7 @@ import { useWorkspaceStore } from '@/stores/workspace-store'
 import { useCompanyStore } from '@/stores/company-store'
 import { CompanySwitcher } from '@/components/features/company/CompanySwitcher'
 import { useAiPanelStore } from '@/stores/ai-panel-store'
+import { NotificationBell } from '@/components/features/competitors/NotificationBell'
 import { AiAssistantPanel } from '@/components/ai/AiAssistantPanel'
 import { AiPageContextProvider } from '@/contexts/AiPageContext'
 import styles from './dashboard.module.css'
@@ -185,6 +186,8 @@ export default function DashboardLayout({
 
           <Group gap="md">
             {user?.is_platform_owner && <CompanySwitcher />}
+
+            <NotificationBell />
 
             <Tooltip label="AI Ассистент" position="bottom">
               <ActionIcon

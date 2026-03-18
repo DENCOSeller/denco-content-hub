@@ -11,6 +11,7 @@ import type {
   CompetitorChannelUpdate,
   PaginatedResponse,
   CompetitorPost,
+  CompetitorChannelSnapshot,
   ResolveUrlResponse,
   SyncResponse,
 } from '@/api/types/competitor'
@@ -29,6 +30,8 @@ export const competitorKeys = {
   postDetail: (postId: number) => ['competitors', 'post', postId] as const,
   postAnalysis: (postId: number) =>
     ['competitors', 'post', postId, 'analysis'] as const,
+  snapshots: (channelId: number, days: number) =>
+    ['competitors', 'snapshots', channelId, { days }] as const,
 }
 
 // ---------------------------------------------------------------------------
@@ -124,6 +127,22 @@ export function usePostAnalysisQuery(postId: number) {
       return data
     },
     enabled: !!postId,
+  })
+}
+
+export function useChannelSnapshotsQuery(channelId: number, days = 30) {
+  return useQuery({
+    queryKey: competitorKeys.snapshots(channelId, days),
+    queryFn: async () => {
+      const { data } = await client.get<CompetitorChannelSnapshot[], unknown, true>({
+        url: '/api/v1/competitors/{channel_id}/snapshots',
+        path: { channel_id: channelId },
+        query: { days },
+        throwOnError: true,
+      })
+      return data
+    },
+    enabled: !!channelId,
   })
 }
 

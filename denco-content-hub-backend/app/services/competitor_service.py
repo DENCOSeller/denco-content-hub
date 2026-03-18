@@ -11,6 +11,7 @@ from app.repositories.workspace_member_repository import WorkspaceMemberReposito
 from app.schemas.competitor import (
     CompetitorAnalysisResponse,
     CompetitorChannelResponse,
+    CompetitorChannelSnapshotResponse,
     CompetitorChannelUpdate,
     CompetitorPostDetailResponse,
     CompetitorPostFilters,
@@ -99,6 +100,16 @@ class CompetitorService:
         await self.repo.soft_delete(channel_id)
         await self.db.commit()
         logger.info("Competitor channel deleted", channel_id=channel_id)
+
+    async def list_channel_snapshots(
+        self,
+        channel_id: int,
+        user_id: int,
+        days: int = 30,
+    ) -> list[CompetitorChannelSnapshotResponse]:
+        await self.get_channel_for_user(channel_id, user_id)
+        snapshots = await self.repo.get_channel_snapshots(channel_id, days)
+        return [CompetitorChannelSnapshotResponse.model_validate(s) for s in snapshots]
 
     async def list_posts(
         self,

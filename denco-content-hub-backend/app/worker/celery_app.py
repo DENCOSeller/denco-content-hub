@@ -36,6 +36,7 @@ celery_app.conf.task_routes = {
     "sync_competitor_channels": {"queue": "default"},
     "sync_single_competitor_channel": {"queue": "default"},
     "analyze_competitor_posts": {"queue": "default"},
+    "take_channel_snapshots": {"queue": "default"},
 }
 
 celery_app.conf.beat_schedule = {
@@ -50,6 +51,10 @@ celery_app.conf.beat_schedule = {
     "analyze-competitor-posts": {
         "task": "analyze_competitor_posts",
         "schedule": 1800.0,  # Каждые 30 минут анализируем новые посты
+    },
+    "take-channel-snapshots": {
+        "task": "take_channel_snapshots",
+        "schedule": 86400.0,  # Раз в сутки (24 часа)
     },
 }
 

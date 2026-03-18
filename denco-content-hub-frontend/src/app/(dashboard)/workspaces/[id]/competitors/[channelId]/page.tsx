@@ -12,6 +12,7 @@ import {
   Pagination,
   ActionIcon,
   Tooltip,
+  Tabs,
 } from '@mantine/core'
 import {
   IconArrowLeft,
@@ -23,6 +24,8 @@ import {
   IconThumbUp,
   IconMessageCircle,
   IconRefresh,
+  IconChartLine,
+  IconList,
 } from '@tabler/icons-react'
 import { useParams, useRouter } from 'next/navigation'
 
@@ -40,6 +43,7 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import type { CompetitorPlatform, CompetitorPost } from '@/api/types/competitor'
 import { PostCard } from '@/components/features/competitors/PostCard'
 import { PostAnalysisPanel } from '@/components/features/competitors/PostAnalysisPanel'
+import { AnalyticsTab } from '@/components/features/competitors/AnalyticsTab'
 import { notifications } from '@mantine/notifications'
 
 const platformConfig: Record<CompetitorPlatform, { icon: typeof IconBrandYoutube; label: string; color: string }> = {
@@ -160,44 +164,57 @@ export default function ChannelDashboardPage() {
         </Group>
       </Card>
 
-      {/* Лента постов */}
-      <Group gap="xs" align="center">
-        <Text fw={600} size="lg">Публикации</Text>
-        {postsData && (
-          <Badge variant="light" size="sm">{postsData.total}</Badge>
-        )}
-      </Group>
+      {/* Табы: Посты / Аналитика */}
+      <Tabs defaultValue="posts">
+        <Tabs.List>
+          <Tabs.Tab value="posts" leftSection={<IconList size={16} />}>
+            Посты
+            {postsData && (
+              <Badge variant="light" size="xs" ml={6}>{postsData.total}</Badge>
+            )}
+          </Tabs.Tab>
+          <Tabs.Tab value="analytics" leftSection={<IconChartLine size={16} />}>
+            Аналитика
+          </Tabs.Tab>
+        </Tabs.List>
 
-      {postsLoading ? (
-        <LoadingState message="Загрузка публикаций..." />
-      ) : !postsData?.items.length ? (
-        <EmptyState message="Публикации пока не загружены. Запустите синхронизацию." />
-      ) : (
-        <Stack gap="md">
-          {postsData.items.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              isSelected={selectedPost?.id === post.id}
-              onSelect={() => setSelectedPost(selectedPost?.id === post.id ? null : post)}
-            />
-          ))}
+        <Tabs.Panel value="posts" pt="md">
+          {postsLoading ? (
+            <LoadingState message="Загрузка публикаций..." />
+          ) : !postsData?.items.length ? (
+            <EmptyState message="Публикации пока не загружены. Запустите синхронизацию." />
+          ) : (
+            <Stack gap="md">
+              {postsData.items.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  isSelected={selectedPost?.id === post.id}
+                  onSelect={() => setSelectedPost(selectedPost?.id === post.id ? null : post)}
+                />
+              ))}
 
-          {selectedPost && (
-            <PostAnalysisPanel postId={selectedPost.id} />
+              {selectedPost && (
+                <PostAnalysisPanel postId={selectedPost.id} />
+              )}
+
+              {postsData.pages > 1 && (
+                <Group justify="center" mt="md">
+                  <Pagination
+                    total={postsData.pages}
+                    value={page}
+                    onChange={setPage}
+                  />
+                </Group>
+              )}
+            </Stack>
           )}
+        </Tabs.Panel>
 
-          {postsData.pages > 1 && (
-            <Group justify="center" mt="md">
-              <Pagination
-                total={postsData.pages}
-                value={page}
-                onChange={setPage}
-              />
-            </Group>
-          )}
-        </Stack>
-      )}
+        <Tabs.Panel value="analytics" pt="md">
+          <AnalyticsTab channelId={channelId} />
+        </Tabs.Panel>
+      </Tabs>
     </Stack>
   )
 }

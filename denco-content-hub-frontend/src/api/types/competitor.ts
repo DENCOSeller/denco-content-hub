@@ -106,3 +106,33 @@ export interface SyncResponse {
   status: string
   message: string
 }
+
+export interface CompetitorChannelSnapshot {
+  id: number
+  channel_id: number
+  recorded_at: string
+  subscribers_count: number
+  posts_count: number
+  avg_views_30d: number
+  avg_er_30d: number
+  total_views_30d: number
+  posts_count_30d: number
+}
+
+export type CompetitorNotificationType =
+  | 'new_post'
+  | 'viral_post'
+  | 'channel_growth'
+
+export interface CompetitorNotification {
+  id: number
+  workspace_id: number
+  channel_id: number
+  post_id?: number
+  notification_type: CompetitorNotificationType
+  title: string
+  body: string
+  is_read: boolean
+  read_at?: string
+  created_at: string
+}

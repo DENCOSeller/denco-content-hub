@@ -10,6 +10,7 @@ from app.schemas.competitor import (
     CompetitorAnalysisResponse,
     CompetitorChannelCreate,
     CompetitorChannelResponse,
+    CompetitorChannelSnapshotResponse,
     CompetitorChannelUpdate,
     CompetitorNotificationResponse,
     CompetitorPostDetailResponse,
@@ -152,6 +153,29 @@ async def sync_channel(
 
     sync_single_competitor_channel.delay(channel_id)
     return SyncResponse(status="accepted", message="Синхронизация запущена")
+
+
+# ── Snapshots ─────────────────────────────────────────────────────────
+
+
+@router.get(
+    "/competitors/{channel_id}/snapshots",
+    response_model=list[CompetitorChannelSnapshotResponse],
+    summary="Get competitor channel metric snapshots",
+    responses={
+        401: {"model": ErrorResponse, "description": "Not authenticated"},
+        403: {"model": ErrorResponse, "description": "Access denied"},
+        404: {"model": ErrorResponse, "description": "Channel not found"},
+    },
+)
+async def list_channel_snapshots(
+    channel_id: int,
+    days: int = Query(30, ge=1, le=365),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[CompetitorChannelSnapshotResponse]:
+    service = CompetitorService(db)
+    return await service.list_channel_snapshots(channel_id, current_user.id, days)
 
 
 # ── Posts ─────────────────────────────────────────────────────────────
