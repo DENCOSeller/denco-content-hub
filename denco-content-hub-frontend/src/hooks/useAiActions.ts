@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { notifications } from '@mantine/notifications'
 import { generateJSON } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import TaskList from '@tiptap/extension-task-list'
@@ -31,9 +32,19 @@ const tiptapExtensions = [
 
 function textToTiptap(text: string): Record<string, unknown> {
   if (!text) return { type: 'doc', content: [{ type: 'paragraph' }] }
-  const html = markdownToHtml(text)
-  if (!html) return { type: 'doc', content: [{ type: 'paragraph' }] }
-  return generateJSON(html, tiptapExtensions) as Record<string, unknown>
+  try {
+    const html = markdownToHtml(text)
+    if (!html) return { type: 'doc', content: [{ type: 'paragraph' }] }
+    return generateJSON(html, tiptapExtensions) as Record<string, unknown>
+  } catch {
+    throw new Error('Не удалось преобразовать контент в формат редактора')
+  }
+}
+
+const SUCCESS_MESSAGES: Record<string, string> = {
+  create_node: 'Узел создан',
+  update_node: 'Узел обновлён',
+  create_edge: 'Связь создана',
 }
 
 interface UseAiActionsOptions {
@@ -50,6 +61,14 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
     async (messageId: string, action: AiAction): Promise<boolean> => {
       try {
         if (action.action_type === 'create_node') {
+          if (!action.payload.node_type_def_id) {
+            notifications.show({
+              title: 'Ошибка',
+              message: 'AI не указал тип узла, попробуйте ещё раз',
+              color: 'red',
+            })
+            return false
+          }
           const body = {
             title: action.payload.title as string,
             node_type_def_id: action.payload.node_type_def_id as number,
@@ -74,6 +93,10 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
           }
         } else if (action.action_type === 'update_node') {
           const nodeId = focusedNodeId ?? Number(action.payload.node_id)
+          if (!nodeId || isNaN(nodeId)) {
+            notifications.show({ title: 'Ошибка', message: 'Не удалось определить узел для обновления', color: 'red' })
+            return false
+          }
           const body: Record<string, unknown> = {}
           if (action.payload.title) body.title = action.payload.title
           if (action.payload.content) body.content = textToTiptap(action.payload.content as string)
@@ -119,8 +142,19 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
         }
 
         updateActionStatus(messageId, action.id, 'applied')
+        notifications.show({
+          title: 'Готово',
+          message: SUCCESS_MESSAGES[action.action_type] ?? 'Действие выполнено',
+          color: 'teal',
+        })
         return true
-      } catch {
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Не удалось выполнить действие'
+        notifications.show({
+          title: 'Ошибка',
+          message,
+          color: 'red',
+        })
         return false
       }
     },

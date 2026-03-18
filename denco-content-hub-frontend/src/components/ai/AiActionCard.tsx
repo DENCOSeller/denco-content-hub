@@ -65,16 +65,15 @@ function getActionColor(action: AiAction): string {
 }
 
 export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {
-  console.log('[AiActionCard] RENDER, action:', action.id, action.action_type)
   const [loading, setLoading] = useState(false)
   const [flashing, setFlashing] = useState(false)
+  const [error, setError] = useState(false)
   const ActionTypeIcon = getActionIcon(action.action_type)
   const color = getActionColor(action)
   const title = (action.payload.title as string) ?? (action.payload.label as string) ?? ''
   const content = action.payload.content as string | undefined
 
   useEffect(() => {
-    console.log('[AiActionCard] flashing changed:', flashing)
     if (!flashing) return
     const timer = setTimeout(() => setFlashing(false), 1500)
     return () => clearTimeout(timer)
@@ -82,12 +81,13 @@ export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {
 
   const handleApply = async () => {
     setLoading(true)
+    setError(false)
     try {
       const success = await onApply()
-      console.log('[AiActionCard] onApply returned:', success, 'type:', typeof success)
       if (success) {
-        console.log('[AiActionCard] Setting flashing=true')
         setFlashing(true)
+      } else {
+        setError(true)
       }
     } finally {
       setLoading(false)
@@ -98,7 +98,7 @@ export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {
 
   return (
     <div
-      className={styles.card}
+      className={`${styles.card} ${error ? styles.cardError : ''}`}
       style={Object.assign(
         { '--action-color': color } as React.CSSProperties,
         flashing
@@ -178,6 +178,11 @@ export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {
       {content && !isResolved && (
         <Text size="xs" c="dimmed" className={styles.preview} lineClamp={3}>
           {content}
+        </Text>
+      )}
+      {error && !isResolved && (
+        <Text size="xs" c="red.5" mt={4}>
+          Ошибка, попробуйте ещё раз
         </Text>
       )}
     </div>
