@@ -96,16 +96,14 @@ export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {
 
   const isResolved = action.status === 'applied' || action.status === 'rejected'
 
+  const cardClassName = [
+    styles.card,
+    flashing ? styles.cardFlash : '',
+    error ? styles.cardError : '',
+  ].filter(Boolean).join(' ')
+
   return (
-    <div
-      className={`${styles.card} ${error ? styles.cardError : ''}`}
-      style={Object.assign(
-        { '--action-color': color } as React.CSSProperties,
-        flashing
-          ? { background: 'rgba(48, 209, 88, 0.3)', borderColor: '#30D158', transition: 'background 1.5s ease-out, border-color 1.5s ease-out' }
-          : { transition: 'background 1.5s ease-out, border-color 1.5s ease-out' },
-      )}
-    >
+    <div className={cardClassName} style={{ '--action-color': color } as React.CSSProperties}>
       <div className={styles.header}>
         <div className={styles.iconWrap} style={{ background: color }}>
           <ActionTypeIcon size={14} color="#fff" />
@@ -128,7 +126,7 @@ export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {
                   <Text fw={600} size="xs">{title || getActionLabel(action)}</Text>
                   {content && (
                     <Text size="xs" c="dimmed" mt={4}>
-                      {content.length > 150 ? content.slice(0, 150) + '…' : content}
+                      {content.length > 150 ? content.slice(0, 150) + '\u2026' : content}
                     </Text>
                   )}
                 </>
@@ -181,8 +179,8 @@ export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {
         </Text>
       )}
       {error && !isResolved && (
-        <Text size="xs" c="red.5" mt={4}>
-          Ошибка, попробуйте ещё раз
+        <Text size="xs" c="red.4" className={styles.errorText}>
+          Ошибка — попробуйте ещё раз
         </Text>
       )}
     </div>

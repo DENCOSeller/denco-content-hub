@@ -32,13 +32,9 @@ const tiptapExtensions = [
 
 function textToTiptap(text: string): Record<string, unknown> {
   if (!text) return { type: 'doc', content: [{ type: 'paragraph' }] }
-  try {
-    const html = markdownToHtml(text)
-    if (!html) return { type: 'doc', content: [{ type: 'paragraph' }] }
-    return generateJSON(html, tiptapExtensions) as Record<string, unknown>
-  } catch {
-    throw new Error('Не удалось преобразовать контент в формат редактора')
-  }
+  const html = markdownToHtml(text)
+  if (!html) return { type: 'doc', content: [{ type: 'paragraph' }] }
+  return generateJSON(html, tiptapExtensions) as Record<string, unknown>
 }
 
 const SUCCESS_MESSAGES: Record<string, string> = {
@@ -60,20 +56,42 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
   const applyAction = useCallback(
     async (messageId: string, action: AiAction): Promise<boolean> => {
       try {
+        // Guard: need workspace or company context to make API calls
+        if (!workspaceId && !companyId) {
+          notifications.show({
+            title: 'Ошибка',
+            message: 'Откройте воркспейс для применения действий',
+            color: 'red',
+          })
+          return false
+        }
+
         if (action.action_type === 'create_node') {
           if (!action.payload.node_type_def_id) {
             notifications.show({
               title: 'Ошибка',
-              message: 'AI не указал тип узла, попробуйте ещё раз',
+              message: 'AI не указал тип узла — переформулируйте запрос',
               color: 'red',
             })
             return false
           }
+
+          let tiptapContent: Record<string, unknown> | undefined
+          if (action.payload.content) {
+            try {
+              tiptapContent = textToTiptap(action.payload.content as string)
+            } catch {
+              notifications.show({ title: 'Ошибка', message: 'Не удалось преобразовать контент', color: 'red' })
+              return false
+            }
+          }
+
           const body = {
             title: action.payload.title as string,
             node_type_def_id: action.payload.node_type_def_id as number,
-            content: action.payload.content ? textToTiptap(action.payload.content as string) : undefined,
+            content: tiptapContent,
           }
+
           if (workspaceId) {
             await createNodeApiV1WorkspacesWorkspaceIdKnowledgeNodesPost({
               path: { workspace_id: workspaceId },
@@ -97,9 +115,22 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
             notifications.show({ title: 'Ошибка', message: 'Не удалось определить узел для обновления', color: 'red' })
             return false
           }
+
           const body: Record<string, unknown> = {}
           if (action.payload.title) body.title = action.payload.title
-          if (action.payload.content) body.content = textToTiptap(action.payload.content as string)
+          if (action.payload.content) {
+            try {
+              body.content = textToTiptap(action.payload.content as string)
+            } catch {
+              notifications.show({ title: 'Ошибка', message: 'Не удалось преобразовать контент', color: 'red' })
+              return false
+            }
+          }
+
+          if (Object.keys(body).length === 0) {
+            notifications.show({ title: 'Ошибка', message: 'Нет данных для обновления', color: 'red' })
+            return false
+          }
 
           if (workspaceId) {
             await updateNodeApiV1WorkspacesWorkspaceIdKnowledgeNodesNodeIdPatch({
@@ -139,20 +170,23 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
             })
             qc.invalidateQueries({ queryKey: companyKnowledgeKeys.graph(companyId) })
           }
+        } else {
+          notifications.show({ title: 'Ошибка', message: 'Неизвестный тип действия', color: 'red' })
+          return false
         }
 
         updateActionStatus(messageId, action.id, 'applied')
         notifications.show({
           title: 'Готово',
           message: SUCCESS_MESSAGES[action.action_type] ?? 'Действие выполнено',
-          color: 'teal',
+          color: 'green',
         })
         return true
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Не удалось выполнить действие'
+        const detail = err instanceof Error ? err.message : String(err)
         notifications.show({
           title: 'Ошибка',
-          message,
+          message: detail || 'Не удалось выполнить действие',
           color: 'red',
         })
         return false

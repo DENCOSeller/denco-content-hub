@@ -2,13 +2,42 @@
   position: relative;
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid var(--mantine-color-dark-4);
-  background: var(--mantine-color-dark-6);
-  transition: border-color 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--action-color, var(--mantine-color-dark-4));
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
-  border-color: var(--mantine-color-dark-3);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  border-left-color: var(--action-color, var(--mantine-color-dark-3));
+}
+
+/* Flash after successful apply */
+.cardFlash {
+  background: rgba(48, 209, 88, 0.15) !important;
+  border-color: rgba(48, 209, 88, 0.3) !important;
+  border-left-color: #30D158 !important;
+  box-shadow: 0 0 8px rgba(48, 209, 88, 0.2);
+  animation: flashFade 1.5s ease-out forwards;
+}
+
+@keyframes flashFade {
+  0% {
+    background: rgba(48, 209, 88, 0.15);
+    box-shadow: 0 0 8px rgba(48, 209, 88, 0.2);
+  }
+  100% {
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 0 0 transparent;
+  }
+}
+
+/* Error state */
+.cardError {
+  border-color: rgba(255, 69, 58, 0.25);
+  border-left-color: #FF453A;
 }
 
 .header {
@@ -59,10 +88,9 @@
 .preview {
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid var(--mantine-color-dark-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.cardError {
-  border-color: var(--mantine-color-red-7);
+.errorText {
+  margin-top: 4px;
 }
-
