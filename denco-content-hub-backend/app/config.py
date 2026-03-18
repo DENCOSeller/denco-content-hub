@@ -52,6 +52,15 @@ class Settings(BaseSettings):
     ai_attachment_max_size_mb: int = 10
     ai_attachment_max_per_message: int = 3
 
+    # Competitor Intelligence — YouTube Data API v3
+    youtube_api_key: str | None = None
+
+    # Competitor Intelligence — Apify (Instagram)
+    apify_api_key: str | None = None
+
+    # Competitor Intelligence — VK API
+    vk_access_token: str | None = None
+
     # Hugging Face (pyannote speaker diarization)
     huggingface_token: str | None = None
 

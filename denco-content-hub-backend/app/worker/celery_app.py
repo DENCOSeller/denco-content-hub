@@ -33,12 +33,23 @@ celery_app.conf.task_routes = {
     "process_pdf": {"queue": "default"},
     "process_webpage": {"queue": "default"},
     "analyze_content": {"queue": "default"},
+    "sync_competitor_channels": {"queue": "default"},
+    "sync_single_competitor_channel": {"queue": "default"},
+    "analyze_competitor_posts": {"queue": "default"},
 }
 
 celery_app.conf.beat_schedule = {
     "recover-stuck-items": {
         "task": "recover_stuck_items",
         "schedule": 600.0,
+    },
+    "sync-competitor-channels": {
+        "task": "sync_competitor_channels",
+        "schedule": 3600.0,  # Каждый час проверяем, какие каналы пора парсить
+    },
+    "analyze-competitor-posts": {
+        "task": "analyze_competitor_posts",
+        "schedule": 1800.0,  # Каждые 30 минут анализируем новые посты
     },
 }
 

@@ -1,4 +1,6 @@
 anthropic
+beautifulsoup4
+lxml
 python-docx
 pyannote.audio
 pymupdf

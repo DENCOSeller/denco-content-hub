@@ -281,7 +281,10 @@ async def get_graph(
     current_user: User = Depends(get_current_user),
 ) -> KnowledgeGraphResponse:
     workspace, _member = workspace_ctx
-    return await kg_client.get_graph("workspace", workspace.id, current_user.id)
+    return await kg_client.get_graph(
+        "workspace", workspace.id, current_user.id,
+        include_company=True, company_id=workspace.company_id,
+    )
 
 
 # --- Public Links ---

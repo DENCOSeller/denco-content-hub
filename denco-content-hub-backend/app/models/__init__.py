@@ -2,6 +2,17 @@ from app.models.base import Base
 from app.models.chat import AiSetting, ChatAttachment, ChatMessage, ChatRole, ChatSession
 from app.models.company import Company
 from app.models.company_member import CompanyMember, CompanyRole
+from app.models.competitor import (
+    CompetitorChannel,
+    CompetitorChannelSnapshot,
+    CompetitorNotification,
+    CompetitorPlatform,
+    CompetitorPost,
+    CompetitorPostAnalysis,
+    CompetitorPostStatus,
+    CompetitorStatus,
+    NotificationType,
+)
 from app.models.content_analysis import ContentAnalysis
 from app.models.content_chat_message import ContentChatMessage
 from app.models.content_item import ContentItem, ContentStatus, SourceType
@@ -17,7 +28,6 @@ from app.models.knowledge import (
     KnowledgeNodeVersion,
     ScopeType,
 )
-from app.models.public_knowledge import KgPublicLink, KgPublicLinkNode, VisibilityMode
 from app.models.library_item import (
     Category,
     ContentType,
@@ -26,6 +36,7 @@ from app.models.library_item import (
     LibraryStatus,
     Platform,
 )
+from app.models.public_knowledge import KgPublicLink, KgPublicLinkNode, VisibilityMode
 from app.models.transcription import Transcription, TranscriptionStatus
 from app.models.user import User
 from app.models.workspace import Workspace, WorkspaceMember, WorkspaceRole
@@ -42,6 +53,14 @@ __all__ = [
     "Company",
     "CompanyMember",
     "CompanyRole",
+    "CompetitorChannel",
+    "CompetitorChannelSnapshot",
+    "CompetitorNotification",
+    "CompetitorPlatform",
+    "CompetitorPost",
+    "CompetitorPostAnalysis",
+    "CompetitorPostStatus",
+    "CompetitorStatus",
     "ContentAnalysis",
     "ContentChatMessage",
     "ContentItem",
@@ -57,10 +76,10 @@ __all__ = [
     "KnowledgeEdge",
     "KnowledgeNode",
     "KnowledgeNodeVersion",
-    "VisibilityMode",
     "LibraryItem",
     "LibrarySourceType",
     "LibraryStatus",
+    "NotificationType",
     "PlanItemStatus",
     "Platform",
     "ScopeType",
@@ -68,6 +87,7 @@ __all__ = [
     "Transcription",
     "TranscriptionStatus",
     "User",
+    "VisibilityMode",
     "Workspace",
     "WorkspaceInvitation",
     "WorkspaceMember",
