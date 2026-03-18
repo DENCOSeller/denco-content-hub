@@ -1,0 +1,218 @@
+/* ─── SummarySection ───────────────────────────────────────────────────────── */
+
+.summaryCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-lg);
+}
+
+.summaryText {
+  line-height: 1.8;
+  color: rgba(220, 220, 255, 0.85);
+  white-space: pre-wrap;
+}
+
+/* ─── KeyPointsSection ────────────────────────────────────────────────────── */
+
+.keyPointCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-md);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.keyPointCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-accent);
+}
+
+.keyPointIndex {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--mantine-color-neonBlue-6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ─── HooksSection ────────────────────────────────────────────────────────── */
+
+.hookRow {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-md);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.hookRow:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-accent);
+}
+
+.hookQuote {
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(220, 220, 255, 0.9);
+  border-left: 3px solid var(--mantine-color-neonBlue-6);
+  padding-left: var(--mantine-spacing-sm);
+}
+
+/* ─── ContentIdeasSection ─────────────────────────────────────────────────── */
+
+.ideaCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-md);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.ideaCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-accent);
+}
+
+.ideaIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 183, 0, 0.15);
+  color: var(--mantine-color-yellow-5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─── ContentStructureSection ─────────────────────────────────────────────── */
+
+.structureCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-lg);
+}
+
+.structureRow {
+  display: flex;
+  align-items: center;
+  gap: var(--mantine-spacing-sm);
+}
+
+.structureLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(220, 220, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  min-width: 100px;
+}
+
+/* ─── StoryboardSection ───────────────────────────────────────────────────── */
+
+.timelineDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mantine-color-neonBlue-6);
+  flex-shrink: 0;
+}
+
+.timelineTiming {
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mantine-color-neonBlue-6);
+  background: rgba(10, 132, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--mantine-radius-sm);
+}
+
+/* ─── AudienceInsightsSection ─────────────────────────────────────────────── */
+
+.insightCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-md);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.insightCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-accent);
+}
+
+.insightIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(138, 99, 255, 0.15);
+  color: var(--mantine-color-violet-5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─── ProductionNotesSection ──────────────────────────────────────────────── */
+
+.noteCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-md);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.noteCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-accent);
+}
+
+/* ─── QualityScore ────────────────────────────────────────────────────────── */
+
+.scoreWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--mantine-spacing-sm);
+}
+
+.scoreCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.scoreLow {
+  background: rgba(255, 59, 48, 0.15);
+  color: var(--mantine-color-red-5);
+  border: 2px solid rgba(255, 59, 48, 0.3);
+}
+
+.scoreMedium {
+  background: rgba(255, 183, 0, 0.15);
+  color: var(--mantine-color-yellow-5);
+  border: 2px solid rgba(255, 183, 0, 0.3);
+}
+
+.scoreHigh {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--mantine-color-green-5);
+  border: 2px solid rgba(52, 199, 89, 0.3);
+}

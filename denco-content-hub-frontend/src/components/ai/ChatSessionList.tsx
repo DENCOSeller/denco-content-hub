@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { ActionIcon, Text } from '@mantine/core'
 import { IconArrowLeft, IconPlus, IconTrash, IconMessage } from '@tabler/icons-react'
 import { useSessionsListQuery, useDeleteSessionMutation } from '@/api/hooks/useAiSessions'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import type { ChatSession } from '@/api/hooks/useAiSessions'
 import styles from './ChatSessionList.module.css'
 
@@ -35,8 +36,9 @@ export function ChatSessionList({
   onNewChat,
   onClose,
 }: ChatSessionListProps) {
-  const { data: sessions, isLoading } = useSessionsListQuery()
-  const deleteMutation = useDeleteSessionMutation()
+  const activeWorkspace = useWorkspaceStore((s) => s.activeWorkspace)
+  const { data: sessions, isLoading } = useSessionsListQuery(activeWorkspace?.id)
+  const deleteMutation = useDeleteSessionMutation(activeWorkspace?.id)
 
   const handleDelete = useCallback(
     (e: React.MouseEvent, session: ChatSession) => {

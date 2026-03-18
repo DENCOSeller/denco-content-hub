@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react'
 import { getAccessToken } from '@/lib/auth'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import type { AiPageContext } from '@/contexts/AiPageContext'
 import type { AttachedFile } from '@/components/ai/AiChatInput'
 
@@ -35,8 +36,10 @@ export interface ChatMessage {
 }
 
 interface SSEEvent {
-  type: 'token' | 'done' | 'error' | 'action' | 'tool_progress'
+  type: 'token' | 'text_delta' | 'done' | 'error' | 'action' | 'tool_progress'
   content?: string
+  delta?: string
+  text?: string
   session_id?: number
   message_id?: number
   detail?: string
@@ -63,7 +66,7 @@ interface UseAiChatReturn {
   resetChat: () => void
 }
 
-async function uploadFiles(files: AttachedFile[]): Promise<number[]> {
+async function uploadFiles(files: AttachedFile[], workspaceId: number): Promise<number[]> {
   const token = getAccessToken()
   const ids: number[] = []
 
@@ -71,7 +74,7 @@ async function uploadFiles(files: AttachedFile[]): Promise<number[]> {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/attachments`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/workspaces/${workspaceId}/ai/attachments`, {
       method: 'POST',
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -92,6 +95,7 @@ async function uploadFiles(files: AttachedFile[]): Promise<number[]> {
 }
 
 export function useAiChat({ sessionId, onSessionCreated }: UseAiChatOptions): UseAiChatReturn {
+  const activeWorkspace = useWorkspaceStore((s) => s.activeWorkspace)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
@@ -100,6 +104,8 @@ export function useAiChat({ sessionId, onSessionCreated }: UseAiChatOptions): Us
   const abortControllerRef = useRef<AbortController | null>(null)
   const sessionIdRef = useRef(sessionId)
   sessionIdRef.current = sessionId
+  const workspaceIdRef = useRef(activeWorkspace?.id)
+  workspaceIdRef.current = activeWorkspace?.id
 
   const stopStreaming = useCallback(() => {
     abortControllerRef.current?.abort()
@@ -131,8 +137,10 @@ export function useAiChat({ sessionId, onSessionCreated }: UseAiChatOptions): Us
   )
 
   const createSession = useCallback(async (): Promise<string> => {
+    const wsId = workspaceIdRef.current
+    if (!wsId) throw new Error('No active workspace')
     const token = getAccessToken()
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/workspaces/${wsId}/ai/sessions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -161,10 +169,12 @@ export function useAiChat({ sessionId, onSessionCreated }: UseAiChatOptions): Us
       }
 
       // Upload files first
+      const wsId = workspaceIdRef.current
+      if (!wsId) throw new Error('No active workspace')
       let attachmentIds: number[] | undefined
       let attachmentInfos: ChatAttachmentInfo[] | undefined
       if (files && files.length > 0) {
-        attachmentIds = await uploadFiles(files)
+        attachmentIds = await uploadFiles(files, wsId)
         attachmentInfos = files.map((f, i) => ({
           id: attachmentIds![i],
           original_name: f.file.name,
@@ -196,7 +206,7 @@ export function useAiChat({ sessionId, onSessionCreated }: UseAiChatOptions): Us
 
       try {
         const token = getAccessToken()
-        const response = await fetch(`${API_BASE_URL}/api/v1/ai/chat`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/workspaces/${wsId}/ai/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -242,22 +252,26 @@ export function useAiChat({ sessionId, onSessionCreated }: UseAiChatOptions): Us
               if (event.type === 'tool_progress' && event.tool) {
                 toolRoundsCount += 1
                 setToolProgress((prev) => [...prev, event.tool!])
-              } else if (event.type === 'token' && event.content) {
+              } else if ((event.type === 'token' || event.type === 'text_delta') && (event.content || event.delta || event.text)) {
                 if (!hasReceivedToken) {
                   hasReceivedToken = true
                   setToolProgress([])
                 }
-                accumulated += event.content
+                const text = event.content ?? event.delta ?? event.text ?? ''
+                accumulated += text
                 setStreamingContent(accumulated)
               } else if (event.type === 'action' && event.action_type && event.payload) {
-                const action: AiAction = {
-                  id: `action-${Date.now()}-${collectedActions.length}`,
-                  action_type: event.action_type,
-                  payload: event.payload,
-                  status: 'proposed',
+                const WRITE_ACTION_TYPES = new Set(['create_node', 'update_node', 'create_edge'])
+                if (WRITE_ACTION_TYPES.has(event.action_type)) {
+                  const action: AiAction = {
+                    id: `action-${Date.now()}-${collectedActions.length}`,
+                    action_type: event.action_type,
+                    payload: event.payload,
+                    status: 'proposed',
+                  }
+                  collectedActions.push(action)
+                  setStreamingActions([...collectedActions])
                 }
-                collectedActions.push(action)
-                setStreamingActions([...collectedActions])
               } else if (event.type === 'done') {
                 const assistantMessage: ChatMessage = {
                   id: String(event.message_id ?? `done-${Date.now()}`),

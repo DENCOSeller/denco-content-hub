@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     # Competitor Intelligence — VK API
     vk_access_token: str | None = None
 
+    # Anthropic (Claude API for analysis)
+    anthropic_api_key: str | None = None
+    ai_model: str = "claude-sonnet-4-20250514"
+
     # Hugging Face (pyannote speaker diarization)
     huggingface_token: str | None = None
 
@@ -54,6 +58,9 @@ class Settings(BaseSettings):
     # Knowledge Graph microservice
     kg_service_url: str = "http://localhost:8010"
     kg_service_secret: str = "kg-service-secret-change-me"
+
+    # Content Intelligence — переключатель новой системы анализа
+    use_new_intelligence: bool = False
 
     # App
     debug: bool = True

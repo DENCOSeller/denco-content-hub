@@ -15,6 +15,7 @@ export interface AiPageContext {
   workspace_name?: string
   content_item_id?: number
   focused_node_ids?: number[]
+  current_node?: { id: number; title: string; type: string }
   selected_content_ids?: number[]
 }
 

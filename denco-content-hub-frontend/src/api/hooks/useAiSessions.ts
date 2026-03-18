@@ -26,25 +26,26 @@ export const aiSessionKeys = {
   messages: (sessionId: string) => [...aiSessionKeys.all, sessionId, 'messages'] as const,
 }
 
-export function useSessionsListQuery() {
+export function useSessionsListQuery(workspaceId: number | undefined) {
   return useQuery<ChatSession[]>({
-    queryKey: aiSessionKeys.list(),
+    queryKey: [...aiSessionKeys.list(), workspaceId],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/workspaces/${workspaceId}/ai/sessions`, {
         headers: authHeaders(),
       })
       if (!response.ok) throw new Error(`Failed to fetch sessions: ${response.status}`)
       return response.json() as Promise<ChatSession[]>
     },
+    enabled: !!workspaceId,
   })
 }
 
-export function useSessionMessagesQuery(sessionId: string | null) {
+export function useSessionMessagesQuery(workspaceId: number | undefined, sessionId: string | null) {
   return useQuery<ChatMessage[]>({
-    queryKey: aiSessionKeys.messages(sessionId ?? ''),
+    queryKey: [...aiSessionKeys.messages(sessionId ?? ''), workspaceId],
     queryFn: async () => {
       const response = await fetch(
-        `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/messages`,
+        `${API_BASE_URL}/api/v1/workspaces/${workspaceId}/ai/sessions/${sessionId}/messages`,
         { headers: authHeaders() },
       )
       if (!response.ok) throw new Error(`Failed to fetch messages: ${response.status}`)
@@ -60,15 +61,15 @@ export function useSessionMessagesQuery(sessionId: string | null) {
           : undefined,
       }))
     },
-    enabled: !!sessionId,
+    enabled: !!sessionId && !!workspaceId,
   })
 }
 
-export function useCreateSessionMutation() {
+export function useCreateSessionMutation(workspaceId: number | undefined) {
   const qc = useQueryClient()
   return useMutation<ChatSession, Error>({
     mutationFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/workspaces/${workspaceId}/ai/sessions`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({}),
@@ -80,11 +81,11 @@ export function useCreateSessionMutation() {
   })
 }
 
-export function useDeleteSessionMutation() {
+export function useDeleteSessionMutation(workspaceId: number | undefined) {
   const qc = useQueryClient()
   return useMutation<void, Error, string>({
     mutationFn: async (sessionId: string) => {
-      const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions/${sessionId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/workspaces/${workspaceId}/ai/sessions/${sessionId}`, {
         method: 'DELETE',
         headers: authHeaders(),
       })

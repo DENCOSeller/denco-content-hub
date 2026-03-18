@@ -121,6 +121,38 @@ async def get_sessions(
         ) from exc
 
 
+async def create_session(
+    user_id: int,
+    title: str,
+    scope_id: int,
+    company_id: int,
+) -> dict:
+    """POST to create a new chat session."""
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
+            resp = await client.post(
+                f"{_base_url()}{_BASE_PATH}/sessions",
+                headers=_headers(user_id),
+                json={
+                    "title": title,
+                    "product_type": "content_hub",
+                    "scope": {
+                        "type": "workspace",
+                        "id": scope_id,
+                        "company_id": company_id,
+                    },
+                },
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as exc:
+        raise AppException(_extract_detail(exc), status_code=exc.response.status_code) from exc
+    except httpx.RequestError as exc:
+        raise AppException(
+            f"AI Chat service unavailable: {exc}", status_code=502,
+        ) from exc
+
+
 async def delete_session(user_id: int, session_id: int) -> None:
     """DELETE a chat session."""
     try:

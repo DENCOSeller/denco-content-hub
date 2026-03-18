@@ -50,15 +50,20 @@ export interface AnalysisResponse {
 export async function getAnalysisApi(
   workspaceId: number,
   contentId: number,
-): Promise<AnalysisResponse> {
+): Promise<AnalysisResponse | undefined> {
   const result = await client.get({
     url: '/api/v1/workspaces/{workspace_id}/content/{content_id}/analysis',
     path: {
       workspace_id: workspaceId,
       content_id: contentId,
     },
-    throwOnError: true,
   })
+  if (result.response.status === 404) {
+    return undefined
+  }
+  if (result.error) {
+    throw new Error((result.error as { detail?: string }).detail ?? 'Failed to load analysis')
+  }
   return result.data as AnalysisResponse
 }
 

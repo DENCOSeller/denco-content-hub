@@ -22,6 +22,7 @@ class ProxyChatRequest(BaseModel):
     session_id: int | None = None
     message: str = Field(max_length=10000)
     attachment_ids: list[int] | None = None
+    page_context: dict | None = None
 
 
 @router.post(
@@ -44,6 +45,7 @@ async def chat_stream(
         "page_context": {
             "workspace_id": workspace.id,
             "company_id": workspace.company_id,
+            **(data.page_context or {}),
         },
         "attachment_ids": data.attachment_ids or [],
     }
@@ -56,6 +58,34 @@ async def chat_stream(
             local_context=local_context,
         ),
         media_type="text/event-stream",
+        headers={
+            "X-Accel-Buffering": "no",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
+    )
+
+
+class CreateSessionRequest(BaseModel):
+    title: str = Field(default="Новый чат", max_length=200)
+
+
+@router.post(
+    "/sessions",
+    summary="Create a new AI chat session",
+    status_code=201,
+)
+async def create_session(
+    data: CreateSessionRequest,
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    workspace, _member = workspace_ctx
+    return await ai_chat_client.create_session(
+        user_id=current_user.id,
+        title=data.title,
+        scope_id=workspace.id,
+        company_id=workspace.company_id,
     )
 
 

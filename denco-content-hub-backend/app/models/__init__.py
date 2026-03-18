@@ -15,6 +15,7 @@ from app.models.competitor import (
 )
 from app.models.content_analysis import ContentAnalysis
 from app.models.content_chat_message import ContentChatMessage
+from app.models.content_intelligence import ContentIntelligence
 from app.models.content_item import ContentItem, ContentStatus, SourceType
 from app.models.content_plan_item import ContentPlanItem, PlanItemStatus
 from app.models.invitation import InvitationStatus, WorkspaceInvitation
@@ -63,6 +64,7 @@ __all__ = [
     "CompetitorStatus",
     "ContentAnalysis",
     "ContentChatMessage",
+    "ContentIntelligence",
     "ContentItem",
     "ContentPlanItem",
     "ContentStatus",

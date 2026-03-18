@@ -5,6 +5,7 @@ import { ActionIcon, Badge, Text, Stack, Tooltip } from '@mantine/core'
 import { IconX, IconSparkles, IconMapPin, IconHistory, IconUpload } from '@tabler/icons-react'
 
 import { useAiPanelStore } from '@/stores/ai-panel-store'
+import { useWorkspaceStore } from '@/stores/workspace-store'
 import { useAiPageContext } from '@/contexts/AiPageContext'
 import type { AiPageContext } from '@/contexts/AiPageContext'
 import { useAiChat } from '@/hooks/useAiChat'
@@ -38,6 +39,7 @@ export function AiAssistantPanel() {
   const close = useAiPanelStore((s) => s.close)
   const activeSessionId = useAiPanelStore((s) => s.activeSessionId)
   const setActiveSessionId = useAiPanelStore((s) => s.setActiveSessionId)
+  const activeWorkspace = useWorkspaceStore((s) => s.activeWorkspace)
   const pageContext = useAiPageContext()
 
   const [showSessionList, setShowSessionList] = useState(false)
@@ -77,7 +79,7 @@ export function AiAssistantPanel() {
   })
 
   // Load history when session changes
-  const { data: historyMessages } = useSessionMessagesQuery(activeSessionId)
+  const { data: historyMessages } = useSessionMessagesQuery(activeWorkspace?.id, activeSessionId)
 
   useEffect(() => {
     if (historyMessages && historyMessages.length > 0 && messages.length === 0) {

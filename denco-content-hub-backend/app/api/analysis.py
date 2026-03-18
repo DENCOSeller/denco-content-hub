@@ -25,6 +25,7 @@ router = APIRouter(
     },
 )
 async def get_analysis(
+    workspace_id: int,
     content_id: int,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
@@ -49,6 +50,7 @@ async def get_analysis(
     },
 )
 async def generate_analysis(
+    workspace_id: int,
     content_id: int,
     body: GenerateAnalysisRequest,
     current_user: User = Depends(get_current_user),

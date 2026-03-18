@@ -137,6 +137,11 @@ export function NodeAiChat({ scope, scopeId, nodeId, nodeTitle, nodeType, connec
     page_type: scope === 'workspace' ? 'workspace_knowledge' : 'company_knowledge',
     ...(scope === 'workspace' ? { workspace_id: scopeId } : { company_id: scopeId }),
     focused_node_ids: [nodeId],
+    current_node: {
+      id: nodeId,
+      title: nodeTitle,
+      type: nodeType,
+    },
   }
 
   const {

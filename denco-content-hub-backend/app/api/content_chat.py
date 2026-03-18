@@ -30,6 +30,7 @@ router = APIRouter(
     },
 )
 async def get_chat_history(
+    workspace_id: int,
     content_id: int,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
@@ -54,6 +55,7 @@ async def get_chat_history(
     },
 )
 async def send_chat_message(
+    workspace_id: int,
     content_id: int,
     body: ChatMessageRequest,
     current_user: User = Depends(get_current_user),

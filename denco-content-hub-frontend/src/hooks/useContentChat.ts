@@ -14,8 +14,10 @@ export interface ContentChatMessage {
 }
 
 interface SSEEvent {
-  type: 'token' | 'done' | 'error'
+  type: 'token' | 'text_delta' | 'done' | 'error'
   content?: string
+  delta?: string
+  text?: string
   message_id?: number
   detail?: string
 }
@@ -153,8 +155,9 @@ export function useContentChat(
             try {
               const event = JSON.parse(jsonStr) as SSEEvent
 
-              if (event.type === 'token' && event.content) {
-                accumulated += event.content
+              if ((event.type === 'token' || event.type === 'text_delta') && (event.content || event.delta || event.text)) {
+                const text = event.content ?? event.delta ?? event.text ?? ''
+                accumulated += text
                 setStreamingContent(accumulated)
               } else if (event.type === 'done') {
                 const assistantMessage: ContentChatMessage = {
