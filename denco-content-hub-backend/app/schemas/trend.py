@@ -12,6 +12,9 @@ class TrendNicheCreate(BaseModel):
     keywords: list[str] = Field(..., min_length=1)
     platforms: list[str] = Field(..., min_length=1)
     monitoring_interval_hours: int = Field(4, ge=1, le=168)
+    language: str | None = Field("ru", max_length=10)
+    region: str | None = Field("RU", max_length=10)
+    keyword_mode: str = Field("separate", pattern=r"^(separate|combined)$")
 
 
 class TrendNicheUpdate(BaseModel):
@@ -20,6 +23,9 @@ class TrendNicheUpdate(BaseModel):
     platforms: list[str] | None = None
     is_active: bool | None = None
     monitoring_interval_hours: int | None = Field(None, ge=1, le=168)
+    language: str | None = Field(None, max_length=10)
+    region: str | None = Field(None, max_length=10)
+    keyword_mode: str | None = Field(None, pattern=r"^(separate|combined)$")
 
 
 class TrendNicheResponse(BaseModel):
@@ -30,6 +36,9 @@ class TrendNicheResponse(BaseModel):
     platforms: list[str]
     is_active: bool
     monitoring_interval_hours: int
+    language: str | None
+    region: str | None
+    keyword_mode: str
     created_at: datetime
     updated_at: datetime
 

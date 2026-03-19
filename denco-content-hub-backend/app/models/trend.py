@@ -54,6 +54,9 @@ class TrendNiche(Base, TimestampMixin):
     platforms: Mapped[list] = mapped_column(ARRAY(String), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     monitoring_interval_hours: Mapped[int] = mapped_column(Integer, default=4, nullable=False)
+    language: Mapped[str | None] = mapped_column(String(10), nullable=True, default="ru")
+    region: Mapped[str | None] = mapped_column(String(10), nullable=True, default="RU")
+    keyword_mode: Mapped[str] = mapped_column(String(20), default="separate", nullable=False)
 
     __table_args__ = (
         Index("ix_trend_niches_workspace", "workspace_id"),
@@ -151,9 +154,7 @@ class TrendAlert(Base):
     is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     threshold_triggered: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     __table_args__ = (
         Index(
@@ -170,9 +171,7 @@ class TrendAlertSettings(Base, TimestampMixin):
     __tablename__ = "trend_alert_settings"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    workspace_id: Mapped[int] = mapped_column(
-        ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False
-    )
+    workspace_id: Mapped[int] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False)
     is_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     min_viral_score: Mapped[float] = mapped_column(Float, default=70.0, nullable=False)
     min_growth_rate: Mapped[float] = mapped_column(Float, default=50.0, nullable=False)
@@ -181,6 +180,4 @@ class TrendAlertSettings(Base, TimestampMixin):
     notify_viral_trend: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     notify_niche_spike: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    __table_args__ = (
-        UniqueConstraint("workspace_id", name="uq_trend_alert_settings_workspace"),
-    )
+    __table_args__ = (UniqueConstraint("workspace_id", name="uq_trend_alert_settings_workspace"),)

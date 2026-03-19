@@ -206,6 +206,10 @@ def _process_niche(
 
     all_posts: list[dict[str, Any]] = []
 
+    # Формируем keywords с учётом keyword_mode
+    keyword_mode = getattr(niche, "keyword_mode", "separate") or "separate"
+    yt_keywords = [" ".join(keywords)] if keyword_mode == "combined" and len(keywords) > 1 else keywords
+
     if "youtube" in platforms and keywords:
         from app.integrations.trend_discovery.youtube_trends import (
             YouTubeTrendDiscovery,
@@ -213,10 +217,14 @@ def _process_niche(
 
         yt = YouTubeTrendDiscovery()
         published_after = datetime.now(UTC) - timedelta(hours=48)
+        relevance_language = getattr(niche, "language", None) or "ru"
+        region_code = getattr(niche, "region", None) or "RU"
         posts = yt.discover_by_niche(
-            keywords=keywords,
+            keywords=yt_keywords,
             max_results=50,
             published_after=published_after,
+            relevance_language=relevance_language,
+            region_code=region_code,
         )
         all_posts.extend(posts)
 

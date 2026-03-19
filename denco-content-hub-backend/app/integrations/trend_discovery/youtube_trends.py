@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 import httpx
@@ -125,6 +125,9 @@ class YouTubeTrendDiscovery:
         keywords: list[str],
         max_results: int = 50,
         published_after: datetime | None = None,
+        relevance_language: str = "ru",
+        region_code: str = "RU",
+        order: str = "relevance",
     ) -> list[dict[str, Any]]:
         """Search YouTube for videos matching niche keywords.
 
@@ -135,6 +138,9 @@ class YouTubeTrendDiscovery:
             keywords: List of search terms. Each keyword triggers a separate search.
             max_results: Maximum videos to return per keyword (capped at 50 by API).
             published_after: Only return videos published after this datetime.
+            relevance_language: ISO 639-1 language code for relevance ranking.
+            region_code: ISO 3166-1 alpha-2 country code for regional results.
+            order: Sort order — "relevance" (default) or "date".
 
         Returns:
             List of dicts compatible with TrendItem fields.
@@ -151,9 +157,11 @@ class YouTubeTrendDiscovery:
                     "key": api_key,
                     "q": keyword,
                     "part": "id",
-                    "order": "date",
+                    "order": order,
                     "type": "video",
                     "maxResults": per_keyword,
+                    "relevanceLanguage": relevance_language,
+                    "regionCode": region_code,
                 }
                 if published_after:
                     params["publishedAfter"] = published_after.strftime("%Y-%m-%dT%H:%M:%SZ")
