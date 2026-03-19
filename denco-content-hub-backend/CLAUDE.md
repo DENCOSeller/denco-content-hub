@@ -399,6 +399,70 @@ test(orders): add integration tests
 
 ---
 
+## Sprint 13 — Trend Discovery (Обнаружение трендов)
+
+### Суть
+Модуль обнаружения и мониторинга трендов по нишам. Автоматический поиск трендовых видео на YouTube и Instagram, расчёт viral score, мониторинг динамики, алерты.
+
+### Новые таблицы
+- `trend_niches` — ниши для мониторинга (keywords, platforms, monitoring_interval)
+- `trend_items` — обнаруженные тренды (platform, metrics, viral_score, stage)
+- `trend_snapshots` — история метрик (velocity, viral_score во времени)
+- `trend_alerts` — уведомления о трендах (alert_type, threshold_triggered)
+- `trend_alert_settings` — настройки порогов алертов per workspace
+- Миграции: `ee855b0184e8`, `8ae1731bf9f0`, `0427f58ba939`
+
+### Новые файлы
+- `app/models/trend.py` — 5 моделей (TrendNiche, TrendItem, TrendSnapshot, TrendAlert, TrendAlertSettings)
+- `app/schemas/trend.py` — Pydantic схемы для всех CRUD операций
+- `app/repositories/trend_repository.py` — 5 репозиториев (Niche, Item, Snapshot, Alert, AlertSettings)
+- `app/services/trend_scorer.py` — алгоритм расчёта viral_score, velocity, acceleration, стадии
+- `app/services/trend_service.py` — TrendDiscoveryService (CRUD ниш, обнаружение, мониторинг, алерты)
+- `app/integrations/trend_discovery/youtube_trends.py` — YouTube Data API интеграция
+- `app/integrations/trend_discovery/instagram_trends.py` — Apify Instagram Reels интеграция
+- `app/worker/tasks/trend_discovery.py` — 4 Celery Beat задачи + 2 Intelligence задачи
+- `app/api/trends.py` — 15 REST API эндпоинтов
+
+### Изменённые файлы
+- `app/models/content_intelligence.py` — добавлен `trend_item_id` FK
+- `app/services/intelligence_service.py` — добавлен `generate_trend_item_intelligence()`
+- `app/worker/tasks/intelligence_pipeline.py` — добавлены trend intelligence tasks
+- `app/api/intelligence.py` — добавлен `trend_router` (GET/POST trend intelligence)
+- `app/api/router.py` — подключены trend_router, trend_intelligence_router
+- `app/worker/celery_app.py` — зарегистрированы trend_discovery tasks в Beat schedule
+
+### API эндпоинты
+```
+GET/POST   /workspaces/{id}/trends/niches       — список/создание ниш
+GET/PATCH/DELETE /workspaces/{id}/trends/niches/{niche_id}
+GET        /workspaces/{id}/trends               — список трендов (фильтры)
+GET        /workspaces/{id}/trends/{trend_id}    — детали тренда
+GET        /workspaces/{id}/trends/{trend_id}/snapshots — история метрик
+POST       /workspaces/{id}/trends/{trend_id}/analyze   — Intelligence анализ
+GET        /workspaces/{id}/trends/alerts        — список алертов
+PATCH      /workspaces/{id}/trends/alerts/{id}/read     — отметить прочитанным
+POST       /workspaces/{id}/trends/alerts/mark-all-read
+GET/PUT    /workspaces/{id}/trends/alerts/settings      — настройки порогов
+POST       /workspaces/{id}/trends/discover-now         — ручной запуск
+```
+
+### Celery Beat задачи
+- `discover_trends_batch` — каждые 2 часа, обход активных ниш
+- `monitor_trend_snapshots` — каждые 4 часа, обновление метрик
+- `check_trend_alerts` — каждый час, проверка порогов
+- `cleanup_old_trends` — раз в день, архивация старых трендов
+
+### Коммит
+- `ff6392a` — feat: Trend Discovery
+
+### Известные ограничения (backlog)
+- Дублирование scoring логики sync/async (Celery vs Service)
+- N+1 в update_trend_snapshots при большом кол-ве трендов
+- discover_trends_batch без fan-out (все ниши в одном таске)
+- YouTube API quota без глобального трекинга
+
+---
+
 ## Deployment (Sprint 2 completed)
 
 - **Server**: `155.212.190.58`, systemd services: `denco-backend.service`, `denco-celery.service`

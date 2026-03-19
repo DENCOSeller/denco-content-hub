@@ -1330,4 +1330,45 @@ src/
 
 ---
 
+## Sprint 13 — Trend Discovery Frontend
+
+### Суть
+Фронтенд модуля обнаружения и мониторинга трендов. 4 страницы: Feed, Niches, Detail, Alerts.
+
+### Новые файлы
+```
+src/
+├── api/types/trend.ts              — TypeScript типы (TrendItem, TrendNiche, TrendAlert, etc.)
+├── api/hooks/useTrends.ts          — 20+ TanStack Query хуков для Trends API
+├── app/(dashboard)/workspaces/[id]/trends/
+│   ├── page.tsx                    — Trend Feed (табы, фильтры, grid карточек)
+│   ├── trends.module.css
+│   ├── [trendId]/page.tsx          — Trend Detail (2 колонки, график, метрики)
+│   ├── niches/page.tsx             — Управление нишами мониторинга
+│   └── alerts/page.tsx             — Настройки алертов + история
+├── components/features/trends/
+│   ├── TrendCard.tsx + .module.css  — карточка тренда (thumbnail, metrics, badges)
+│   ├── TrendFilters.tsx            — фильтры (период, ниша, стадия, сортировка)
+│   ├── TrendStatsStrip.tsx         — статистика вверху страницы
+│   ├── TrendGrowthChart.tsx        — AreaChart роста из snapshots
+│   ├── TrendEmbedPreview.tsx       — встроенный видеоплеер/превью
+│   ├── TrendHeader.tsx             — шапка детальной страницы
+│   ├── TrendIntelligenceSection.tsx — Intelligence панель (reuse секций)
+│   ├── TrendMetricsPanel.tsx       — viral score, engagement, metrics
+│   ├── NicheCard.tsx + .module.css  — карточка ниши (keywords, platforms, sparkline)
+│   ├── NicheFormModal.tsx          — модалка создания/редактирования ниши
+│   ├── AlertSettings.tsx           — настройки порогов (Switch + Slider)
+│   └── AlertHistory.tsx + .module.css — история алертов
+```
+
+### Изменённые файлы
+- `src/app/(dashboard)/layout.tsx` — IconFlame "Тренды" в sidebar
+- `src/components/features/settings/ContentSettingsTab.tsx` — ссылка на настройки трендов
+- `src/api/client/*` — перегенерированный hey-api клиент
+
+### Коммит
+- `ff6392a` — feat: Trend Discovery
+
+---
+
 *Конец инструкций. Следуй им при каждом запросе.*
