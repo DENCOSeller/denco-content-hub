@@ -74,6 +74,7 @@ def _upsert_trend_item(
         channel_name=post_data.get("channel_name"),
         channel_url=post_data.get("channel_url"),
         duration_seconds=post_data.get("duration_seconds"),
+        orientation=post_data.get("orientation"),
         published_at=post_data.get("published_at"),
         views_count=post_data.get("views_count", 0),
         likes_count=post_data.get("likes_count", 0),
@@ -166,6 +167,7 @@ def discover_trends_batch() -> dict[str, Any]:
         "new_items": 0,
         "updated_items": 0,
         "errors": 0,
+        "warnings": 0,
     }
 
     try:
@@ -233,14 +235,22 @@ def _process_niche(
             ApifyInstagramTrendProvider,
         )
 
-        ig = ApifyInstagramTrendProvider()
-        posts = _run_async(
-            ig.discover_reels_by_keyword(
-                keywords=keywords,
-                max_results=50,
+        if not ApifyInstagramTrendProvider.check_configured():
+            logger.warning(
+                "Instagram discovery пропущен для ниши '%s': APIFY_API_KEY не задан в .env",
+                niche.name,
+                niche_id=niche.id,
             )
-        )
-        all_posts.extend(posts)
+            stats["warnings"] += 1
+        else:
+            ig = ApifyInstagramTrendProvider()
+            posts = _run_async(
+                ig.discover_reels_by_keyword(
+                    keywords=keywords,
+                    max_results=50,
+                )
+            )
+            all_posts.extend(posts)
 
     existing_count_before = (
         db.query(TrendItem)

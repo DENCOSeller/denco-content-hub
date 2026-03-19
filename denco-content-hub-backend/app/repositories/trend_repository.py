@@ -35,12 +35,14 @@ class TrendItemFilters:
         platform: str | None = None,
         niche_id: int | None = None,
         stage: str | None = None,
+        orientation: str | None = None,
         min_viral_score: float | None = None,
         analysis_status: str | None = None,
     ) -> None:
         self.platform = platform
         self.niche_id = niche_id
         self.stage = stage
+        self.orientation = orientation
         self.min_viral_score = min_viral_score
         self.analysis_status = analysis_status
 
@@ -155,6 +157,8 @@ class TrendItemRepository(BaseRepository[TrendItem]):
             query = query.where(TrendItem.niche_id == filters.niche_id)
         if filters.stage is not None:
             query = query.where(TrendItem.stage == filters.stage)
+        if filters.orientation is not None:
+            query = query.where(TrendItem.orientation == filters.orientation)
         if filters.min_viral_score is not None:
             query = query.where(TrendItem.viral_score >= filters.min_viral_score)
         if filters.analysis_status is not None:

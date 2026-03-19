@@ -126,6 +126,7 @@ def _normalize_post(post: dict[str, Any]) -> dict[str, Any] | None:
         "channel_name": owner_username or None,
         "channel_url": f"https://www.instagram.com/{owner_username}/" if owner_username else None,
         "duration_seconds": int(post["videoDuration"]) if post.get("videoDuration") else None,
+        "orientation": "reels",
         "published_at": _parse_timestamp(post.get("timestamp")),
         "views_count": views,
         "likes_count": likes,
@@ -151,6 +152,11 @@ class ApifyInstagramTrendProvider(TrendDiscoveryProvider):
 
     def __init__(self, timeout_secs: int = APIFY_TIMEOUT_SECS) -> None:
         self._timeout_secs = timeout_secs
+
+    @classmethod
+    def check_configured(cls) -> bool:
+        """Проверяет наличие APIFY_API_KEY без выброса исключения."""
+        return bool(settings.apify_api_key)
 
     async def discover_reels_by_hashtag(
         self,

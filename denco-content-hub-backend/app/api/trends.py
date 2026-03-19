@@ -306,6 +306,7 @@ async def list_trends(
     platform: str | None = Query(None),
     niche_id: int | None = Query(None),
     stage: str | None = Query(None),
+    orientation: str | None = Query(None),
     min_viral_score: float | None = Query(None),
     sort_by: str | None = Query(None),
     page: int = Query(1, ge=1),
@@ -318,6 +319,7 @@ async def list_trends(
         platform=platform,
         niche_id=niche_id,
         stage=stage,
+        orientation=orientation,
         min_viral_score=min_viral_score,
     )
     return await service.list_trend_items(

@@ -61,6 +61,7 @@ class TrendItemResponse(BaseModel):
     channel_name: str | None
     channel_url: str | None
     duration_seconds: int | None
+    orientation: str | None
     published_at: datetime | None
     detected_at: datetime
     views_count: int
@@ -126,6 +127,7 @@ class TrendItemFilters(BaseModel):
     platform: str | None = None
     niche_id: int | None = None
     stage: str | None = None
+    orientation: str | None = None
     min_viral_score: float | None = None
     sort_by: str | None = None
 

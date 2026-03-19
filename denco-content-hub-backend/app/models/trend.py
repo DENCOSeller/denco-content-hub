@@ -79,6 +79,7 @@ class TrendItem(Base, TimestampMixin):
     channel_name: Mapped[str | None] = mapped_column(String(500), nullable=True)
     channel_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     duration_seconds: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    orientation: Mapped[str | None] = mapped_column(String(20), nullable=True)
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     detected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 

@@ -12,6 +12,7 @@ from app.api.content import router as content_router
 from app.api.content_chat import router as content_chat_router
 from app.api.content_plan import router as content_plan_router
 from app.api.health import router as health_router
+from app.api.integrations import router as integrations_router
 from app.api.intelligence import comp_router as intelligence_comp_router
 from app.api.intelligence import ref_router as intelligence_ref_router
 from app.api.intelligence import trend_router as intelligence_trend_router
@@ -53,5 +54,6 @@ api_router.include_router(content_plan_router)
 api_router.include_router(competitors_router)
 api_router.include_router(competitor_notifications_router)
 api_router.include_router(trends_router)
+api_router.include_router(integrations_router)
 api_router.include_router(admin_router)
 api_router.include_router(public_knowledge_router)

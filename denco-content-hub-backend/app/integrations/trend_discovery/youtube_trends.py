@@ -60,6 +60,7 @@ def _video_item_to_trend_dict(v: dict[str, Any]) -> dict[str, Any]:
     video_id = v["id"] if isinstance(v["id"], str) else v["id"].get("videoId", "")
 
     channel_id = snippet.get("channelId", "")
+    duration_seconds = _parse_iso8601_duration(content.get("duration", "PT0S"))
 
     return {
         "platform": "youtube",
@@ -70,7 +71,8 @@ def _video_item_to_trend_dict(v: dict[str, Any]) -> dict[str, Any]:
         "thumbnail_url": (snippet.get("thumbnails", {}).get("high", {}) or {}).get("url"),
         "channel_name": snippet.get("channelTitle", ""),
         "channel_url": f"https://www.youtube.com/channel/{channel_id}" if channel_id else None,
-        "duration_seconds": _parse_iso8601_duration(content.get("duration", "PT0S")),
+        "duration_seconds": duration_seconds,
+        "orientation": "shorts" if duration_seconds <= 60 else "long_video",
         "published_at": _parse_published_at(snippet.get("publishedAt", "")),
         "views_count": int(stats.get("viewCount", 0)),
         "likes_count": int(stats.get("likeCount", 0)),
