@@ -1309,4 +1309,25 @@ src/
 
 ---
 
+## Sprint 12 — Content Intelligence Frontend
+
+### Суть
+Замена отдельных панелей анализа References и Competitors на единый ContentIntelligencePanel.
+
+### Новые файлы
+- `src/components/features/content-intelligence/` — 11 секционных компонентов + мастер-панель
+- `src/api/hooks/useIntelligence.ts` — TanStack Query хуки для Intelligence API
+- `src/api/types/intelligence.ts` — TypeScript типы
+
+### Удалённые файлы
+- `src/api/analysis.ts`, `src/api/hooks/useAnalysis.ts`
+- `src/components/features/competitors/PostAnalysisPanel.tsx`
+- `src/components/features/references/AnalysisTabPanel.tsx`
+- `src/components/features/references/analysis/` — вся директория (7 файлов)
+
+### Коммит
+- `91301c0` — unified Content Intelligence
+
+---
+
 *Конец инструкций. Следуй им при каждом запросе.*

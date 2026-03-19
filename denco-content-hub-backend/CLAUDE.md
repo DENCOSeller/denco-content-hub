@@ -370,6 +370,35 @@ test(orders): add integration tests
 
 ---
 
+## Sprint 12 — Content Intelligence (Unified Analyzer)
+
+### Суть
+Объединение дублированных AI-анализаторов References и Competitors в единый Content Intelligence пайплайн.
+Было: отдельные `analysis_service.py` + `competitor/ai_analyzer.py` с дублированием логики.
+Стало: единый `UnifiedAnalyzer` с динамическим выбором секций по `source_type`.
+
+### Новые файлы
+- `app/integrations/content_intelligence/` — analyzer, schemas, config (единая точка входа)
+- `app/models/content_intelligence.py` — полиморфная модель (content_item_id OR competitor_post_id)
+- `app/services/intelligence_service.py` — единый сервис
+- `app/worker/tasks/intelligence_pipeline.py` — Celery tasks (on-demand + batch)
+- `migrations/versions/c3d4e5f6a7b8_migrate_data_to_content_intelligence.py` — миграция данных
+
+### Удалённые файлы (старый код)
+- `app/api/analysis.py`, `app/services/analysis_service.py`, `app/repositories/analysis_repository.py`
+- `app/models/content_analysis.py`, `app/schemas/content_analysis.py`
+- `app/worker/tasks/analyze_content.py`, `app/worker/tasks/competitor_analysis.py`
+- `app/integrations/competitor/ai_analyzer.py`
+
+### Feature flag
+- `USE_NEW_INTELLIGENCE=true` в config — переключает References и Competitors на unified analyzer
+
+### Коммит
+- `91301c0` — feat(intelligence): unified Content Intelligence для References и Competitors
+- 87 файлов, +1279/-2728 строк (net -1449)
+
+---
+
 ## Deployment (Sprint 2 completed)
 
 - **Server**: `155.212.190.58`, systemd services: `denco-backend.service`, `denco-celery.service`
