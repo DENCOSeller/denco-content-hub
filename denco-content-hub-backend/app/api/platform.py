@@ -40,9 +40,7 @@ async def list_workspaces(
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedResponse[PlatformWorkspaceResponse]:
     service = PlatformService(db)
-    return await service.list_workspaces(
-        PaginationParams(page=page, size=size), search, include_personal, company_id
-    )
+    return await service.list_workspaces(PaginationParams(page=page, size=size), search, include_personal, company_id)
 
 
 @router.get(

@@ -36,9 +36,7 @@ def get_adapter(source_type: str) -> BaseSourceAdapter:
     cls = _ADAPTERS.get(source_type)
     if cls is None:
         available = ", ".join(sorted(_ADAPTERS))
-        raise SourceExtractionError(
-            f"Unknown source type '{source_type}'. Available: {available}"
-        )
+        raise SourceExtractionError(f"Unknown source type '{source_type}'. Available: {available}")
     return cls()
 
 

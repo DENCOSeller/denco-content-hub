@@ -4,8 +4,6 @@ import json
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
-import pytest
-
 if TYPE_CHECKING:
     import httpx
 

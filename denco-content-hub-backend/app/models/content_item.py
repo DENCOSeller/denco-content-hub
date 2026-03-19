@@ -10,7 +10,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, SoftDeleteMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from app.models.content_analysis import ContentAnalysis
     from app.models.content_chat_message import ContentChatMessage
     from app.models.transcription import Transcription
 
@@ -71,7 +70,6 @@ class ContentItem(Base, TimestampMixin, SoftDeleteMixin):
 
     # Relationships
     transcription: Mapped[Transcription | None] = relationship(back_populates="content_item", uselist=False)
-    analysis: Mapped[ContentAnalysis | None] = relationship(back_populates="content_item", uselist=False)
     chat_messages: Mapped[list[ContentChatMessage]] = relationship(
         back_populates="content_item", order_by="ContentChatMessage.created_at"
     )

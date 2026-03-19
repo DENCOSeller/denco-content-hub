@@ -106,10 +106,6 @@ def downgrade() -> None:
     op.drop_index("ix_kgc_company", table_name="kg_conflicts")
     op.drop_index("ix_kgc_workspace", table_name="kg_conflicts")
     op.drop_index("ix_kgc_status", table_name="kg_conflicts")
-    op.drop_constraint(
-        "ck_kg_conflicts_status", "kg_conflicts", type_="check"
-    )
-    op.drop_constraint(
-        "ck_kg_conflicts_conflict_type", "kg_conflicts", type_="check"
-    )
+    op.drop_constraint("ck_kg_conflicts_status", "kg_conflicts", type_="check")
+    op.drop_constraint("ck_kg_conflicts_conflict_type", "kg_conflicts", type_="check")
     op.drop_table("kg_conflicts")

@@ -29,6 +29,6 @@ class BaseSourceAdapter(ABC):
     def extract_text(self, data: dict) -> str:
         """Return the full extracted text suitable for downstream analysis."""
 
-    def supports_transcription(self) -> bool:  # noqa: PLR6301
+    def supports_transcription(self) -> bool:
         """Whether this source type supports audio transcription."""
         return False

@@ -15,7 +15,7 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, SoftDeleteMixin, TimestampMixin
 
@@ -119,10 +119,6 @@ class CompetitorPost(Base, TimestampMixin):
         ForeignKey("library_items.id", ondelete="SET NULL"), nullable=True
     )
 
-    analysis: Mapped[CompetitorPostAnalysis | None] = relationship(
-        "CompetitorPostAnalysis", uselist=False, lazy="noload"
-    )
-
     __table_args__ = (
         Index(
             "ix_competitor_posts_channel_post",
@@ -139,27 +135,6 @@ class CompetitorPost(Base, TimestampMixin):
         ),
         Index("ix_competitor_posts_analysis_status", "analysis_status"),
     )
-
-
-class CompetitorPostAnalysis(Base, TimestampMixin):
-    __tablename__ = "competitor_post_analyses"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    post_id: Mapped[int] = mapped_column(
-        ForeignKey("competitor_posts.id", ondelete="CASCADE"),
-        nullable=False,
-        unique=True,
-    )
-    transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
-    transcript_language: Mapped[str | None] = mapped_column(String(10), nullable=True)
-    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-    hooks: Mapped[list | None] = mapped_column(JSONB, nullable=True)
-    key_points: Mapped[list | None] = mapped_column(JSONB, nullable=True)
-    topics: Mapped[list | None] = mapped_column(JSONB, nullable=True)
-    tone: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    content_structure: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    content_ideas: Mapped[list | None] = mapped_column(JSONB, nullable=True)
-    quality_score: Mapped[float | None] = mapped_column(Float, nullable=True)
 
 
 class CompetitorChannelSnapshot(Base):

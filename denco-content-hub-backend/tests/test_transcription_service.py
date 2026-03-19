@@ -32,8 +32,9 @@ async def _create_workspace_and_user(db: AsyncSession) -> tuple[int, int]:
     db.add(user)
     await db.flush()
 
-    from app.models.company import Company
     from sqlalchemy import select
+
+    from app.models.company import Company
 
     result = await db.execute(select(Company).where(Company.is_default.is_(True)))
     default_company = result.scalar_one()

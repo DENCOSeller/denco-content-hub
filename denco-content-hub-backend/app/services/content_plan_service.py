@@ -182,9 +182,7 @@ class ContentPlanService:
         )
 
         if plan_item.status not in (PlanItemStatus.DRAFT, PlanItemStatus.SCHEDULED):
-            raise BadRequestException(
-                f"Cannot publish plan item with status '{plan_item.status}'"
-            )
+            raise BadRequestException(f"Cannot publish plan item with status '{plan_item.status}'")
 
         now = datetime.now(UTC)
 

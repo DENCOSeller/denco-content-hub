@@ -15,7 +15,7 @@ _client: httpx.AsyncClient | None = None
 
 
 def _get_client() -> httpx.AsyncClient:
-    global _client  # noqa: PLW0603
+    global _client
     if _client is None or _client.is_closed:
         _client = httpx.AsyncClient(
             base_url=settings.kg_service_url.rstrip("/") + "/api/v1",
@@ -79,9 +79,7 @@ async def _request(
             pass
         raise AppException(detail, status_code=exc.response.status_code) from exc
     except httpx.RequestError as exc:
-        raise AppException(
-            f"KG service unavailable: {exc}", status_code=502
-        ) from exc
+        raise AppException(f"KG service unavailable: {exc}", status_code=502) from exc
 
     if resp.status_code == 204:
         return None
@@ -169,9 +167,7 @@ async def delete_node(node_id: int, user_id: int) -> None:
     await _request("DELETE", f"/nodes/{node_id}", user_id=user_id)
 
 
-async def get_node_versions(
-    node_id: int, user_id: int, *, limit: int = 20
-) -> list[dict]:
+async def get_node_versions(node_id: int, user_id: int, *, limit: int = 20) -> list[dict]:
     return await _request(
         "GET",
         f"/nodes/{node_id}/versions",
@@ -185,9 +181,7 @@ async def get_node_versions(
 # ---------------------------------------------------------------------------
 
 
-async def create_edge(
-    scope_type: str, scope_id: int, user_id: int, data: dict
-) -> dict:
+async def create_edge(scope_type: str, scope_id: int, user_id: int, data: dict) -> dict:
     return await _request(
         "POST",
         f"/scopes/{scope_type}/{scope_id}/edges",
@@ -230,9 +224,7 @@ async def get_graph(
     )
 
 
-async def get_graph_overview(
-    scope_type: str, scope_id: int, user_id: int
-) -> dict:
+async def get_graph_overview(scope_type: str, scope_id: int, user_id: int) -> dict:
     return await _request(
         "GET",
         f"/scopes/{scope_type}/{scope_id}/graph/overview",
@@ -262,9 +254,7 @@ async def search_nodes(
 # ---------------------------------------------------------------------------
 
 
-async def list_conflicts(
-    scope_type: str, scope_id: int, user_id: int
-) -> list[dict]:
+async def list_conflicts(scope_type: str, scope_id: int, user_id: int) -> list[dict]:
     return await _request(
         "GET",
         f"/scopes/{scope_type}/{scope_id}/conflicts",
@@ -286,9 +276,7 @@ async def resolve_conflict(conflict_id: int, user_id: int, data: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 
-async def create_public_link(
-    scope_type: str, scope_id: int, user_id: int, data: dict
-) -> dict:
+async def create_public_link(scope_type: str, scope_id: int, user_id: int, data: dict) -> dict:
     return await _request(
         "POST",
         f"/scopes/{scope_type}/{scope_id}/public-links",
@@ -297,9 +285,7 @@ async def create_public_link(
     )
 
 
-async def list_public_links(
-    scope_type: str, scope_id: int, user_id: int
-) -> list[dict]:
+async def list_public_links(scope_type: str, scope_id: int, user_id: int) -> list[dict]:
     return await _request(
         "GET",
         f"/scopes/{scope_type}/{scope_id}/public-links",
@@ -334,9 +320,7 @@ async def add_node_to_link(link_id: int, node_id: int, user_id: int) -> None:
     )
 
 
-async def remove_node_from_link(
-    link_id: int, node_id: int, user_id: int
-) -> None:
+async def remove_node_from_link(link_id: int, node_id: int, user_id: int) -> None:
     await _request(
         "DELETE",
         f"/public-links/{link_id}/nodes/{node_id}",
@@ -404,9 +388,7 @@ async def deactivate_edge_type(type_id: int, user_id: int) -> dict:
 # ---------------------------------------------------------------------------
 
 
-async def bulk_create_nodes(
-    scope_type: str, scope_id: int, user_id: int, nodes: list[dict]
-) -> list[dict]:
+async def bulk_create_nodes(scope_type: str, scope_id: int, user_id: int, nodes: list[dict]) -> list[dict]:
     return await _request(
         "POST",
         f"/scopes/{scope_type}/{scope_id}/bulk/nodes",
@@ -415,9 +397,7 @@ async def bulk_create_nodes(
     )
 
 
-async def bulk_create_edges(
-    scope_type: str, scope_id: int, user_id: int, edges: list[dict]
-) -> list[dict]:
+async def bulk_create_edges(scope_type: str, scope_id: int, user_id: int, edges: list[dict]) -> list[dict]:
     return await _request(
         "POST",
         f"/scopes/{scope_type}/{scope_id}/bulk/edges",
@@ -433,7 +413,7 @@ async def bulk_create_edges(
 
 async def close() -> None:
     """Shut down the connection pool gracefully."""
-    global _client  # noqa: PLW0603
+    global _client
     if _client and not _client.is_closed:
         await _client.aclose()
         _client = None

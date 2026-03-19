@@ -48,8 +48,11 @@ async def list_nodes(
     current_user: User = Depends(get_current_user),
 ) -> list[KnowledgeNodeResponse]:
     return await kg_client.list_nodes(
-        "company", company_id, current_user.id,
-        node_type_def_id=node_type_def_id, search=search,
+        "company",
+        company_id,
+        current_user.id,
+        node_type_def_id=node_type_def_id,
+        search=search,
     )
 
 
@@ -67,7 +70,9 @@ async def create_node(
     _admin: CompanyMember = Depends(require_company_admin),
 ) -> KnowledgeNodeResponse:
     return await kg_client.create_node(
-        "company", company_id, current_user.id,
+        "company",
+        company_id,
+        current_user.id,
         data.model_dump(exclude_none=True),
         company_scope_id=company_id,
     )
@@ -90,7 +95,10 @@ async def batch_update_positions(
 ) -> dict[str, int]:
     positions = [p.model_dump() for p in data.positions]
     return await kg_client.batch_update_positions(
-        "company", company_id, current_user.id, positions,
+        "company",
+        company_id,
+        current_user.id,
+        positions,
     )
 
 
@@ -129,7 +137,8 @@ async def update_node(
     _admin: CompanyMember = Depends(require_company_admin),
 ) -> KnowledgeNodeResponse:
     return await kg_client.update_node(
-        node_id, current_user.id,
+        node_id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 
@@ -192,7 +201,9 @@ async def create_edge(
     _admin: CompanyMember = Depends(require_company_admin),
 ) -> KnowledgeEdgeResponse:
     return await kg_client.create_edge(
-        "company", company_id, current_user.id,
+        "company",
+        company_id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 
@@ -250,7 +261,9 @@ async def create_company_public_link(
     _admin: CompanyMember = Depends(require_company_admin),
 ) -> KgPublicLinkResponse:
     return await kg_client.create_public_link(
-        "company", company_id, current_user.id,
+        "company",
+        company_id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 
@@ -287,7 +300,8 @@ async def update_company_public_link(
     _admin: CompanyMember = Depends(require_company_admin),
 ) -> KgPublicLinkResponse:
     return await kg_client.update_public_link(
-        link_id, current_user.id,
+        link_id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 

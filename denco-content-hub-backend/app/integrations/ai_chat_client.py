@@ -90,7 +90,8 @@ async def stream(
         raise
     except httpx.RequestError as exc:
         raise AppException(
-            f"AI Chat service unavailable: {exc}", status_code=502,
+            f"AI Chat service unavailable: {exc}",
+            status_code=502,
         ) from exc
 
 
@@ -117,7 +118,8 @@ async def get_sessions(
         raise AppException(_extract_detail(exc), status_code=exc.response.status_code) from exc
     except httpx.RequestError as exc:
         raise AppException(
-            f"AI Chat service unavailable: {exc}", status_code=502,
+            f"AI Chat service unavailable: {exc}",
+            status_code=502,
         ) from exc
 
 
@@ -149,7 +151,8 @@ async def create_session(
         raise AppException(_extract_detail(exc), status_code=exc.response.status_code) from exc
     except httpx.RequestError as exc:
         raise AppException(
-            f"AI Chat service unavailable: {exc}", status_code=502,
+            f"AI Chat service unavailable: {exc}",
+            status_code=502,
         ) from exc
 
 
@@ -166,7 +169,8 @@ async def delete_session(user_id: int, session_id: int) -> None:
         raise AppException(_extract_detail(exc), status_code=exc.response.status_code) from exc
     except httpx.RequestError as exc:
         raise AppException(
-            f"AI Chat service unavailable: {exc}", status_code=502,
+            f"AI Chat service unavailable: {exc}",
+            status_code=502,
         ) from exc
 
 
@@ -184,5 +188,6 @@ async def get_messages(user_id: int, session_id: int) -> list[dict]:
         raise AppException(_extract_detail(exc), status_code=exc.response.status_code) from exc
     except httpx.RequestError as exc:
         raise AppException(
-            f"AI Chat service unavailable: {exc}", status_code=502,
+            f"AI Chat service unavailable: {exc}",
+            status_code=502,
         ) from exc

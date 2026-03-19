@@ -32,9 +32,7 @@ class YouTubeAdapter(BaseSourceAdapter):
             raise SourceExtractionError("Missing 'url' in input data")
         lower = url.lower()
         if "youtube.com" not in lower and "youtu.be" not in lower:
-            raise SourceExtractionError(
-                f"URL does not look like a YouTube link: {url}"
-            )
+            raise SourceExtractionError(f"URL does not look like a YouTube link: {url}")
         return True
 
     def extract_metadata(self, data: dict) -> dict:
@@ -42,9 +40,7 @@ class YouTubeAdapter(BaseSourceAdapter):
         try:
             meta = self._parser.fetch_metadata(url)
         except YouTubeParseError as exc:
-            raise SourceExtractionError(
-                f"Failed to fetch YouTube metadata: {exc}"
-            ) from exc
+            raise SourceExtractionError(f"Failed to fetch YouTube metadata: {exc}") from exc
 
         return {
             "video_id": meta.video_id,

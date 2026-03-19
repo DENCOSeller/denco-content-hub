@@ -19,9 +19,7 @@ class WebPageAdapter(BaseSourceAdapter):
         if not url:
             raise SourceExtractionError("Missing 'url' in input data")
         if not url.lower().startswith("http"):
-            raise SourceExtractionError(
-                f"URL must start with http:// or https://: {url}"
-            )
+            raise SourceExtractionError(f"URL must start with http:// or https://: {url}")
         return True
 
     def extract_metadata(self, data: dict) -> dict:
@@ -31,9 +29,7 @@ class WebPageAdapter(BaseSourceAdapter):
 
             downloaded = trafilatura.fetch_url(url)
         except Exception as exc:
-            raise SourceExtractionError(
-                f"Failed to fetch web page: {exc}"
-            ) from exc
+            raise SourceExtractionError(f"Failed to fetch web page: {exc}") from exc
 
         if not downloaded:
             raise SourceExtractionError(f"Could not download page: {url}")
@@ -71,9 +67,7 @@ class WebPageAdapter(BaseSourceAdapter):
 
             downloaded = trafilatura.fetch_url(url)
         except Exception as exc:
-            raise SourceExtractionError(
-                f"Failed to fetch web page for text extraction: {exc}"
-            ) from exc
+            raise SourceExtractionError(f"Failed to fetch web page for text extraction: {exc}") from exc
 
         if not downloaded:
             raise SourceExtractionError(f"Could not download page: {url}")
@@ -85,7 +79,5 @@ class WebPageAdapter(BaseSourceAdapter):
         )
 
         if not text or not text.strip():
-            raise SourceExtractionError(
-                f"No extractable text content on page: {url}"
-            )
+            raise SourceExtractionError(f"No extractable text content on page: {url}")
         return text

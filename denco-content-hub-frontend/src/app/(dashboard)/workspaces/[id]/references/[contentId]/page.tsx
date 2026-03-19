@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useCallback } from 'react'
+import { useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import {
   Group,
@@ -21,8 +21,6 @@ import {
 } from '@tabler/icons-react'
 
 import { useContentDetailQuery, useTranscriptionQuery, useRetryContentMutation } from '@/api/hooks/useContent'
-import { useAnalysisQuery, useGenerateAnalysisMutation } from '@/api/hooks/useAnalysis'
-import type { AnalysisType } from '@/api/analysis'
 import type { ContentItemWithYouTube } from '@/api/types/content'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { StatusBadge } from '@/components/shared/StatusBadge'
@@ -30,25 +28,12 @@ import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { TranscriptionPanel } from '@/components/features/references/TranscriptionPanel'
-import { AnalysisTabPanel } from '@/components/features/references/AnalysisTabPanel'
+import { ContentIntelligencePanel } from '@/components/features/content-intelligence'
 import { ContentChatTab } from '@/components/features/references/ContentChatTab'
 import { extractYouTubeVideoId, formatDuration, formatNumber } from '@/lib/utils/youtube'
 import { getSourceType, getSourceTypeInfo } from '@/lib/utils/source-type'
 
 import styles from './content-detail.module.css'
-
-const ANALYSIS_TABS: { value: AnalysisType; label: string }[] = [
-  { value: 'summary', label: 'Резюме' },
-  { value: 'theses', label: 'Тезисы' },
-  { value: 'hooks', label: 'Хуки' },
-  { value: 'storyboard', label: 'Раскадровка' },
-]
-
-const YOUTUBE_ANALYSIS_TABS: { value: AnalysisType; label: string }[] = [
-  { value: 'content_ideas', label: 'Идеи контента' },
-  { value: 'audience_insights', label: 'Анализ аудитории' },
-  { value: 'production_notes', label: 'Заметки по продакшену' },
-]
 
 export default function WorkspaceContentDetailPage() {
   const params = useParams()
@@ -73,15 +58,7 @@ export default function WorkspaceContentDetailPage() {
     refetch: transcriptionRefetch,
   } = useTranscriptionQuery(workspaceId, contentId, content?.status)
 
-  const {
-    data: analysis,
-    isLoading: analysisLoading,
-    isError: analysisError,
-    refetch: analysisRefetch,
-  } = useAnalysisQuery(workspaceId, contentId)
-
   const retryMutation = useRetryContentMutation(workspaceId)
-  const generateMutation = useGenerateAnalysisMutation(workspaceId, contentId)
 
   const ytContent = content as ContentItemWithYouTube | undefined
   const sourceType = getSourceType(content?.source_type)
@@ -99,10 +76,6 @@ export default function WorkspaceContentDetailPage() {
       onSuccess: () => { contentRefetch(); transcriptionRefetch() },
     })
   }
-
-  const handleGenerate = useCallback(() => {
-    generateMutation.mutate(false)
-  }, [generateMutation])
 
   function seekTo(seconds: number) {
     playerRef.current?.contentWindow?.postMessage(
@@ -249,12 +222,7 @@ export default function WorkspaceContentDetailPage() {
           <Tabs defaultValue="transcription" keepMounted={false} className={styles.tabsRoot}>
             <Tabs.List className={styles.tabsList}>
               <Tabs.Tab value="transcription">{sourceInfo.transcriptionLabel}</Tabs.Tab>
-              {ANALYSIS_TABS.map((tab) => (
-                <Tabs.Tab key={tab.value} value={tab.value}>{tab.label}</Tabs.Tab>
-              ))}
-              {isYoutube && YOUTUBE_ANALYSIS_TABS.map((tab) => (
-                <Tabs.Tab key={tab.value} value={tab.value}>{tab.label}</Tabs.Tab>
-              ))}
+              <Tabs.Tab value="analysis">Анализ</Tabs.Tab>
               <Tabs.Tab value="ai-chat">AI Чат</Tabs.Tab>
             </Tabs.List>
 
@@ -273,35 +241,13 @@ export default function WorkspaceContentDetailPage() {
               />
             </Tabs.Panel>
 
-            {ANALYSIS_TABS.map((tab) => (
-              <Tabs.Panel key={tab.value} value={tab.value} className={styles.tabPanel}>
-                <AnalysisTabPanel
-                  type={tab.value}
-                  label={tab.label}
-                  analysis={analysis}
-                  isAnalysisLoading={analysisLoading}
-                  isAnalysisError={analysisError}
-                  isGenerating={generateMutation.isPending}
-                  onGenerate={handleGenerate}
-                  onRefetch={analysisRefetch}
-                />
-              </Tabs.Panel>
-            ))}
-
-            {isYoutube && YOUTUBE_ANALYSIS_TABS.map((tab) => (
-              <Tabs.Panel key={tab.value} value={tab.value} className={styles.tabPanel}>
-                <AnalysisTabPanel
-                  type={tab.value}
-                  label={tab.label}
-                  analysis={analysis}
-                  isAnalysisLoading={analysisLoading}
-                  isAnalysisError={analysisError}
-                  isGenerating={generateMutation.isPending}
-                  onGenerate={handleGenerate}
-                  onRefetch={analysisRefetch}
-                />
-              </Tabs.Panel>
-            ))}
+            <Tabs.Panel value="analysis" className={styles.tabPanel}>
+              <ContentIntelligencePanel
+                sourceType="reference"
+                sourceId={contentId}
+                workspaceId={workspaceId}
+              />
+            </Tabs.Panel>
 
             <Tabs.Panel value="ai-chat" className={styles.tabPanel}>
               <ContentChatTab workspaceId={workspaceId} contentId={contentId} />

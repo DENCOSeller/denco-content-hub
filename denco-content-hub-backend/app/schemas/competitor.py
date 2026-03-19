@@ -64,25 +64,8 @@ class CompetitorPostResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class CompetitorAnalysisResponse(BaseModel):
-    id: int
-    post_id: int
-    transcript: str | None
-    summary: str | None
-    hooks: list[dict] | None
-    key_points: list[str] | None
-    topics: list[str] | None
-    tone: str | None
-    content_structure: dict | None
-    content_ideas: list[dict] | None
-    quality_score: float | None
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
-
-
 class CompetitorPostDetailResponse(CompetitorPostResponse):
-    analysis: CompetitorAnalysisResponse | None = None
+    pass
 
 
 class ResolveUrlRequest(BaseModel):

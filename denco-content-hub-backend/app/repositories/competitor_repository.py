@@ -4,7 +4,6 @@ from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING
 
 from sqlalchemy import select, update
-from sqlalchemy.orm import selectinload
 
 from app.exceptions import NotFoundException
 from app.models.competitor import (
@@ -12,7 +11,6 @@ from app.models.competitor import (
     CompetitorChannelSnapshot,
     CompetitorNotification,
     CompetitorPost,
-    CompetitorPostAnalysis,
 )
 from app.repositories.base import BaseRepository
 
@@ -85,20 +83,13 @@ class CompetitorRepository(BaseRepository[CompetitorChannel]):
         query = query.order_by(CompetitorPost.published_at.desc())
         return await self._paginate_model(query, params)
 
-    async def get_post_with_analysis(self, post_id: int) -> CompetitorPost:
-        query = (
-            select(CompetitorPost).options(selectinload(CompetitorPost.analysis)).where(CompetitorPost.id == post_id)
-        )
+    async def get_post_by_id(self, post_id: int) -> CompetitorPost:
+        query = select(CompetitorPost).where(CompetitorPost.id == post_id)
         result = await self.db.execute(query)
         post = result.scalar_one_or_none()
         if post is None:
             raise NotFoundException("Competitor post not found")
         return post
-
-    async def get_analysis_by_post_id(self, post_id: int) -> CompetitorPostAnalysis | None:
-        query = select(CompetitorPostAnalysis).where(CompetitorPostAnalysis.post_id == post_id)
-        result = await self.db.execute(query)
-        return result.scalar_one_or_none()
 
     async def get_notifications(
         self,

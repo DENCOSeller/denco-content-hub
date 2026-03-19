@@ -9,7 +9,6 @@ from app.integrations.competitor.url_resolver import resolve_url
 from app.repositories.competitor_repository import CompetitorRepository
 from app.repositories.workspace_member_repository import WorkspaceMemberRepository
 from app.schemas.competitor import (
-    CompetitorAnalysisResponse,
     CompetitorChannelResponse,
     CompetitorChannelSnapshotResponse,
     CompetitorChannelUpdate,
@@ -131,36 +130,16 @@ class CompetitorService:
 
     async def _check_post_access(self, post_id: int, user_id: int) -> CompetitorPost:
         """Загружает пост и проверяет что пользователь — член workspace канала."""
-        post = await self.repo.get_post_with_analysis(post_id)
+        post = await self.repo.get_post_by_id(post_id)
         channel = await self.repo.get_by_id(post.channel_id)
         membership = await self.member_repo.get_membership(user_id, channel.workspace_id)
         if not membership:
             raise ForbiddenException("Нет доступа к этому посту конкурента")
         return post
 
-    async def get_post_analysis(self, post_id: int, user_id: int) -> CompetitorAnalysisResponse:
-        """Получает анализ поста. Проверяет доступ через workspace канала."""
-        from app.exceptions import NotFoundException
-
-        await self._check_post_access(post_id, user_id)
-        analysis = await self.repo.get_analysis_by_post_id(post_id)
-        if analysis is None:
-            raise NotFoundException("Анализ для этого поста ещё не готов")
-        return CompetitorAnalysisResponse.model_validate(analysis)
-
     async def get_post_detail(self, post_id: int, user_id: int) -> CompetitorPostDetailResponse:
         post = await self._check_post_access(post_id, user_id)
-        analysis = None
-        if post.analysis:
-            analysis = CompetitorAnalysisResponse.model_validate(post.analysis)
-        return CompetitorPostDetailResponse(
-            **{
-                k: v
-                for k, v in CompetitorPostDetailResponse.model_validate(post).model_dump().items()
-                if k != "analysis"
-            },
-            analysis=analysis,
-        )
+        return CompetitorPostDetailResponse.model_validate(post)
 
     async def list_notifications(
         self,

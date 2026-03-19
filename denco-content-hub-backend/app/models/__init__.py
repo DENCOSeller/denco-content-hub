@@ -8,12 +8,10 @@ from app.models.competitor import (
     CompetitorNotification,
     CompetitorPlatform,
     CompetitorPost,
-    CompetitorPostAnalysis,
     CompetitorPostStatus,
     CompetitorStatus,
     NotificationType,
 )
-from app.models.content_analysis import ContentAnalysis
 from app.models.content_chat_message import ContentChatMessage
 from app.models.content_intelligence import ContentIntelligence
 from app.models.content_item import ContentItem, ContentStatus, SourceType
@@ -59,10 +57,8 @@ __all__ = [
     "CompetitorNotification",
     "CompetitorPlatform",
     "CompetitorPost",
-    "CompetitorPostAnalysis",
     "CompetitorPostStatus",
     "CompetitorStatus",
-    "ContentAnalysis",
     "ContentChatMessage",
     "ContentIntelligence",
     "ContentItem",

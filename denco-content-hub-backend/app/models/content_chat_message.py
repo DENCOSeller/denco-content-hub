@@ -28,6 +28,4 @@ class ContentChatMessage(Base):
     # Relationships
     content_item: Mapped[ContentItem] = relationship(back_populates="chat_messages")
 
-    __table_args__ = (
-        Index("ix_content_chat_messages_content_item_id", "content_item_id"),
-    )
+    __table_args__ = (Index("ix_content_chat_messages_content_item_id", "content_item_id"),)

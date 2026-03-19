@@ -146,6 +146,9 @@ export function useGenerateCompetitorIntelligenceMutation(workspaceId: number) {
       qc.invalidateQueries({
         queryKey: intelligenceKeys.competitorPost(workspaceId, variables.postId),
       })
+      qc.invalidateQueries({
+        queryKey: ['competitors', 'posts'],
+      })
     },
   })
 }

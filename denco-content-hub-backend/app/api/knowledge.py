@@ -53,8 +53,11 @@ async def list_nodes(
 ) -> list[KnowledgeNodeResponse]:
     workspace, _member = workspace_ctx
     return await kg_client.list_nodes(
-        "workspace", workspace.id, current_user.id,
-        node_type_def_id=node_type_def_id, search=search,
+        "workspace",
+        workspace.id,
+        current_user.id,
+        node_type_def_id=node_type_def_id,
+        search=search,
     )
 
 
@@ -76,7 +79,9 @@ async def create_node(
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
     return await kg_client.create_node(
-        "workspace", workspace.id, current_user.id,
+        "workspace",
+        workspace.id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 
@@ -98,7 +103,10 @@ async def batch_update_positions(
     workspace, _member = workspace_ctx
     positions = [p.model_dump() for p in data.positions]
     result = await kg_client.batch_update_positions(
-        "workspace", workspace.id, current_user.id, positions,
+        "workspace",
+        workspace.id,
+        current_user.id,
+        positions,
     )
     return result
 
@@ -138,7 +146,8 @@ async def update_node(
     _workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
     return await kg_client.update_node(
-        node_id, current_user.id,
+        node_id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 
@@ -202,7 +211,9 @@ async def create_edge(
     _workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
     return await kg_client.create_edge(
-        "workspace", workspace_ctx[0].id, current_user.id,
+        "workspace",
+        workspace_ctx[0].id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 
@@ -282,8 +293,11 @@ async def get_graph(
 ) -> KnowledgeGraphResponse:
     workspace, _member = workspace_ctx
     return await kg_client.get_graph(
-        "workspace", workspace.id, current_user.id,
-        include_company=True, company_id=workspace.company_id,
+        "workspace",
+        workspace.id,
+        current_user.id,
+        include_company=True,
+        company_id=workspace.company_id,
     )
 
 
@@ -308,7 +322,9 @@ async def create_workspace_public_link(
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
     return await kg_client.create_public_link(
-        "workspace", workspace.id, current_user.id,
+        "workspace",
+        workspace.id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 
@@ -347,7 +363,8 @@ async def update_workspace_public_link(
     workspace, member = workspace_ctx
     require_role(member, WRITE_ROLES)
     return await kg_client.update_public_link(
-        link_id, current_user.id,
+        link_id,
+        current_user.id,
         data.model_dump(exclude_none=True),
     )
 

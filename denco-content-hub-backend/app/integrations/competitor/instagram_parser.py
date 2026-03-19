@@ -38,7 +38,8 @@ def fetch_channel_info(handle: str) -> dict[str, Any]:
             "resultsLimit": 1,
         }
         run = client.actor("apify/instagram-scraper").call(
-            run_input=run_input, timeout_secs=120,
+            run_input=run_input,
+            timeout_secs=120,
         )
         items = list(client.dataset(run["defaultDatasetId"]).iterate_items())
     except Exception:
@@ -85,7 +86,8 @@ def fetch_latest_posts(
             "resultsLimit": max_posts,
         }
         run = client.actor("apify/instagram-scraper").call(
-            run_input=run_input, timeout_secs=120,
+            run_input=run_input,
+            timeout_secs=120,
         )
         items = list(client.dataset(run["defaultDatasetId"]).iterate_items())
     except Exception:

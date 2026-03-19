@@ -10,13 +10,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import structlog
-from anthropic import APIStatusError, APITimeoutError, RateLimitError
+from anthropic import APITimeoutError, AuthenticationError, BadRequestError, PermissionDeniedError, RateLimitError
 
 from app.config import settings
 from app.integrations.content_intelligence.analyzer import UnifiedAnalyzer
 from app.integrations.content_intelligence.config import PROMPT_VERSION, get_sections
 
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
     from app.integrations.content_intelligence.schemas import IntelligenceResult
 from app.models.competitor import CompetitorChannel, CompetitorPost
 from app.models.content_intelligence import ContentIntelligence
@@ -38,7 +40,7 @@ def _dump_pydantic_list(items: list | None) -> list[dict] | None:
 
 
 def _run_intelligence_analysis(
-    db: Any,
+    db: Session,
     *,
     source_type: str,
     source_id_field: str,
@@ -115,7 +117,8 @@ def _run_intelligence_analysis(
     name="analyze_reference_intelligence",
     time_limit=300,
     soft_time_limit=280,
-    autoretry_for=(RateLimitError, APIStatusError, APITimeoutError),
+    autoretry_for=(RateLimitError, APITimeoutError),
+    dont_autoretry_for=(BadRequestError, AuthenticationError, PermissionDeniedError),
     retry_backoff=True,
     max_retries=3,
 )
@@ -207,7 +210,8 @@ def analyze_reference_intelligence(content_item_id: int) -> dict:
     name="analyze_competitor_batch_intelligence",
     time_limit=900,
     soft_time_limit=850,
-    autoretry_for=(RateLimitError, APIStatusError, APITimeoutError),
+    autoretry_for=(RateLimitError, APITimeoutError),
+    dont_autoretry_for=(BadRequestError, AuthenticationError, PermissionDeniedError),
     retry_backoff=True,
     max_retries=3,
 )
@@ -273,7 +277,8 @@ def analyze_competitor_batch_intelligence() -> dict[str, Any]:
     name="analyze_competitor_post_intelligence",
     time_limit=300,
     soft_time_limit=280,
-    autoretry_for=(RateLimitError, APIStatusError, APITimeoutError),
+    autoretry_for=(RateLimitError, APITimeoutError),
+    dont_autoretry_for=(BadRequestError, AuthenticationError, PermissionDeniedError),
     retry_backoff=True,
     max_retries=3,
 )
@@ -311,7 +316,7 @@ def analyze_competitor_post_intelligence(post_id: int) -> dict:
         db.close()
 
 
-def _analyze_single_competitor(db: Any, post: CompetitorPost) -> None:
+def _analyze_single_competitor(db: Session, post: CompetitorPost) -> None:
     """Analyze one CompetitorPost via Intelligence pipeline."""
     # Build text from title + description
     parts = [post.title or "", post.description or ""]

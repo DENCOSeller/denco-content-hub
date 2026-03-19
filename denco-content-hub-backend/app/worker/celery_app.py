@@ -32,11 +32,10 @@ celery_app.conf.task_routes = {
     "transcribe_content": {"queue": "transcription"},
     "process_pdf": {"queue": "default"},
     "process_webpage": {"queue": "default"},
-    "analyze_content": {"queue": "default"},
     "sync_competitor_channels": {"queue": "default"},
     "sync_single_competitor_channel": {"queue": "default"},
-    "analyze_competitor_posts": {"queue": "default"},
     "analyze_reference_intelligence": {"queue": "default"},
+    "analyze_competitor_post_intelligence": {"queue": "default"},
     "analyze_competitor_batch_intelligence": {"queue": "default"},
     "take_channel_snapshots": {"queue": "default"},
 }
@@ -49,15 +48,6 @@ celery_app.conf.beat_schedule = {
     "sync-competitor-channels": {
         "task": "sync_competitor_channels",
         "schedule": 3600.0,  # Каждый час проверяем, какие каналы пора парсить
-    },
-    # DEPRECATED: переключено на unified Intelligence analyzer (чанк 8)
-    # "analyze-competitor-posts": {
-    #     "task": "analyze_competitor_posts",
-    #     "schedule": 1800.0,  # Каждые 30 минут анализируем новые посты
-    # },
-    "analyze-competitor-batch-intelligence": {
-        "task": "analyze_competitor_batch_intelligence",
-        "schedule": 1800.0,  # Каждые 30 минут — Intelligence анализ постов
     },
     "take-channel-snapshots": {
         "task": "take_channel_snapshots",

@@ -7,7 +7,6 @@ from app.models.user import User
 from app.models.workspace import Workspace, WorkspaceMember
 from app.schemas.common import ErrorResponse, PaginatedResponse, PaginationParams
 from app.schemas.competitor import (
-    CompetitorAnalysisResponse,
     CompetitorChannelCreate,
     CompetitorChannelResponse,
     CompetitorChannelSnapshotResponse,
@@ -228,25 +227,6 @@ async def get_post_detail(
 ) -> CompetitorPostDetailResponse:
     service = CompetitorService(db)
     return await service.get_post_detail(post_id, current_user.id)
-
-
-@router.get(
-    "/competitors/posts/{post_id}/analysis",
-    response_model=CompetitorAnalysisResponse,
-    summary="Get competitor post AI analysis",
-    responses={
-        401: {"model": ErrorResponse, "description": "Not authenticated"},
-        403: {"model": ErrorResponse, "description": "Access denied"},
-        404: {"model": ErrorResponse, "description": "Analysis not found"},
-    },
-)
-async def get_post_analysis(
-    post_id: int,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-) -> CompetitorAnalysisResponse:
-    service = CompetitorService(db)
-    return await service.get_post_analysis(post_id, current_user.id)
 
 
 # ── URL Resolve ───────────────────────────────────────────────────────

@@ -21,9 +21,7 @@ class PDFAdapter(BaseSourceAdapter):
         if not file_path:
             raise SourceExtractionError("Missing 'file_path' in input data")
         if not file_path.lower().endswith(".pdf"):
-            raise SourceExtractionError(
-                f"File does not have a .pdf extension: {file_path}"
-            )
+            raise SourceExtractionError(f"File does not have a .pdf extension: {file_path}")
         if not os.path.isfile(file_path):
             raise SourceExtractionError(f"PDF file not found: {file_path}")
         return True
@@ -35,9 +33,7 @@ class PDFAdapter(BaseSourceAdapter):
 
             doc = fitz.open(file_path)
         except Exception as exc:
-            raise SourceExtractionError(
-                f"Failed to open PDF: {exc}"
-            ) from exc
+            raise SourceExtractionError(f"Failed to open PDF: {exc}") from exc
 
         pdf_meta = doc.metadata or {}
         title = pdf_meta.get("title") or os.path.splitext(os.path.basename(file_path))[0]
@@ -58,9 +54,7 @@ class PDFAdapter(BaseSourceAdapter):
 
             doc = fitz.open(file_path)
         except Exception as exc:
-            raise SourceExtractionError(
-                f"Failed to open PDF for text extraction: {exc}"
-            ) from exc
+            raise SourceExtractionError(f"Failed to open PDF for text extraction: {exc}") from exc
 
         pages: list[str] = []
         for page in doc:
@@ -71,7 +65,5 @@ class PDFAdapter(BaseSourceAdapter):
 
         full_text = "\n\n".join(pages)
         if not full_text.strip():
-            raise SourceExtractionError(
-                f"PDF contains no extractable text: {file_path}"
-            )
+            raise SourceExtractionError(f"PDF contains no extractable text: {file_path}")
         return full_text

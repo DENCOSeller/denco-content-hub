@@ -67,11 +67,7 @@ def process_webpage_task(self, content_item_id: int) -> dict:
         error_msg = str(exc)[:500]
 
         try:
-            item = (
-                db.query(ContentItem)
-                .filter(ContentItem.id == content_item_id)
-                .first()
-            )
+            item = db.query(ContentItem).filter(ContentItem.id == content_item_id).first()
             if item:
                 item.status = ContentStatus.FAILED
                 item.error_message = error_msg

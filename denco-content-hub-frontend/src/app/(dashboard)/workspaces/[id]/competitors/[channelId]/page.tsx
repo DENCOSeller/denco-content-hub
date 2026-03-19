@@ -42,7 +42,7 @@ import { ErrorState } from '@/components/shared/ErrorState'
 import { EmptyState } from '@/components/shared/EmptyState'
 import type { CompetitorPlatform, CompetitorPost } from '@/api/types/competitor'
 import { PostCard } from '@/components/features/competitors/PostCard'
-import { PostAnalysisPanel } from '@/components/features/competitors/PostAnalysisPanel'
+import { ContentIntelligencePanel } from '@/components/features/content-intelligence'
 import { AnalyticsTab } from '@/components/features/competitors/AnalyticsTab'
 import { notifications } from '@mantine/notifications'
 
@@ -186,17 +186,23 @@ export default function ChannelDashboardPage() {
           ) : (
             <Stack gap="md">
               {postsData.items.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  isSelected={selectedPost?.id === post.id}
-                  onSelect={() => setSelectedPost(selectedPost?.id === post.id ? null : post)}
-                />
+                <Stack key={post.id} gap="md">
+                  <PostCard
+                    post={post}
+                    isSelected={selectedPost?.id === post.id}
+                    onSelect={() => setSelectedPost(selectedPost?.id === post.id ? null : post)}
+                  />
+                  {selectedPost?.id === post.id && (
+                    <Card withBorder radius="md" padding="md">
+                      <ContentIntelligencePanel
+                        sourceType="competitor_post"
+                        sourceId={post.id}
+                        workspaceId={workspaceId}
+                      />
+                    </Card>
+                  )}
+                </Stack>
               ))}
-
-              {selectedPost && (
-                <PostAnalysisPanel postId={selectedPost.id} />
-              )}
 
               {postsData.pages > 1 && (
                 <Group justify="center" mt="md">

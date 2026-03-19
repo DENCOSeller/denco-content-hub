@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 import structlog
 
 from app.exceptions import BadRequestException, NotFoundException
-from app.repositories.analysis_repository import ContentAnalysisRepository
 from app.repositories.content_chat_repository import ContentChatMessageRepository
 from app.repositories.content_repository import ContentRepository
+from app.repositories.intelligence_repository import IntelligenceRepository
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -25,7 +25,7 @@ class ContentChatService:
         self.db = db
         self.chat_repo = ContentChatMessageRepository(db)
         self.content_repo = ContentRepository(db)
-        self.analysis_repo = ContentAnalysisRepository(db)
+        self.intelligence_repo = IntelligenceRepository(db)
 
     async def get_history(self, workspace_id: int, content_id: int) -> list[ContentChatMessage]:
         """Get chat history for a content item."""
@@ -53,16 +53,18 @@ class ContentChatService:
         if not source_text:
             raise BadRequestException("Content has no text to chat about")
 
-        # Load analysis for extra context
+        # Load intelligence for extra context
         analysis_context = ""
-        analysis = await self.analysis_repo.get_by_content_item_id(content_id)
-        if analysis and analysis.status == "completed":
+        intelligence = await self.intelligence_repo.get_by_content_item(content_id)
+        if intelligence and intelligence.status == "completed":
             parts: list[str] = []
-            if analysis.summary:
-                parts.append(f"Резюме: {analysis.summary}")
-            if analysis.theses:
-                theses_text = ", ".join(t.get("title", "") for t in analysis.theses)
-                parts.append(f"Тезисы: {theses_text}")
+            if intelligence.summary:
+                parts.append(f"Резюме: {intelligence.summary}")
+            if intelligence.key_points:
+                kp_text = ", ".join(
+                    kp.get("point", "") if isinstance(kp, dict) else str(kp) for kp in intelligence.key_points
+                )
+                parts.append(f"Ключевые тезисы: {kp_text}")
             if parts:
                 analysis_context = "Анализ контента:\n" + "\n".join(parts)
 

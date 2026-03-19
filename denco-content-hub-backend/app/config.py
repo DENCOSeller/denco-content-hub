@@ -59,9 +59,6 @@ class Settings(BaseSettings):
     kg_service_url: str = "http://localhost:8010"
     kg_service_secret: str = "kg-service-secret-change-me"
 
-    # Content Intelligence — переключатель новой системы анализа
-    use_new_intelligence: bool = False
-
     # App
     debug: bool = True
     app_name: str = "DENCO Content Hub API"

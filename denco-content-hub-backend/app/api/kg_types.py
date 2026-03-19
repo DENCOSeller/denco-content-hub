@@ -55,7 +55,9 @@ async def create_node_type(
     current_user: User = Depends(get_current_user),
 ) -> KgNodeTypeDefResponse:
     return await kg_client.create_node_type(
-        company_id, current_user.id, data.model_dump(),
+        company_id,
+        current_user.id,
+        data.model_dump(),
     )
 
 
@@ -112,7 +114,9 @@ async def create_edge_type(
     current_user: User = Depends(get_current_user),
 ) -> KgEdgeTypeDefResponse:
     return await kg_client.create_edge_type(
-        company_id, current_user.id, data.model_dump(),
+        company_id,
+        current_user.id,
+        data.model_dump(),
     )
 
 
