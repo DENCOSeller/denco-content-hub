@@ -37,6 +37,16 @@ from app.models.library_item import (
 )
 from app.models.public_knowledge import KgPublicLink, KgPublicLinkNode, VisibilityMode
 from app.models.transcription import Transcription, TranscriptionStatus
+from app.models.trend import (
+    TrendAlert,
+    TrendAlertSettings,
+    TrendAlertType,
+    TrendAnalysisStatus,
+    TrendItem,
+    TrendNiche,
+    TrendSnapshot,
+    TrendStage,
+)
 from app.models.user import User
 from app.models.workspace import Workspace, WorkspaceMember, WorkspaceRole
 
@@ -84,6 +94,14 @@ __all__ = [
     "SourceType",
     "Transcription",
     "TranscriptionStatus",
+    "TrendAlert",
+    "TrendAlertSettings",
+    "TrendAlertType",
+    "TrendAnalysisStatus",
+    "TrendItem",
+    "TrendNiche",
+    "TrendSnapshot",
+    "TrendStage",
     "User",
     "VisibilityMode",
     "Workspace",

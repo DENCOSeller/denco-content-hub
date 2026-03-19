@@ -37,7 +37,13 @@ celery_app.conf.task_routes = {
     "analyze_reference_intelligence": {"queue": "default"},
     "analyze_competitor_post_intelligence": {"queue": "default"},
     "analyze_competitor_batch_intelligence": {"queue": "default"},
+    "analyze_trend_item_intelligence": {"queue": "default"},
+    "analyze_trend_batch_intelligence": {"queue": "default"},
     "take_channel_snapshots": {"queue": "default"},
+    "discover_trends_batch": {"queue": "default"},
+    "monitor_trend_snapshots": {"queue": "default"},
+    "check_trend_alerts": {"queue": "default"},
+    "cleanup_old_trends": {"queue": "default"},
 }
 
 celery_app.conf.beat_schedule = {
@@ -52,6 +58,26 @@ celery_app.conf.beat_schedule = {
     "take-channel-snapshots": {
         "task": "take_channel_snapshots",
         "schedule": 86400.0,  # Раз в сутки (24 часа)
+    },
+    "discover-trends-batch": {
+        "task": "discover_trends_batch",
+        "schedule": 7200.0,  # Каждые 2 часа
+    },
+    "monitor-trend-snapshots": {
+        "task": "monitor_trend_snapshots",
+        "schedule": 14400.0,  # Каждые 4 часа
+    },
+    "check-trend-alerts": {
+        "task": "check_trend_alerts",
+        "schedule": 3600.0,  # Каждый час
+    },
+    "cleanup-old-trends": {
+        "task": "cleanup_old_trends",
+        "schedule": 86400.0,  # Раз в день
+    },
+    "analyze-trend-batch-intelligence": {
+        "task": "analyze_trend_batch_intelligence",
+        "schedule": 1800.0,  # Каждые 30 минут
     },
 }
 

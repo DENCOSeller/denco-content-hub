@@ -1,0 +1,14 @@
+.alertItem {
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.alertItem:hover {
+  background-color: var(--card-bg-hover);
+}
+
+.unread {
+  border-left: 3px solid var(--mantine-color-blue-6);
+}

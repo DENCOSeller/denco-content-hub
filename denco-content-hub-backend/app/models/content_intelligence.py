@@ -27,7 +27,9 @@ class ContentIntelligence(Base, TimestampMixin):
     competitor_post_id: Mapped[int | None] = mapped_column(
         ForeignKey("competitor_posts.id", ondelete="CASCADE"), nullable=True
     )
-    trend_item_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    trend_item_id: Mapped[int | None] = mapped_column(
+        ForeignKey("trend_items.id", ondelete="CASCADE"), nullable=True
+    )
     source_type: Mapped[str] = mapped_column(String(30), nullable=False)
 
     # Результаты анализа
@@ -75,6 +77,12 @@ class ContentIntelligence(Base, TimestampMixin):
             "competitor_post_id",
             unique=True,
             postgresql_where="competitor_post_id IS NOT NULL",
+        ),
+        Index(
+            "ix_ci_trend_item_id",
+            "trend_item_id",
+            unique=True,
+            postgresql_where="trend_item_id IS NOT NULL",
         ),
         Index("ix_ci_workspace_source", "workspace_id", "source_type"),
         Index("ix_ci_status", "status"),

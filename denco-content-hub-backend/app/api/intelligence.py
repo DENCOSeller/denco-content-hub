@@ -127,3 +127,63 @@ async def generate_competitor_intelligence(
     service = IntelligenceService(db)
     record = await service.generate_competitor_intelligence(workspace.id, post_id, force)
     return IntelligenceResponse.model_validate(record)
+
+
+# ── Trend item intelligence ──────────────────────────────────────────
+
+trend_router = APIRouter(
+    prefix="/workspaces/{workspace_id}/trends/{trend_item_id}/intelligence",
+    tags=["Intelligence"],
+)
+
+
+@trend_router.get(
+    "",
+    response_model=IntelligenceResponse,
+    summary="Get trend item intelligence analysis",
+    responses={
+        401: {"model": ErrorResponse, "description": "Not authenticated"},
+        404: {"model": ErrorResponse, "description": "Trend item or analysis not found"},
+    },
+)
+async def get_trend_item_intelligence(
+    workspace_id: int,
+    trend_item_id: int,
+    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> IntelligenceResponse:
+    """Get intelligence analysis for a trend item."""
+    workspace, _member = workspace_ctx
+    service = IntelligenceService(db)
+    return await service.get_trend_item_intelligence(workspace.id, trend_item_id)
+
+
+@trend_router.post(
+    "/generate",
+    response_model=IntelligenceResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Generate trend item intelligence analysis",
+    responses={
+        401: {"model": ErrorResponse, "description": "Not authenticated"},
+        403: {"model": ErrorResponse, "description": "Insufficient permissions"},
+        404: {"model": ErrorResponse, "description": "Trend item not found"},
+    },
+)
+async def generate_trend_item_intelligence(
+    workspace_id: int,
+    trend_item_id: int,
+    force: bool = False,
+    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_workspace_from_path),
+    db: AsyncSession = Depends(get_db),
+) -> IntelligenceResponse:
+    """Generate or regenerate intelligence analysis for a trend item."""
+    workspace, member = workspace_ctx
+    require_role(
+        member,
+        [WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.EDITOR, WorkspaceRole.CONTRACTOR],
+    )
+    service = IntelligenceService(db)
+    record = await service.generate_trend_item_intelligence(workspace.id, trend_item_id, force)
+    return IntelligenceResponse.model_validate(record)

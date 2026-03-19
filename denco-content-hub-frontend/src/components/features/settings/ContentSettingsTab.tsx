@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { SegmentedControl, Stack } from '@mantine/core'
 
 import { NodeTypeManager } from './NodeTypeManager'
-import type { NodeType } from '@/api/client/types.gen'
+
+type NodeType = 'speaker' | 'content_goal' | 'narrative_format' | 'hook_type' | 'tone_of_voice' | 'product_focus'
 
 const NODE_TYPE_OPTIONS: { value: NodeType; label: string }[] = [
   { value: 'speaker', label: 'Спикеры' },

@@ -1,8 +1,11 @@
 """Content Intelligence pipeline — Celery tasks.
 
-Two entry-points:
+Entry-points:
 - analyze_reference_intelligence(content_item_id) — on-demand
+- analyze_competitor_post_intelligence(post_id) — on-demand
 - analyze_competitor_batch_intelligence() — beat (every 30 min)
+- analyze_trend_item_intelligence(trend_item_id) — on-demand
+- analyze_trend_batch_intelligence() — beat (every 30 min)
 """
 
 from __future__ import annotations
@@ -24,6 +27,7 @@ from app.models.competitor import CompetitorChannel, CompetitorPost
 from app.models.content_intelligence import ContentIntelligence
 from app.models.content_item import ContentItem, SourceType
 from app.models.transcription import Transcription
+from app.models.trend import TrendItem
 from app.worker.celery_app import celery_app
 from app.worker.db import SyncSessionLocal
 
@@ -358,3 +362,145 @@ def _analyze_single_competitor(db: Session, post: CompetitorPost) -> None:
     db.commit()
 
     logger.info("Competitor post intelligence done", post_id=post.id)
+
+
+@celery_app.task(
+    name="analyze_trend_item_intelligence",
+    time_limit=300,
+    soft_time_limit=280,
+    autoretry_for=(RateLimitError, APITimeoutError),
+    dont_autoretry_for=(BadRequestError, AuthenticationError, PermissionDeniedError),
+    retry_backoff=True,
+    max_retries=3,
+)
+def analyze_trend_item_intelligence(trend_item_id: int) -> dict:
+    """On-demand: анализ одного TrendItem через Content Intelligence."""
+    db = SyncSessionLocal()
+    try:
+        item = db.query(TrendItem).filter(TrendItem.id == trend_item_id).first()
+        if not item:
+            logger.warning("TrendItem not found", trend_item_id=trend_item_id)
+            return {"status": "skipped", "reason": "not_found"}
+
+        _analyze_single_trend_item(db, item)
+        return {"status": "completed", "trend_item_id": trend_item_id}
+
+    except Exception as exc:
+        db.rollback()
+        error_msg = str(exc)[:500]
+        try:
+            record = db.query(ContentIntelligence).filter(ContentIntelligence.trend_item_id == trend_item_id).first()
+            if record:
+                record.status = "failed"
+                record.error_message = error_msg
+                db.commit()
+        except Exception:
+            db.rollback()
+        logger.error(
+            "Trend item intelligence failed",
+            trend_item_id=trend_item_id,
+            error=error_msg,
+        )
+        raise
+
+    finally:
+        db.close()
+
+
+@celery_app.task(
+    name="analyze_trend_batch_intelligence",
+    time_limit=900,
+    soft_time_limit=850,
+    autoretry_for=(RateLimitError, APITimeoutError),
+    dont_autoretry_for=(BadRequestError, AuthenticationError, PermissionDeniedError),
+    retry_backoff=True,
+    max_retries=3,
+)
+def analyze_trend_batch_intelligence() -> dict[str, Any]:
+    """Beat: берёт до 20 TrendItem (new), анализирует через Intelligence."""
+    db = SyncSessionLocal()
+    analyzed = 0
+    errors = 0
+    skipped = 0
+    try:
+        items = (
+            db.query(TrendItem)
+            .filter(TrendItem.analysis_status == "new")
+            .order_by(TrendItem.detected_at.desc())
+            .limit(BATCH_SIZE)
+            .all()
+        )
+
+        if not items:
+            logger.info("No trend items for intelligence analysis")
+            return {"analyzed": 0, "errors": 0, "skipped": 0}
+
+        logger.info("Starting trend intelligence batch", count=len(items))
+
+        for item in items:
+            try:
+                _analyze_single_trend_item(db, item)
+                analyzed += 1
+            except Exception as exc:
+                errors += 1
+                db.rollback()
+                try:
+                    db.refresh(item)
+                    item.analysis_status = "failed"
+                    db.commit()
+                except Exception:
+                    db.rollback()
+                logger.error(
+                    "Intelligence analysis failed for trend item",
+                    trend_item_id=item.id,
+                    error=str(exc)[:200],
+                )
+
+        logger.info(
+            "Trend intelligence batch completed",
+            analyzed=analyzed,
+            errors=errors,
+            skipped=skipped,
+        )
+        return {"analyzed": analyzed, "errors": errors, "skipped": skipped}
+
+    finally:
+        db.close()
+
+
+def _analyze_single_trend_item(db: Session, item: TrendItem) -> None:
+    """Analyze one TrendItem via Intelligence pipeline."""
+    parts = [item.title or "", item.description or ""]
+    text = "\n\n".join(p for p in parts if p.strip())
+
+    if not text.strip():
+        item.analysis_status = "skipped"
+        db.commit()
+        return
+
+    metadata = {
+        "source_type": "trend_item",
+        "platform": item.platform,
+        "duration": item.duration_seconds,
+        "has_timestamps": False,
+        "channel_name": item.channel_name,
+        "views": item.views_count,
+        "likes": item.likes_count,
+        "viral_score": item.viral_score,
+        "stage": item.stage,
+    }
+
+    _run_intelligence_analysis(
+        db,
+        source_type="trend_item",
+        source_id_field="trend_item_id",
+        source_id=item.id,
+        workspace_id=item.workspace_id,
+        text=text,
+        metadata=metadata,
+    )
+
+    item.analysis_status = "analyzed"
+    db.commit()
+
+    logger.info("Trend item intelligence done", trend_item_id=item.id)

@@ -25,6 +25,11 @@ class IntelligenceRepository(BaseRepository[ContentIntelligence]):
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
+    async def get_by_trend_item(self, trend_item_id: int) -> ContentIntelligence | None:
+        query = select(ContentIntelligence).where(ContentIntelligence.trend_item_id == trend_item_id)
+        result = await self.db.execute(query)
+        return result.scalar_one_or_none()
+
     async def create_or_update(
         self,
         source_type: str,

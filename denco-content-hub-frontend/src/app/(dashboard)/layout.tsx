@@ -31,6 +31,7 @@ import {
   IconBooks,
   IconCalendar,
   IconSpy,
+  IconFlame,
 } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -127,6 +128,7 @@ export default function DashboardLayout({
         { href: `/workspaces/${workspaceId}/library`, label: 'Библиотека', icon: IconBooks, exact: false },
         { href: `/workspaces/${workspaceId}/content-plan`, label: 'Контент-план', icon: IconCalendar, exact: false },
         { href: `/workspaces/${workspaceId}/competitors`, label: 'Мониторинг', icon: IconSpy, exact: false },
+        { href: `/workspaces/${workspaceId}/trends`, label: 'Тренды', icon: IconFlame, exact: false },
         { href: `/workspaces/${workspaceId}/settings`, label: 'Настройки', icon: IconSettings, exact: false },
       ]
     : []
