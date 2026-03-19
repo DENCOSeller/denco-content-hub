@@ -17,7 +17,7 @@ import {
   IconPhoto,
 } from '@tabler/icons-react'
 
-import type { TrendItem, TrendStage, TrendPlatform } from '@/api/types/trend'
+import type { TrendItem, TrendStage, TrendPlatform, TrendOrientation } from '@/api/types/trend'
 
 import styles from './TrendCard.module.css'
 
@@ -43,6 +43,12 @@ function formatViews(n: number): string {
   return String(n)
 }
 
+const ORIENTATION_CONFIG: Record<TrendOrientation, { label: string; color: string }> = {
+  shorts: { label: 'Shorts', color: 'orange' },
+  long_video: { label: 'Long', color: 'blue' },
+  reels: { label: 'Reels', color: 'violet' },
+}
+
 function getViralClass(score: number | null): string {
   if (score == null) return styles.viralLow
   if (score >= 70) return styles.viralHigh
@@ -54,6 +60,7 @@ export function TrendCard({ item, workspaceId }: TrendCardProps) {
   const platform = PLATFORM_CONFIG[item.platform]
   const PlatformIcon = platform.icon
   const stage = item.stage ? STAGE_CONFIG[item.stage] : null
+  const orientation = item.orientation ? ORIENTATION_CONFIG[item.orientation] : null
 
   return (
     <Card
@@ -84,6 +91,17 @@ export function TrendCard({ item, workspaceId }: TrendCardProps) {
         >
           {platform.label}
         </Badge>
+
+        {orientation && (
+          <Badge
+            className={styles.orientationBadge}
+            size="xs"
+            variant="light"
+            color={orientation.color}
+          >
+            {orientation.label}
+          </Badge>
+        )}
 
         {stage && (
           <Badge

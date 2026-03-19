@@ -7,19 +7,24 @@ import {
   TagsInput,
   MultiSelect,
   Select,
+  SegmentedControl,
   Button,
   Group,
   Stack,
+  Alert,
+  Text,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { zodResolver } from 'mantine-form-zod-resolver'
 import { notifications } from '@mantine/notifications'
+import { IconAlertTriangle } from '@tabler/icons-react'
 import { z } from 'zod'
 
-import type { TrendNiche, TrendPlatform } from '@/api/types/trend'
+import type { TrendNiche, TrendPlatform, TrendKeywordMode } from '@/api/types/trend'
 import {
   useCreateTrendNicheMutation,
   useUpdateTrendNicheMutation,
+  useIntegrationsStatusQuery,
 } from '@/api/hooks/useTrends'
 
 interface NicheFormModalProps {
@@ -34,6 +39,9 @@ const nicheSchema = z.object({
   keywords: z.array(z.string()).min(1, 'Добавьте хотя бы одно ключевое слово'),
   platforms: z.array(z.string()).min(1, 'Выберите хотя бы одну платформу'),
   monitoring_interval_hours: z.string().min(1, 'Выберите интервал'),
+  language: z.string().min(1, 'Выберите язык'),
+  region: z.string().min(1, 'Выберите регион'),
+  keyword_mode: z.enum(['separate', 'combined']),
 })
 
 type NicheFormValues = z.infer<typeof nicheSchema>
@@ -51,6 +59,29 @@ const INTERVAL_OPTIONS = [
   { value: '24', label: 'Раз в сутки' },
 ]
 
+const LANGUAGE_OPTIONS = [
+  { value: 'ru', label: 'Русский' },
+  { value: 'en', label: 'English' },
+  { value: 'es', label: 'Español' },
+  { value: 'de', label: 'Deutsch' },
+  { value: 'fr', label: 'Français' },
+  { value: 'zh', label: '中文' },
+]
+
+const REGION_OPTIONS = [
+  { value: 'RU', label: 'Россия' },
+  { value: 'US', label: 'США' },
+  { value: 'GB', label: 'Великобритания' },
+  { value: 'DE', label: 'Германия' },
+  { value: 'KZ', label: 'Казахстан' },
+  { value: 'BY', label: 'Беларусь' },
+]
+
+const KEYWORD_MODE_OPTIONS = [
+  { value: 'separate', label: 'Раздельный поиск' },
+  { value: 'combined', label: 'Объединённый AND' },
+]
+
 function getInitialValues(niche?: TrendNiche | null): NicheFormValues {
   if (niche) {
     return {
@@ -58,6 +89,9 @@ function getInitialValues(niche?: TrendNiche | null): NicheFormValues {
       keywords: niche.keywords,
       platforms: niche.platforms,
       monitoring_interval_hours: String(niche.monitoring_interval_hours),
+      language: niche.language ?? 'ru',
+      region: niche.region ?? 'RU',
+      keyword_mode: niche.keyword_mode ?? 'separate',
     }
   }
   return {
@@ -65,6 +99,9 @@ function getInitialValues(niche?: TrendNiche | null): NicheFormValues {
     keywords: [],
     platforms: ['youtube'],
     monitoring_interval_hours: '6',
+    language: 'ru',
+    region: 'RU',
+    keyword_mode: 'separate',
   }
 }
 
@@ -72,6 +109,7 @@ export function NicheFormModal({ opened, onClose, workspaceId, niche }: NicheFor
   const isEdit = !!niche
   const createNiche = useCreateTrendNicheMutation(workspaceId)
   const updateNiche = useUpdateTrendNicheMutation(workspaceId)
+  const { data: integrationsStatus } = useIntegrationsStatusQuery(workspaceId)
 
   const form = useForm<NicheFormValues>({
     mode: 'uncontrolled',
@@ -92,9 +130,14 @@ export function NicheFormModal({ opened, onClose, workspaceId, niche }: NicheFor
     onClose()
   }
 
+  const selectedPlatforms = form.getValues().platforms ?? []
+  const hasInstagram = selectedPlatforms.includes('instagram')
+  const instagramNotConfigured = hasInstagram && integrationsStatus?.instagram?.configured === false
+
   const handleSubmit = form.onSubmit(async (values) => {
     const platforms = values.platforms as TrendPlatform[]
     const intervalHours = Number(values.monitoring_interval_hours)
+    const keywordMode = values.keyword_mode as TrendKeywordMode
 
     try {
       if (isEdit) {
@@ -105,6 +148,9 @@ export function NicheFormModal({ opened, onClose, workspaceId, niche }: NicheFor
             keywords: values.keywords,
             platforms,
             monitoring_interval_hours: intervalHours,
+            language: values.language,
+            region: values.region,
+            keyword_mode: keywordMode,
           },
         })
         notifications.show({
@@ -118,6 +164,9 @@ export function NicheFormModal({ opened, onClose, workspaceId, niche }: NicheFor
           keywords: values.keywords,
           platforms,
           monitoring_interval_hours: intervalHours,
+          language: values.language,
+          region: values.region,
+          keyword_mode: keywordMode,
         })
         notifications.show({
           title: 'Создано',
@@ -171,6 +220,41 @@ export function NicheFormModal({ opened, onClose, workspaceId, niche }: NicheFor
             key={form.key('platforms')}
             {...form.getInputProps('platforms')}
           />
+
+          {instagramNotConfigured && (
+            <Alert
+              variant="light"
+              color="yellow"
+              icon={<IconAlertTriangle size={16} />}
+            >
+              Instagram требует APIFY_API_KEY. Обратитесь к администратору для настройки.
+            </Alert>
+          )}
+
+          <Group grow>
+            <Select
+              label="Язык"
+              data={LANGUAGE_OPTIONS}
+              key={form.key('language')}
+              {...form.getInputProps('language')}
+            />
+            <Select
+              label="Регион"
+              data={REGION_OPTIONS}
+              key={form.key('region')}
+              {...form.getInputProps('region')}
+            />
+          </Group>
+
+          <div>
+            <Text size="sm" fw={500} mb={4}>Режим ключевых слов</Text>
+            <SegmentedControl
+              fullWidth
+              data={KEYWORD_MODE_OPTIONS}
+              key={form.key('keyword_mode')}
+              {...form.getInputProps('keyword_mode')}
+            />
+          </div>
 
           <Select
             label="Интервал мониторинга"

@@ -12,11 +12,12 @@ import {
   Pagination,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { IconRadar, IconFlame } from '@tabler/icons-react'
+import { IconRadar, IconFlame, IconCategory } from '@tabler/icons-react'
 import { useParams, useSearchParams, useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 import { useTrendsQuery, useTrendNichesQuery, useDiscoverNowMutation } from '@/api/hooks/useTrends'
-import type { TrendPlatform, TrendStage, TrendItem } from '@/api/types/trend'
+import type { TrendPlatform, TrendStage, TrendOrientation, TrendItem } from '@/api/types/trend'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { EmptyState } from '@/components/shared/EmptyState'
@@ -47,6 +48,7 @@ export default function TrendsPage() {
   const minViralScore = searchParams.get('min_viral_score')
     ? Number(searchParams.get('min_viral_score'))
     : null
+  const orientation = (searchParams.get('orientation') as TrendOrientation) || null
   const sortBy = searchParams.get('sort_by') || null
 
   const updateSearchParams = (updates: Record<string, string | null>) => {
@@ -81,6 +83,7 @@ export default function TrendsPage() {
     platform: effectivePlatform,
     niche_id: tab === 'my_niches' ? undefined : (nicheId ?? undefined),
     stage: stage ?? undefined,
+    orientation: orientation ?? undefined,
     min_viral_score: minViralScore ?? undefined,
     sort_by: sortBy ?? undefined,
   })
@@ -139,13 +142,23 @@ export default function TrendsPage() {
         <Title order={2} className={styles.pageTitle}>
           Тренды
         </Title>
-        <Button
-          leftSection={<IconRadar size={16} />}
-          onClick={handleDiscoverNow}
-          loading={discoverNow.isPending}
-        >
-          Обнаружить сейчас
-        </Button>
+        <Group gap="sm">
+          <Button
+            component={Link}
+            href={`/workspaces/${workspaceId}/trends/niches`}
+            variant="light"
+            leftSection={<IconCategory size={16} />}
+          >
+            Ниши
+          </Button>
+          <Button
+            leftSection={<IconRadar size={16} />}
+            onClick={handleDiscoverNow}
+            loading={discoverNow.isPending}
+          >
+            Обнаружить сейчас
+          </Button>
+        </Group>
       </Group>
 
       <Tabs value={tab} onChange={handleTabChange}>
@@ -162,6 +175,7 @@ export default function TrendsPage() {
       <TrendFilters
         nicheId={nicheId}
         stage={stage}
+        orientation={orientation}
         minViralScore={minViralScore}
         sortBy={sortBy}
         niches={activeNiches}
@@ -169,6 +183,7 @@ export default function TrendsPage() {
           updateSearchParams({ niche_id: v != null ? String(v) : null, page: null })
         }
         onStageChange={(v) => updateSearchParams({ stage: v, page: null })}
+        onOrientationChange={(v) => updateSearchParams({ orientation: v, page: null })}
         onMinViralScoreChange={(v) =>
           updateSearchParams({ min_viral_score: v != null ? String(v) : null, page: null })
         }

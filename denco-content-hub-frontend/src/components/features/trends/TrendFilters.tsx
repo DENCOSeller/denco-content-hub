@@ -2,16 +2,18 @@
 
 import { Group, Select, NumberInput } from '@mantine/core'
 
-import type { TrendStage, TrendNiche } from '@/api/types/trend'
+import type { TrendStage, TrendNiche, TrendOrientation } from '@/api/types/trend'
 
 interface TrendFiltersProps {
   nicheId: number | null
   stage: TrendStage | null
+  orientation: TrendOrientation | null
   minViralScore: number | null
   sortBy: string | null
   niches: TrendNiche[]
   onNicheChange: (value: number | null) => void
   onStageChange: (value: TrendStage | null) => void
+  onOrientationChange: (value: TrendOrientation | null) => void
   onMinViralScoreChange: (value: number | null) => void
   onSortByChange: (value: string | null) => void
 }
@@ -20,6 +22,12 @@ const STAGE_OPTIONS = [
   { value: 'rising', label: 'Растёт' },
   { value: 'peaking', label: 'Пик' },
   { value: 'declining', label: 'Спад' },
+]
+
+const ORIENTATION_OPTIONS = [
+  { value: 'shorts', label: 'Shorts' },
+  { value: 'long_video', label: 'Long Video' },
+  { value: 'reels', label: 'Reels' },
 ]
 
 const SORT_OPTIONS = [
@@ -32,11 +40,13 @@ const SORT_OPTIONS = [
 export function TrendFilters({
   nicheId,
   stage,
+  orientation,
   minViralScore,
   sortBy,
   niches,
   onNicheChange,
   onStageChange,
+  onOrientationChange,
   onMinViralScoreChange,
   onSortByChange,
 }: TrendFiltersProps) {
@@ -64,6 +74,15 @@ export function TrendFilters({
         clearable
         size="xs"
         w={130}
+      />
+      <Select
+        placeholder="Формат"
+        data={ORIENTATION_OPTIONS}
+        value={orientation}
+        onChange={(v) => onOrientationChange(v as TrendOrientation | null)}
+        clearable
+        size="xs"
+        w={140}
       />
       <NumberInput
         placeholder="Виральность от"

@@ -32,6 +32,8 @@ import {
   IconCalendar,
   IconSpy,
   IconFlame,
+  IconCategory,
+  IconBell,
 } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -128,7 +130,17 @@ export default function DashboardLayout({
         { href: `/workspaces/${workspaceId}/library`, label: 'Библиотека', icon: IconBooks, exact: false },
         { href: `/workspaces/${workspaceId}/content-plan`, label: 'Контент-план', icon: IconCalendar, exact: false },
         { href: `/workspaces/${workspaceId}/competitors`, label: 'Мониторинг', icon: IconSpy, exact: false },
-        { href: `/workspaces/${workspaceId}/trends`, label: 'Тренды', icon: IconFlame, exact: false },
+        {
+          href: `/workspaces/${workspaceId}/trends`,
+          label: 'Тренды',
+          icon: IconFlame,
+          exact: false,
+          children: [
+            { href: `/workspaces/${workspaceId}/trends`, label: 'Лента', icon: IconFlame },
+            { href: `/workspaces/${workspaceId}/trends/niches`, label: 'Ниши', icon: IconCategory },
+            { href: `/workspaces/${workspaceId}/trends/alerts`, label: 'Алерты', icon: IconBell },
+          ],
+        },
         { href: `/workspaces/${workspaceId}/settings`, label: 'Настройки', icon: IconSettings, exact: false },
       ]
     : []
@@ -255,25 +267,57 @@ export default function DashboardLayout({
             <Text className={styles.navSection} mb={6}>
               {activeWorkspace?.name ?? 'Воркспейс'}
             </Text>
-            {workspaceLinks.map((link) => (
-              <NavLink
-                key={link.href}
-                component={Link}
-                href={link.href}
-                label={link.label}
-                leftSection={
-                  <link.icon size={20} style={{ color: 'var(--neon-blue)' }} />
-                }
-                active={
-                  link.exact
-                    ? pathname === link.href
-                    : pathname.startsWith(link.href)
-                }
-                className={styles.navLink}
-                color="neonBlue"
-                variant="light"
-              />
-            ))}
+            {workspaceLinks.map((link) =>
+              link.children ? (
+                <NavLink
+                  key={link.href}
+                  label={link.label}
+                  leftSection={
+                    <link.icon size={20} style={{ color: 'var(--neon-blue)' }} />
+                  }
+                  active={pathname.startsWith(link.href)}
+                  defaultOpened={pathname.startsWith(link.href)}
+                  className={styles.navLink}
+                  color="neonBlue"
+                  variant="light"
+                  childrenOffset={28}
+                >
+                  {link.children.map((child) => (
+                    <NavLink
+                      key={child.href}
+                      component={Link}
+                      href={child.href}
+                      label={child.label}
+                      leftSection={
+                        <child.icon size={16} style={{ color: 'var(--neon-blue)' }} />
+                      }
+                      active={pathname === child.href}
+                      className={styles.navLink}
+                      color="neonBlue"
+                      variant="light"
+                    />
+                  ))}
+                </NavLink>
+              ) : (
+                <NavLink
+                  key={link.href}
+                  component={Link}
+                  href={link.href}
+                  label={link.label}
+                  leftSection={
+                    <link.icon size={20} style={{ color: 'var(--neon-blue)' }} />
+                  }
+                  active={
+                    link.exact
+                      ? pathname === link.href
+                      : pathname.startsWith(link.href)
+                  }
+                  className={styles.navLink}
+                  color="neonBlue"
+                  variant="light"
+                />
+              ),
+            )}
           </Stack>
         ) : isInCompany ? (
           <Stack gap={4}>

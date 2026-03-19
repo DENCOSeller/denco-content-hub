@@ -42,6 +42,12 @@
   right: 8px;
 }
 
+.orientationBadge {
+  position: absolute;
+  top: 34px;
+  right: 8px;
+}
+
 .viralHigh {
   color: var(--mantine-color-green-5);
 }

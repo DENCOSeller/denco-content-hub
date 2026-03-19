@@ -17,6 +17,8 @@ import {
   IconPencil,
   IconTrash,
   IconClock,
+  IconLanguage,
+  IconMapPin,
 } from '@tabler/icons-react'
 
 import type { TrendNiche, TrendPlatform } from '@/api/types/trend'
@@ -144,6 +146,26 @@ export function NicheCard({ niche, workspaceId, onEdit }: NicheCardProps) {
               {kw}
             </Badge>
           ))}
+        </Group>
+
+        <Group gap={4} wrap="wrap">
+          {niche.language && (
+            <Badge size="xs" variant="light" color="teal" leftSection={<IconLanguage size={10} />}>
+              {niche.language.toUpperCase()}
+            </Badge>
+          )}
+          {niche.region && (
+            <Badge size="xs" variant="light" color="cyan" leftSection={<IconMapPin size={10} />}>
+              {niche.region}
+            </Badge>
+          )}
+          <Badge
+            size="xs"
+            variant="light"
+            color={niche.keyword_mode === 'combined' ? 'orange' : 'gray'}
+          >
+            {niche.keyword_mode === 'combined' ? 'AND' : 'OR'}
+          </Badge>
         </Group>
 
         <Group gap="xs">

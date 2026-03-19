@@ -17,6 +17,7 @@ import type {
   TrendAlertFilters,
   TaskAccepted,
   PaginatedResponse,
+  IntegrationsStatusResponse,
 } from '@/api/types/trend'
 import type { IntelligenceResponse } from '@/api/types/intelligence'
 
@@ -62,13 +63,14 @@ export function useTrendsQuery(
     platform,
     niche_id,
     stage,
+    orientation,
     min_viral_score,
     sort_by,
   } = filters
 
   return useQuery({
     queryKey: trendKeys.list(workspaceId, {
-      page, size, platform, niche_id, stage, min_viral_score, sort_by,
+      page, size, platform, niche_id, stage, orientation, min_viral_score, sort_by,
     }),
     queryFn: async () => {
       const { data } = await client.get<PaginatedResponse<TrendItem>, unknown, true>({
@@ -80,6 +82,7 @@ export function useTrendsQuery(
           ...(platform ? { platform } : {}),
           ...(niche_id != null ? { niche_id } : {}),
           ...(stage ? { stage } : {}),
+          ...(orientation ? { orientation } : {}),
           ...(min_viral_score != null ? { min_viral_score } : {}),
           ...(sort_by ? { sort_by } : {}),
         },
@@ -396,6 +399,21 @@ export function useAnalyzeTrendMutation(workspaceId: number) {
         queryKey: trendKeys.detail(workspaceId, trendId),
       })
     },
+  })
+}
+
+export function useIntegrationsStatusQuery(workspaceId: number) {
+  return useQuery({
+    queryKey: ['integrations', workspaceId, 'status'],
+    queryFn: async () => {
+      const { data } = await client.get<IntegrationsStatusResponse, unknown, true>({
+        url: '/api/v1/integrations/status',
+        throwOnError: true,
+      })
+      return data
+    },
+    enabled: !!workspaceId,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
