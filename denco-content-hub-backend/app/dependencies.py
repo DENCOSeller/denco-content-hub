@@ -32,6 +32,19 @@ logger = structlog.get_logger()
 
 security_scheme = HTTPBearer()
 
+# --- JWT magic string constants ---
+
+_DEFAULT_ORG_ROLE = "org_member"
+_DEFAULT_COMPANY_ROLE = CompanyRole.MEMBER
+
+
+class JWTPlatformRole:
+    """Значения platform_role из JWT Staff Service."""
+
+    SUPER_ADMIN = "super_admin"
+    PLATFORM_ADMIN = "platform_admin"
+    PLATFORM_STAFF = "platform_staff"
+
 
 def _make_synthetic_viewer(user_id: int, workspace_id: int) -> WorkspaceMember:
     """Create a synthetic VIEWER member for platform owner read-only access."""
@@ -82,7 +95,7 @@ async def _sync_org_memberships(
 
         staff_org_id: int = int(org["org_id"])
         org_slug: str = org.get("org_slug", "")
-        org_role_str: str = org.get("org_role", "org_member")
+        org_role_str: str = org.get("org_role", _DEFAULT_ORG_ROLE)
 
         # Find company by staff_org_id first, then by slug
         company = await company_repo.get_by_staff_org_id(staff_org_id)
@@ -110,7 +123,7 @@ async def _sync_org_memberships(
             )
 
         # Sync membership
-        target_role = _ORG_ROLE_MAP.get(org_role_str, CompanyRole.MEMBER)
+        target_role = _ORG_ROLE_MAP.get(org_role_str, _DEFAULT_COMPANY_ROLE)
         membership = await member_repo.get_membership(company.id, user.id)
         if not membership:
             await member_repo.add_member(company.id, user.id, target_role)
@@ -179,7 +192,7 @@ async def _resolve_sso_user(payload: dict, db: AsyncSession) -> User:
     # Sync platform_role from JWT v2
     if platform_role is not None:
         user.platform_role = platform_role
-        user.is_platform_owner = platform_role == "super_admin"
+        user.is_platform_owner = platform_role == JWTPlatformRole.SUPER_ADMIN
         await db.flush()
 
     # Sync organizations from JWT v2
@@ -256,7 +269,11 @@ async def require_platform_owner(
     return current_user
 
 
-_PLATFORM_STAFF_ROLES = ("super_admin", "platform_admin", "platform_staff")
+_PLATFORM_STAFF_ROLES = (
+    JWTPlatformRole.SUPER_ADMIN,
+    JWTPlatformRole.PLATFORM_ADMIN,
+    JWTPlatformRole.PLATFORM_STAFF,
+)
 
 
 async def require_platform_staff(
