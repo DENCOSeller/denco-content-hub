@@ -50,7 +50,7 @@ _ORG_ROLE_MAP: dict[str, CompanyRole] = {
     "org_owner": CompanyRole.OWNER,
     "org_admin": CompanyRole.ADMIN,
     "org_member": CompanyRole.MEMBER,
-    "org_viewer": CompanyRole.MEMBER,
+    "org_viewer": CompanyRole.VIEWER,
 }
 
 

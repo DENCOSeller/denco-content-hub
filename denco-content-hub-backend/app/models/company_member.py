@@ -12,6 +12,7 @@ class CompanyRole(enum.StrEnum):
     OWNER = "owner"
     ADMIN = "admin"
     MEMBER = "member"
+    VIEWER = "viewer"
 
 
 class CompanyMember(Base, TimestampMixin):
