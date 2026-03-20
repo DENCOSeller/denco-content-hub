@@ -25,6 +25,7 @@ class PlatformUserResponse(BaseModel):
     name: str
     is_active: bool
     is_platform_owner: bool
+    platform_role: str | None = None
     workspaces_count: int
     created_at: datetime
 

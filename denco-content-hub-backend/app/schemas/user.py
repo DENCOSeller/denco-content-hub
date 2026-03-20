@@ -9,6 +9,7 @@ class UserResponse(BaseModel):
     name: str
     is_active: bool
     is_platform_owner: bool
+    platform_role: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

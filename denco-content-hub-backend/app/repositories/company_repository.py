@@ -20,6 +20,11 @@ class CompanyRepository(BaseRepository[Company]):
     def __init__(self, db: AsyncSession) -> None:
         super().__init__(Company, db)
 
+    async def get_by_staff_org_id(self, staff_org_id: int) -> Company | None:
+        query = self._base_query().where(Company.staff_org_id == staff_org_id)
+        result = await self.db.execute(query)
+        return result.scalar_one_or_none()
+
     async def get_by_slug(self, slug: str) -> Company | None:
         query = self._base_query().where(Company.slug == slug)
         result = await self.db.execute(query)

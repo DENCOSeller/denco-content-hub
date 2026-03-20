@@ -1,4 +1,4 @@
-from sqlalchemy import Index, String, text
+from sqlalchemy import Index, Integer, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, SoftDeleteMixin, TimestampMixin
@@ -13,6 +13,17 @@ class User(Base, TimestampMixin, SoftDeleteMixin):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     is_platform_owner: Mapped[bool] = mapped_column(default=False, nullable=False)
+    platform_role: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+        default=None,
+    )
+    staff_employee_id: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        unique=True,
+        default=None,
+    )
 
     __table_args__ = (
         Index(

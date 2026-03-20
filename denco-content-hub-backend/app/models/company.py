@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Index, String, text
+from sqlalchemy import Index, Integer, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, SoftDeleteMixin, TimestampMixin
@@ -13,6 +13,12 @@ class Company(Base, TimestampMixin, SoftDeleteMixin):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     is_default: Mapped[bool] = mapped_column(default=False, nullable=False)
+    staff_org_id: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        unique=True,
+        default=None,
+    )
 
     workspaces: Mapped[list[Workspace]] = relationship(back_populates="company")  # noqa: F821
 
