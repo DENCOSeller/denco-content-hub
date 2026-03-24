@@ -8,7 +8,7 @@ import { PageHeader } from '@denco/ui'
 import { useOrganizationStore } from '@/stores/organization-store'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { LoadingState } from '@/components/shared/LoadingState'
-import { useSetAiPageContext } from '@/contexts/AiPageContext'
+import { useSetAiPageContext } from '@/stores/ai-page-store'
 
 const KnowledgeGraph = dynamic(
   () => import('@/components/knowledge/KnowledgeGraph').then((m) => m.KnowledgeGraph),

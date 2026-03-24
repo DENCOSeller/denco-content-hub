@@ -9,7 +9,7 @@ import { useAiChat } from '@/hooks/useAiChat'
 import { AiChatMessageItem, AiStreamingMessage } from '@/components/ai/AiChatMessage'
 import { AiChatInput } from '@/components/ai/AiChatInput'
 import type { AttachedFile } from '@/components/ai/AiChatInput'
-import type { AiPageContext } from '@/contexts/AiPageContext'
+import type { AiPageContext } from '@/stores/ai-page-store'
 import { useUpdateLibraryItemMutation } from '@/api/hooks/useLibrary'
 
 import styles from './content-block-ai-panel.module.css'

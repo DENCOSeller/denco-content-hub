@@ -13,7 +13,7 @@ import { DeleteWorkspaceModal } from '@/components/features/workspace/DeleteWork
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { EmptyState } from '@/components/shared/EmptyState'
-import { useSetAiPageContext } from '@/contexts/AiPageContext'
+import { useSetAiPageContext } from '@/stores/ai-page-store'
 import type { WorkspaceResponse } from '@/api/client/types.gen'
 
 import styles from '../dashboard.module.css'

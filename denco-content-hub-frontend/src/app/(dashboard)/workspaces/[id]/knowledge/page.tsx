@@ -7,7 +7,7 @@ import { Stack, Title } from '@mantine/core'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { LoadingState } from '@/components/shared/LoadingState'
-import { useSetAiPageContext } from '@/contexts/AiPageContext'
+import { useSetAiPageContext } from '@/stores/ai-page-store'
 
 const KnowledgeGraph = dynamic(
   () => import('@/components/knowledge/KnowledgeGraph').then((m) => m.KnowledgeGraph),

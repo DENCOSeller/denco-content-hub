@@ -6,8 +6,8 @@ import { IconX, IconSparkles, IconMapPin, IconHistory, IconUpload } from '@table
 
 import { useAiPanelStore, MIN_PANEL_WIDTH, MAX_PANEL_WIDTH } from '@/stores/ai-panel-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
-import { useAiPageContext } from '@/contexts/AiPageContext'
-import type { AiPageContext } from '@/contexts/AiPageContext'
+import { useAiPageContext } from '@/stores/ai-page-store'
+import type { AiPageContext } from '@/stores/ai-page-store'
 import { useAiChat } from '@/hooks/useAiChat'
 import { useAiActions } from '@/hooks/useAiActions'
 import type { AttachedFile, AiChatInputHandle } from './AiChatInput'

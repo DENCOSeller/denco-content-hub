@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { pluralize } from '@/utils/pluralize'
 import { useOrganizationStore } from '@/stores/organization-store'
-import { useSetAiPageContext } from '@/contexts/AiPageContext'
+import { useSetAiPageContext } from '@/stores/ai-page-store'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { LoadingState } from '@/components/shared/LoadingState'
 

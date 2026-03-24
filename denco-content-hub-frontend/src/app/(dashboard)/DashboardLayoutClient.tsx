@@ -55,7 +55,6 @@ import { OrgMismatchNotification } from '@/components/features/organization/OrgM
 import { useAiPanelStore } from '@/stores/ai-panel-store'
 import { NotificationBell } from '@/components/features/competitors/NotificationBell'
 import { AiAssistantPanel } from '@/components/ai/AiAssistantPanel'
-import { AiPageContextProvider } from '@/contexts/AiPageContext'
 import styles from './dashboard.module.css'
 
 const SIDEBAR_COLLAPSED_KEY = 'denco-ch-sidebar-collapsed'
@@ -299,7 +298,6 @@ export function DashboardLayoutClient({
   }
 
   return (
-    <AiPageContextProvider>
     <AppShell
       header={{ height: 52 }}
       navbar={{
@@ -591,6 +589,5 @@ export function DashboardLayoutClient({
       )}
       <OrgMismatchNotification />
     </AppShell>
-    </AiPageContextProvider>
   )
 }

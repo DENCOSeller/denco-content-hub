@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 
 import { useCompetitorsQuery } from '@/api/hooks/useCompetitors'
 import { useWorkspaceStore } from '@/stores/workspace-store'
-import { useSetAiPageContext } from '@/contexts/AiPageContext'
+import { useSetAiPageContext } from '@/stores/ai-page-store'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'

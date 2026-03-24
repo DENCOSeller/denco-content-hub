@@ -11,7 +11,7 @@ import type { AttachedFile } from '@/components/ai/AiChatInput'
 import { AiChatInput } from '@/components/ai/AiChatInput'
 import { AiChatMessageItem, AiStreamingMessage } from '@/components/ai/AiChatMessage'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
-import type { AiPageContext } from '@/contexts/AiPageContext'
+import type { AiPageContext } from '@/stores/ai-page-store'
 import styles from './NodeAiChat.module.css'
 
 interface NodeAiChatProps {

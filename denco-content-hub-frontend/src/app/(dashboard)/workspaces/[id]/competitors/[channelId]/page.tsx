@@ -29,7 +29,7 @@ import {
   useSyncCompetitorMutation,
 } from '@/api/hooks/useCompetitors'
 import { useWorkspaceStore } from '@/stores/workspace-store'
-import { useSetAiPageContext } from '@/contexts/AiPageContext'
+import { useSetAiPageContext } from '@/stores/ai-page-store'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { EmptyState } from '@/components/shared/EmptyState'

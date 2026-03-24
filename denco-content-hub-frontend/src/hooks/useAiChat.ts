@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react'
 import { getAccessToken } from '@/lib/auth'
 import { useWorkspaceStore } from '@/stores/workspace-store'
-import type { AiPageContext } from '@/contexts/AiPageContext'
+import type { AiPageContext } from '@/stores/ai-page-store'
 import type { AttachedFile } from '@/components/ai/AiChatInput'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
