@@ -30,13 +30,23 @@ export default function CompetitorsPage() {
   const { data, isLoading, isError, refetch } = useCompetitorsQuery(workspaceId)
 
   const breadcrumbs = [
-    { label: activeWorkspace?.company_name ?? '', href: '/' },
+    { label: activeWorkspace?.company_name ?? '' },
     { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
     { label: 'Мониторинг' },
   ]
 
-  if (isLoading) return <LoadingState message="Загрузка каналов..." />
-  if (isError) return <ErrorState onRetry={refetch} />
+  if (isLoading) return (
+    <Stack>
+      <AppBreadcrumbs items={breadcrumbs} />
+      <LoadingState message="Загрузка каналов..." />
+    </Stack>
+  )
+  if (isError) return (
+    <Stack>
+      <AppBreadcrumbs items={breadcrumbs} />
+      <ErrorState onRetry={refetch} />
+    </Stack>
+  )
 
   return (
     <Stack>

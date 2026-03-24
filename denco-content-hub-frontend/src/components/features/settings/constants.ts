@@ -10,7 +10,7 @@ export const roleLabelMap: Record<WorkspaceRole, string> = {
 }
 
 export const roleColorMap: Record<WorkspaceRole, string> = {
-  owner: 'neonBlue',
+  owner: 'contentHubTeal',
   admin: 'violet',
   editor: 'green',
   viewer: 'gray',

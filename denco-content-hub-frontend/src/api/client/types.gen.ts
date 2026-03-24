@@ -148,9 +148,9 @@ export type ChatMessageResponse = {
 };
 
 /**
- * CompanyCreate
+ * OrganizationCreate
  */
-export type CompanyCreate = {
+export type OrganizationCreate = {
     /**
      * Name
      */
@@ -158,9 +158,9 @@ export type CompanyCreate = {
 };
 
 /**
- * CompanyDetailResponse
+ * OrganizationDetailResponse
  */
-export type CompanyDetailResponse = {
+export type OrganizationDetailResponse = {
     /**
      * Id
      */
@@ -196,9 +196,9 @@ export type CompanyDetailResponse = {
 };
 
 /**
- * CompanyMemberCreate
+ * OrganizationMemberCreate
  */
-export type CompanyMemberCreate = {
+export type OrganizationMemberCreate = {
     /**
      * User Id
      */
@@ -207,9 +207,9 @@ export type CompanyMemberCreate = {
 };
 
 /**
- * CompanyMemberResponse
+ * OrganizationMemberResponse
  */
-export type CompanyMemberResponse = {
+export type OrganizationMemberResponse = {
     /**
      * Id
      */
@@ -217,7 +217,7 @@ export type CompanyMemberResponse = {
     /**
      * Company Id
      */
-    company_id: number;
+    organization_id: number;
     /**
      * User Id
      */
@@ -238,16 +238,16 @@ export type CompanyMemberResponse = {
 };
 
 /**
- * CompanyMemberUpdate
+ * OrganizationMemberUpdate
  */
-export type CompanyMemberUpdate = {
+export type OrganizationMemberUpdate = {
     role: CompanyRole;
 };
 
 /**
- * CompanyResponse
+ * OrganizationResponse
  */
-export type CompanyResponse = {
+export type OrganizationResponse = {
     /**
      * Id
      */
@@ -276,9 +276,9 @@ export type CompanyResponse = {
 export type CompanyRole = 'owner' | 'admin' | 'member';
 
 /**
- * CompanyUpdate
+ * OrganizationUpdate
  */
-export type CompanyUpdate = {
+export type OrganizationUpdate = {
     /**
      * Name
      */
@@ -1358,7 +1358,7 @@ export type KgEdgeTypeDefResponse = {
     /**
      * Company Id
      */
-    company_id?: number | null;
+    organization_id?: number | null;
 };
 
 /**
@@ -1434,7 +1434,7 @@ export type KgNodeTypeDefResponse = {
     /**
      * Company Id
      */
-    company_id?: number | null;
+    organization_id?: number | null;
 };
 
 /**
@@ -1712,7 +1712,7 @@ export type KnowledgeNodeResponse = {
     /**
      * Company Id
      */
-    company_id?: number | null;
+    organization_id?: number | null;
     /**
      * Workspace Id
      */
@@ -2138,13 +2138,13 @@ export type NodePositionUpdate = {
 };
 
 /**
- * PaginatedResponse[CompanyMemberResponse]
+ * PaginatedResponse[OrganizationMemberResponse]
  */
-export type PaginatedResponseCompanyMemberResponse = {
+export type PaginatedResponseOrganizationMemberResponse = {
     /**
      * Items
      */
-    items: Array<CompanyMemberResponse>;
+    items: Array<OrganizationMemberResponse>;
     /**
      * Total
      */
@@ -2164,13 +2164,13 @@ export type PaginatedResponseCompanyMemberResponse = {
 };
 
 /**
- * PaginatedResponse[CompanyResponse]
+ * PaginatedResponse[OrganizationResponse]
  */
-export type PaginatedResponseCompanyResponse = {
+export type PaginatedResponseOrganizationResponse = {
     /**
      * Items
      */
-    items: Array<CompanyResponse>;
+    items: Array<OrganizationResponse>;
     /**
      * Total
      */
@@ -2601,7 +2601,7 @@ export type PlatformWorkspaceResponse = {
     /**
      * Company Id
      */
-    company_id: number;
+    organization_id: number;
     /**
      * Company Name
      */
@@ -3543,7 +3543,7 @@ export type WorkspaceCreate = {
     /**
      * Company Id
      */
-    company_id?: number | null;
+    organization_id?: number | null;
 };
 
 /**
@@ -3597,7 +3597,7 @@ export type WorkspaceResponse = {
     /**
      * Company Id
      */
-    company_id: number;
+    organization_id: number;
     /**
      * Company Name
      */
@@ -4914,7 +4914,7 @@ export type ListWorkspacesApiV1PlatformWorkspacesGetData = {
          *
          * Filter by company
          */
-        company_id?: number | null;
+        organization_id?: number | null;
     };
     url: '/api/v1/platform/workspaces';
 };
@@ -5059,7 +5059,7 @@ export type ListUsersApiV1PlatformUsersGetResponses = {
 
 export type ListUsersApiV1PlatformUsersGetResponse = ListUsersApiV1PlatformUsersGetResponses[keyof ListUsersApiV1PlatformUsersGetResponses];
 
-export type ListCompaniesApiV1PlatformCompaniesGetData = {
+export type ListCompaniesApiV1PlatformOrganizationsGetData = {
     body?: never;
     path?: never;
     query?: {
@@ -5076,10 +5076,10 @@ export type ListCompaniesApiV1PlatformCompaniesGetData = {
          */
         search?: string | null;
     };
-    url: '/api/v1/platform/companies';
+    url: '/api/v1/platform/organizations';
 };
 
-export type ListCompaniesApiV1PlatformCompaniesGetErrors = {
+export type ListCompaniesApiV1PlatformOrganizationsGetErrors = {
     /**
      * Not a platform owner
      */
@@ -5090,25 +5090,25 @@ export type ListCompaniesApiV1PlatformCompaniesGetErrors = {
     422: HttpValidationError;
 };
 
-export type ListCompaniesApiV1PlatformCompaniesGetError = ListCompaniesApiV1PlatformCompaniesGetErrors[keyof ListCompaniesApiV1PlatformCompaniesGetErrors];
+export type ListCompaniesApiV1PlatformOrganizationsGetError = ListCompaniesApiV1PlatformOrganizationsGetErrors[keyof ListCompaniesApiV1PlatformOrganizationsGetErrors];
 
-export type ListCompaniesApiV1PlatformCompaniesGetResponses = {
+export type ListCompaniesApiV1PlatformOrganizationsGetResponses = {
     /**
      * Successful Response
      */
-    200: PaginatedResponseCompanyResponse;
+    200: PaginatedResponseOrganizationResponse;
 };
 
-export type ListCompaniesApiV1PlatformCompaniesGetResponse = ListCompaniesApiV1PlatformCompaniesGetResponses[keyof ListCompaniesApiV1PlatformCompaniesGetResponses];
+export type ListCompaniesApiV1PlatformOrganizationsGetResponse = ListCompaniesApiV1PlatformOrganizationsGetResponses[keyof ListCompaniesApiV1PlatformOrganizationsGetResponses];
 
-export type CreateCompanyApiV1PlatformCompaniesPostData = {
-    body: CompanyCreate;
+export type CreateCompanyApiV1PlatformOrganizationsPostData = {
+    body: OrganizationCreate;
     path?: never;
     query?: never;
-    url: '/api/v1/platform/companies';
+    url: '/api/v1/platform/organizations';
 };
 
-export type CreateCompanyApiV1PlatformCompaniesPostErrors = {
+export type CreateCompanyApiV1PlatformOrganizationsPostErrors = {
     /**
      * Not a platform owner
      */
@@ -5123,30 +5123,30 @@ export type CreateCompanyApiV1PlatformCompaniesPostErrors = {
     422: HttpValidationError;
 };
 
-export type CreateCompanyApiV1PlatformCompaniesPostError = CreateCompanyApiV1PlatformCompaniesPostErrors[keyof CreateCompanyApiV1PlatformCompaniesPostErrors];
+export type CreateCompanyApiV1PlatformOrganizationsPostError = CreateCompanyApiV1PlatformOrganizationsPostErrors[keyof CreateCompanyApiV1PlatformOrganizationsPostErrors];
 
-export type CreateCompanyApiV1PlatformCompaniesPostResponses = {
+export type CreateCompanyApiV1PlatformOrganizationsPostResponses = {
     /**
      * Successful Response
      */
-    201: CompanyResponse;
+    201: OrganizationResponse;
 };
 
-export type CreateCompanyApiV1PlatformCompaniesPostResponse = CreateCompanyApiV1PlatformCompaniesPostResponses[keyof CreateCompanyApiV1PlatformCompaniesPostResponses];
+export type CreateCompanyApiV1PlatformOrganizationsPostResponse = CreateCompanyApiV1PlatformOrganizationsPostResponses[keyof CreateCompanyApiV1PlatformOrganizationsPostResponses];
 
-export type DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteData = {
+export type DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/platform/companies/{company_id}';
+    url: '/api/v1/platform/organizations/{organization_id}';
 };
 
-export type DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteErrors = {
+export type DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteErrors = {
     /**
      * Not a platform owner or cannot delete
      */
@@ -5161,30 +5161,30 @@ export type DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteErrors = {
     422: HttpValidationError;
 };
 
-export type DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteError = DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteErrors[keyof DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteErrors];
+export type DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteError = DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteErrors[keyof DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteErrors];
 
-export type DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteResponses = {
+export type DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteResponse = DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteResponses[keyof DeleteCompanyApiV1PlatformCompaniesCompanyIdDeleteResponses];
+export type DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteResponse = DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteResponses[keyof DeleteCompanyApiV1PlatformOrganizationsOrganizationIdDeleteResponses];
 
-export type GetCompanyApiV1PlatformCompaniesCompanyIdGetData = {
+export type GetCompanyApiV1PlatformOrganizationsOrganizationIdGetData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/platform/companies/{company_id}';
+    url: '/api/v1/platform/organizations/{organization_id}';
 };
 
-export type GetCompanyApiV1PlatformCompaniesCompanyIdGetErrors = {
+export type GetCompanyApiV1PlatformOrganizationsOrganizationIdGetErrors = {
     /**
      * Not a platform owner
      */
@@ -5199,30 +5199,30 @@ export type GetCompanyApiV1PlatformCompaniesCompanyIdGetErrors = {
     422: HttpValidationError;
 };
 
-export type GetCompanyApiV1PlatformCompaniesCompanyIdGetError = GetCompanyApiV1PlatformCompaniesCompanyIdGetErrors[keyof GetCompanyApiV1PlatformCompaniesCompanyIdGetErrors];
+export type GetCompanyApiV1PlatformOrganizationsOrganizationIdGetError = GetCompanyApiV1PlatformOrganizationsOrganizationIdGetErrors[keyof GetCompanyApiV1PlatformOrganizationsOrganizationIdGetErrors];
 
-export type GetCompanyApiV1PlatformCompaniesCompanyIdGetResponses = {
+export type GetCompanyApiV1PlatformOrganizationsOrganizationIdGetResponses = {
     /**
      * Successful Response
      */
-    200: CompanyDetailResponse;
+    200: OrganizationDetailResponse;
 };
 
-export type GetCompanyApiV1PlatformCompaniesCompanyIdGetResponse = GetCompanyApiV1PlatformCompaniesCompanyIdGetResponses[keyof GetCompanyApiV1PlatformCompaniesCompanyIdGetResponses];
+export type GetCompanyApiV1PlatformOrganizationsOrganizationIdGetResponse = GetCompanyApiV1PlatformOrganizationsOrganizationIdGetResponses[keyof GetCompanyApiV1PlatformOrganizationsOrganizationIdGetResponses];
 
-export type UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchData = {
-    body: CompanyUpdate;
+export type UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchData = {
+    body: OrganizationUpdate;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/platform/companies/{company_id}';
+    url: '/api/v1/platform/organizations/{organization_id}';
 };
 
-export type UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchErrors = {
+export type UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchErrors = {
     /**
      * Not a platform owner
      */
@@ -5237,24 +5237,24 @@ export type UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchErrors = {
     422: HttpValidationError;
 };
 
-export type UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchError = UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchErrors[keyof UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchErrors];
+export type UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchError = UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchErrors[keyof UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchErrors];
 
-export type UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchResponses = {
+export type UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchResponses = {
     /**
      * Successful Response
      */
-    200: CompanyResponse;
+    200: OrganizationResponse;
 };
 
-export type UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchResponse = UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchResponses[keyof UpdateCompanyApiV1PlatformCompaniesCompanyIdPatchResponses];
+export type UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchResponse = UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchResponses[keyof UpdateCompanyApiV1PlatformOrganizationsOrganizationIdPatchResponses];
 
-export type ListMembersApiV1CompaniesCompanyIdMembersGetData = {
+export type ListMembersApiV1OrganizationsOrganizationIdMembersGetData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: {
         /**
@@ -5266,10 +5266,10 @@ export type ListMembersApiV1CompaniesCompanyIdMembersGetData = {
          */
         size?: number;
     };
-    url: '/api/v1/companies/{company_id}/members';
+    url: '/api/v1/organizations/{organization_id}/members';
 };
 
-export type ListMembersApiV1CompaniesCompanyIdMembersGetErrors = {
+export type ListMembersApiV1OrganizationsOrganizationIdMembersGetErrors = {
     /**
      * Not a company member
      */
@@ -5280,30 +5280,30 @@ export type ListMembersApiV1CompaniesCompanyIdMembersGetErrors = {
     422: HttpValidationError;
 };
 
-export type ListMembersApiV1CompaniesCompanyIdMembersGetError = ListMembersApiV1CompaniesCompanyIdMembersGetErrors[keyof ListMembersApiV1CompaniesCompanyIdMembersGetErrors];
+export type ListMembersApiV1OrganizationsOrganizationIdMembersGetError = ListMembersApiV1OrganizationsOrganizationIdMembersGetErrors[keyof ListMembersApiV1OrganizationsOrganizationIdMembersGetErrors];
 
-export type ListMembersApiV1CompaniesCompanyIdMembersGetResponses = {
+export type ListMembersApiV1OrganizationsOrganizationIdMembersGetResponses = {
     /**
      * Successful Response
      */
-    200: PaginatedResponseCompanyMemberResponse;
+    200: PaginatedResponseOrganizationMemberResponse;
 };
 
-export type ListMembersApiV1CompaniesCompanyIdMembersGetResponse = ListMembersApiV1CompaniesCompanyIdMembersGetResponses[keyof ListMembersApiV1CompaniesCompanyIdMembersGetResponses];
+export type ListMembersApiV1OrganizationsOrganizationIdMembersGetResponse = ListMembersApiV1OrganizationsOrganizationIdMembersGetResponses[keyof ListMembersApiV1OrganizationsOrganizationIdMembersGetResponses];
 
-export type AddMemberApiV1CompaniesCompanyIdMembersPostData = {
-    body: CompanyMemberCreate;
+export type AddMemberApiV1OrganizationsOrganizationIdMembersPostData = {
+    body: OrganizationMemberCreate;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/members';
+    url: '/api/v1/organizations/{organization_id}/members';
 };
 
-export type AddMemberApiV1CompaniesCompanyIdMembersPostErrors = {
+export type AddMemberApiV1OrganizationsOrganizationIdMembersPostErrors = {
     /**
      * Insufficient permissions
      */
@@ -5322,34 +5322,34 @@ export type AddMemberApiV1CompaniesCompanyIdMembersPostErrors = {
     422: HttpValidationError;
 };
 
-export type AddMemberApiV1CompaniesCompanyIdMembersPostError = AddMemberApiV1CompaniesCompanyIdMembersPostErrors[keyof AddMemberApiV1CompaniesCompanyIdMembersPostErrors];
+export type AddMemberApiV1OrganizationsOrganizationIdMembersPostError = AddMemberApiV1OrganizationsOrganizationIdMembersPostErrors[keyof AddMemberApiV1OrganizationsOrganizationIdMembersPostErrors];
 
-export type AddMemberApiV1CompaniesCompanyIdMembersPostResponses = {
+export type AddMemberApiV1OrganizationsOrganizationIdMembersPostResponses = {
     /**
      * Successful Response
      */
-    201: CompanyMemberResponse;
+    201: OrganizationMemberResponse;
 };
 
-export type AddMemberApiV1CompaniesCompanyIdMembersPostResponse = AddMemberApiV1CompaniesCompanyIdMembersPostResponses[keyof AddMemberApiV1CompaniesCompanyIdMembersPostResponses];
+export type AddMemberApiV1OrganizationsOrganizationIdMembersPostResponse = AddMemberApiV1OrganizationsOrganizationIdMembersPostResponses[keyof AddMemberApiV1OrganizationsOrganizationIdMembersPostResponses];
 
-export type RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteData = {
+export type RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
         /**
          * Member Id
          */
         member_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/members/{member_id}';
+    url: '/api/v1/organizations/{organization_id}/members/{member_id}';
 };
 
-export type RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteErrors = {
+export type RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteErrors = {
     /**
      * Insufficient permissions
      */
@@ -5364,34 +5364,34 @@ export type RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteErrors = {
     422: HttpValidationError;
 };
 
-export type RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteError = RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteErrors[keyof RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteErrors];
+export type RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteError = RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteErrors[keyof RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteErrors];
 
-export type RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteResponses = {
+export type RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteResponse = RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteResponses[keyof RemoveMemberApiV1CompaniesCompanyIdMembersMemberIdDeleteResponses];
+export type RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteResponse = RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteResponses[keyof RemoveMemberApiV1OrganizationsOrganizationIdMembersMemberIdDeleteResponses];
 
-export type UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchData = {
-    body: CompanyMemberUpdate;
+export type UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchData = {
+    body: OrganizationMemberUpdate;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
         /**
          * Member Id
          */
         member_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/members/{member_id}';
+    url: '/api/v1/organizations/{organization_id}/members/{member_id}';
 };
 
-export type UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchErrors = {
+export type UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchErrors = {
     /**
      * Insufficient permissions
      */
@@ -5406,16 +5406,16 @@ export type UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchErrors = 
     422: HttpValidationError;
 };
 
-export type UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchError = UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchErrors[keyof UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchErrors];
+export type UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchError = UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchErrors[keyof UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchErrors];
 
-export type UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchResponses = {
+export type UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchResponses = {
     /**
      * Successful Response
      */
-    200: CompanyMemberResponse;
+    200: OrganizationMemberResponse;
 };
 
-export type UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchResponse = UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchResponses[keyof UpdateMemberRoleApiV1CompaniesCompanyIdMembersMemberIdPatchResponses];
+export type UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchResponse = UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchResponses[keyof UpdateMemberRoleApiV1OrganizationsOrganizationIdMembersMemberIdPatchResponses];
 
 export type ListNodesApiV1WorkspacesWorkspaceIdKnowledgeNodesGetData = {
     body?: never;
@@ -6151,13 +6151,13 @@ export type RemoveNodeFromWorkspacePublicLinkApiV1WorkspacesWorkspaceIdKnowledge
 
 export type RemoveNodeFromWorkspacePublicLinkApiV1WorkspacesWorkspaceIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponse = RemoveNodeFromWorkspacePublicLinkApiV1WorkspacesWorkspaceIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses[keyof RemoveNodeFromWorkspacePublicLinkApiV1WorkspacesWorkspaceIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses];
 
-export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetData = {
+export type ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: {
         /**
@@ -6169,10 +6169,10 @@ export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetData = {
          */
         search?: string | null;
     };
-    url: '/api/v1/companies/{company_id}/knowledge/nodes';
+    url: '/api/v1/organizations/{organization_id}/knowledge/nodes';
 };
 
-export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetErrors = {
+export type ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetErrors = {
     /**
      * Not a company member
      */
@@ -6183,9 +6183,9 @@ export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetErrors = {
     422: HttpValidationError;
 };
 
-export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetError = ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetErrors[keyof ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetErrors];
+export type ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetError = ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetErrors[keyof ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetErrors];
 
-export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetResponses = {
+export type ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetResponses = {
     /**
      * Response List Nodes Api V1 Companies  Company Id  Knowledge Nodes Get
      *
@@ -6194,21 +6194,21 @@ export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetResponses = {
     200: Array<KnowledgeNodeResponse>;
 };
 
-export type ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetResponse = ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetResponses[keyof ListNodesApiV1CompaniesCompanyIdKnowledgeNodesGetResponses];
+export type ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetResponse = ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetResponses[keyof ListNodesApiV1OrganizationsOrganizationIdKnowledgeNodesGetResponses];
 
-export type CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostData = {
+export type CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostData = {
     body: KnowledgeNodeCreate;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/nodes';
+    url: '/api/v1/organizations/{organization_id}/knowledge/nodes';
 };
 
-export type CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostErrors = {
+export type CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostErrors = {
     /**
      * Insufficient permissions
      */
@@ -6219,30 +6219,30 @@ export type CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostErrors = {
     422: HttpValidationError;
 };
 
-export type CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostError = CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostErrors[keyof CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostErrors];
+export type CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostError = CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostErrors[keyof CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostErrors];
 
-export type CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostResponses = {
+export type CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostResponses = {
     /**
      * Successful Response
      */
     201: KnowledgeNodeResponse;
 };
 
-export type CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostResponse = CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostResponses[keyof CreateNodeApiV1CompaniesCompanyIdKnowledgeNodesPostResponses];
+export type CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostResponse = CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostResponses[keyof CreateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPostResponses];
 
-export type BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchData = {
+export type BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchData = {
     body: BatchPositionUpdateRequest;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/nodes/positions';
+    url: '/api/v1/organizations/{organization_id}/knowledge/nodes/positions';
 };
 
-export type BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchErrors = {
+export type BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchErrors = {
     /**
      * Not a company member
      */
@@ -6253,9 +6253,9 @@ export type BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPa
     422: HttpValidationError;
 };
 
-export type BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchError = BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchErrors[keyof BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchErrors];
+export type BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchError = BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchErrors[keyof BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchErrors];
 
-export type BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchResponses = {
+export type BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchResponses = {
     /**
      * Response Batch Update Positions Api V1 Companies  Company Id  Knowledge Nodes Positions Patch
      *
@@ -6266,9 +6266,9 @@ export type BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPa
     };
 };
 
-export type BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchResponse = BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchResponses[keyof BatchUpdatePositionsApiV1CompaniesCompanyIdKnowledgeNodesPositionsPatchResponses];
+export type BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchResponse = BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchResponses[keyof BatchUpdatePositionsApiV1OrganizationsOrganizationIdKnowledgeNodesPositionsPatchResponses];
 
-export type DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteData = {
+export type DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteData = {
     body?: never;
     path: {
         /**
@@ -6278,13 +6278,13 @@ export type DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteData = {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/nodes/{node_id}';
+    url: '/api/v1/organizations/{organization_id}/knowledge/nodes/{node_id}';
 };
 
-export type DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteErrors = {
+export type DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteErrors = {
     /**
      * Insufficient permissions
      */
@@ -6299,18 +6299,18 @@ export type DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteErrors = 
     422: HttpValidationError;
 };
 
-export type DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteError = DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteErrors[keyof DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteErrors];
+export type DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteError = DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteErrors[keyof DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteErrors];
 
-export type DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteResponses = {
+export type DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteResponse = DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteResponses[keyof DeleteNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdDeleteResponses];
+export type DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteResponse = DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteResponses[keyof DeleteNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdDeleteResponses];
 
-export type GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetData = {
+export type GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetData = {
     body?: never;
     path: {
         /**
@@ -6320,13 +6320,13 @@ export type GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetData = {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/nodes/{node_id}';
+    url: '/api/v1/organizations/{organization_id}/knowledge/nodes/{node_id}';
 };
 
-export type GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetErrors = {
+export type GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetErrors = {
     /**
      * Not a company member
      */
@@ -6341,18 +6341,18 @@ export type GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetErrors = {
     422: HttpValidationError;
 };
 
-export type GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetError = GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetErrors[keyof GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetErrors];
+export type GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetError = GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetErrors[keyof GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetErrors];
 
-export type GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetResponses = {
+export type GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetResponses = {
     /**
      * Successful Response
      */
     200: KnowledgeNodeResponse;
 };
 
-export type GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetResponse = GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetResponses[keyof GetNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdGetResponses];
+export type GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetResponse = GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetResponses[keyof GetNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdGetResponses];
 
-export type UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchData = {
+export type UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchData = {
     body: KnowledgeNodeUpdate;
     path: {
         /**
@@ -6362,13 +6362,13 @@ export type UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchData = {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/nodes/{node_id}';
+    url: '/api/v1/organizations/{organization_id}/knowledge/nodes/{node_id}';
 };
 
-export type UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchErrors = {
+export type UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchErrors = {
     /**
      * Insufficient permissions
      */
@@ -6383,18 +6383,18 @@ export type UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchErrors = {
     422: HttpValidationError;
 };
 
-export type UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchError = UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchErrors[keyof UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchErrors];
+export type UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchError = UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchErrors[keyof UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchErrors];
 
-export type UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchResponses = {
+export type UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchResponses = {
     /**
      * Successful Response
      */
     200: KnowledgeNodeResponse;
 };
 
-export type UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchResponse = UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchResponses[keyof UpdateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatchResponses];
+export type UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchResponse = UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchResponses[keyof UpdateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatchResponses];
 
-export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetData = {
+export type GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetData = {
     body?: never;
     path: {
         /**
@@ -6404,7 +6404,7 @@ export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGe
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: {
         /**
@@ -6412,10 +6412,10 @@ export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGe
          */
         limit?: number;
     };
-    url: '/api/v1/companies/{company_id}/knowledge/nodes/{node_id}/versions';
+    url: '/api/v1/organizations/{organization_id}/knowledge/nodes/{node_id}/versions';
 };
 
-export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetErrors = {
+export type GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetErrors = {
     /**
      * Not a company member
      */
@@ -6430,9 +6430,9 @@ export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGe
     422: HttpValidationError;
 };
 
-export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetError = GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetErrors[keyof GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetErrors];
+export type GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetError = GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetErrors[keyof GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetErrors];
 
-export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetResponses = {
+export type GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetResponses = {
     /**
      * Response Get Node Versions Api V1 Companies  Company Id  Knowledge Nodes  Node Id  Versions Get
      *
@@ -6441,21 +6441,21 @@ export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGe
     200: Array<KnowledgeNodeVersionResponse>;
 };
 
-export type GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetResponse = GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetResponses[keyof GetNodeVersionsApiV1CompaniesCompanyIdKnowledgeNodesNodeIdVersionsGetResponses];
+export type GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetResponse = GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetResponses[keyof GetNodeVersionsApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdVersionsGetResponses];
 
-export type CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostData = {
+export type CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostData = {
     body: KnowledgeEdgeCreate;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/edges';
+    url: '/api/v1/organizations/{organization_id}/knowledge/edges';
 };
 
-export type CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostErrors = {
+export type CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostErrors = {
     /**
      * Insufficient permissions
      */
@@ -6474,18 +6474,18 @@ export type CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostErrors = {
     422: HttpValidationError;
 };
 
-export type CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostError = CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostErrors[keyof CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostErrors];
+export type CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostError = CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostErrors[keyof CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostErrors];
 
-export type CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostResponses = {
+export type CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostResponses = {
     /**
      * Successful Response
      */
     201: KnowledgeEdgeResponse;
 };
 
-export type CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostResponse = CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostResponses[keyof CreateEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPostResponses];
+export type CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostResponse = CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostResponses[keyof CreateEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPostResponses];
 
-export type DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteData = {
+export type DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteData = {
     body?: never;
     path: {
         /**
@@ -6495,13 +6495,13 @@ export type DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteData = {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/edges/{edge_id}';
+    url: '/api/v1/organizations/{organization_id}/knowledge/edges/{edge_id}';
 };
 
-export type DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteErrors = {
+export type DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteErrors = {
     /**
      * Insufficient permissions
      */
@@ -6516,30 +6516,30 @@ export type DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteErrors = 
     422: HttpValidationError;
 };
 
-export type DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteError = DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteErrors[keyof DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteErrors];
+export type DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteError = DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteErrors[keyof DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteErrors];
 
-export type DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteResponses = {
+export type DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteResponse = DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteResponses[keyof DeleteEdgeApiV1CompaniesCompanyIdKnowledgeEdgesEdgeIdDeleteResponses];
+export type DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteResponse = DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteResponses[keyof DeleteEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesEdgeIdDeleteResponses];
 
-export type GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetData = {
+export type GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/graph';
+    url: '/api/v1/organizations/{organization_id}/knowledge/graph';
 };
 
-export type GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetErrors = {
+export type GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetErrors = {
     /**
      * Not a company member
      */
@@ -6550,30 +6550,30 @@ export type GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetErrors = {
     422: HttpValidationError;
 };
 
-export type GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetError = GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetErrors[keyof GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetErrors];
+export type GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetError = GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetErrors[keyof GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetErrors];
 
-export type GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetResponses = {
+export type GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetResponses = {
     /**
      * Successful Response
      */
     200: KnowledgeGraphResponse;
 };
 
-export type GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetResponse = GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetResponses[keyof GetGraphApiV1CompaniesCompanyIdKnowledgeGraphGetResponses];
+export type GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetResponse = GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetResponses[keyof GetGraphApiV1OrganizationsOrganizationIdKnowledgeGraphGetResponses];
 
-export type ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetData = {
+export type ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/public-links';
+    url: '/api/v1/organizations/{organization_id}/knowledge/public-links';
 };
 
-export type ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetErrors = {
+export type ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetErrors = {
     /**
      * Not a company member
      */
@@ -6584,9 +6584,9 @@ export type ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGet
     422: HttpValidationError;
 };
 
-export type ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetError = ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetErrors[keyof ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetErrors];
+export type ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetError = ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetErrors[keyof ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetErrors];
 
-export type ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetResponses = {
+export type ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetResponses = {
     /**
      * Response List Company Public Links Api V1 Companies  Company Id  Knowledge Public Links Get
      *
@@ -6595,21 +6595,21 @@ export type ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGet
     200: Array<KgPublicLinkResponse>;
 };
 
-export type ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetResponse = ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetResponses[keyof ListCompanyPublicLinksApiV1CompaniesCompanyIdKnowledgePublicLinksGetResponses];
+export type ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetResponse = ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetResponses[keyof ListCompanyPublicLinksApiV1OrganizationsOrganizationIdKnowledgePublicLinksGetResponses];
 
-export type CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostData = {
+export type CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostData = {
     body: KgPublicLinkCreateRequest;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/public-links';
+    url: '/api/v1/organizations/{organization_id}/knowledge/public-links';
 };
 
-export type CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostErrors = {
+export type CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostErrors = {
     /**
      * Insufficient permissions
      */
@@ -6620,34 +6620,34 @@ export type CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPo
     422: HttpValidationError;
 };
 
-export type CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostError = CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostErrors[keyof CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostErrors];
+export type CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostError = CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostErrors[keyof CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostErrors];
 
-export type CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostResponses = {
+export type CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostResponses = {
     /**
      * Successful Response
      */
     201: KgPublicLinkResponse;
 };
 
-export type CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostResponse = CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostResponses[keyof CreateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksPostResponses];
+export type CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostResponse = CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostResponses[keyof CreateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksPostResponses];
 
-export type DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteData = {
+export type DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
         /**
          * Link Id
          */
         link_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/public-links/{link_id}';
+    url: '/api/v1/organizations/{organization_id}/knowledge/public-links/{link_id}';
 };
 
-export type DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteErrors = {
+export type DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteErrors = {
     /**
      * Insufficient permissions
      */
@@ -6662,18 +6662,18 @@ export type DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLi
     422: HttpValidationError;
 };
 
-export type DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteError = DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteErrors[keyof DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteErrors];
+export type DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteError = DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteErrors[keyof DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteErrors];
 
-export type DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteResponses = {
+export type DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteResponse = DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteResponses[keyof DeleteCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdDeleteResponses];
+export type DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteResponse = DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteResponses[keyof DeleteCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdDeleteResponses];
 
-export type UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchData = {
+export type UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchData = {
     body: KgPublicLinkUpdate;
     path: {
         /**
@@ -6683,13 +6683,13 @@ export type UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLi
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/public-links/{link_id}';
+    url: '/api/v1/organizations/{organization_id}/knowledge/public-links/{link_id}';
 };
 
-export type UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchErrors = {
+export type UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchErrors = {
     /**
      * Insufficient permissions
      */
@@ -6704,18 +6704,18 @@ export type UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLi
     422: HttpValidationError;
 };
 
-export type UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchError = UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchErrors[keyof UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchErrors];
+export type UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchError = UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchErrors[keyof UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchErrors];
 
-export type UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchResponses = {
+export type UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchResponses = {
     /**
      * Successful Response
      */
     200: KgPublicLinkResponse;
 };
 
-export type UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchResponse = UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchResponses[keyof UpdateCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdPatchResponses];
+export type UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchResponse = UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchResponses[keyof UpdateCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdPatchResponses];
 
-export type AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostData = {
+export type AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostData = {
     body: KgPublicLinkNodeAdd;
     path: {
         /**
@@ -6725,13 +6725,13 @@ export type AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLink
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/public-links/{link_id}/nodes';
+    url: '/api/v1/organizations/{organization_id}/knowledge/public-links/{link_id}/nodes';
 };
 
-export type AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostErrors = {
+export type AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostErrors = {
     /**
      * Insufficient permissions
      */
@@ -6746,18 +6746,18 @@ export type AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLink
     422: HttpValidationError;
 };
 
-export type AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostError = AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostErrors[keyof AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostErrors];
+export type AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostError = AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostErrors[keyof AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostErrors];
 
-export type AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostResponses = {
+export type AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostResponse = AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostResponses[keyof AddNodeToCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesPostResponses];
+export type AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostResponse = AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostResponses[keyof AddNodeToCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesPostResponses];
 
-export type RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteData = {
+export type RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteData = {
     body?: never;
     path: {
         /**
@@ -6771,13 +6771,13 @@ export type RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePubli
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/public-links/{link_id}/nodes/{node_id}';
+    url: '/api/v1/organizations/{organization_id}/knowledge/public-links/{link_id}/nodes/{node_id}';
 };
 
-export type RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteErrors = {
+export type RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteErrors = {
     /**
      * Insufficient permissions
      */
@@ -6792,30 +6792,30 @@ export type RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePubli
     422: HttpValidationError;
 };
 
-export type RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteError = RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteErrors[keyof RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteErrors];
+export type RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteError = RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteErrors[keyof RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteErrors];
 
-export type RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses = {
+export type RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponse = RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses[keyof RemoveNodeFromCompanyPublicLinkApiV1CompaniesCompanyIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses];
+export type RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponse = RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses[keyof RemoveNodeFromCompanyPublicLinkApiV1OrganizationsOrganizationIdKnowledgePublicLinksLinkIdNodesNodeIdDeleteResponses];
 
-export type ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetData = {
+export type ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/types/nodes';
+    url: '/api/v1/organizations/{organization_id}/knowledge/types/nodes';
 };
 
-export type ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetErrors = {
+export type ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetErrors = {
     /**
      * Not a company member
      */
@@ -6826,9 +6826,9 @@ export type ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetErrors = {
     422: HttpValidationError;
 };
 
-export type ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetError = ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetErrors[keyof ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetErrors];
+export type ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetError = ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetErrors[keyof ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetErrors];
 
-export type ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetResponses = {
+export type ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetResponses = {
     /**
      * Response List Node Types Api V1 Companies  Company Id  Knowledge Types Nodes Get
      *
@@ -6837,21 +6837,21 @@ export type ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetResponses 
     200: Array<KgNodeTypeDefResponse>;
 };
 
-export type ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetResponse = ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetResponses[keyof ListNodeTypesApiV1CompaniesCompanyIdKnowledgeTypesNodesGetResponses];
+export type ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetResponse = ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetResponses[keyof ListNodeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesNodesGetResponses];
 
-export type CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostData = {
+export type CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostData = {
     body: KgNodeTypeDefCreate;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/types/nodes';
+    url: '/api/v1/organizations/{organization_id}/knowledge/types/nodes';
 };
 
-export type CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostErrors = {
+export type CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostErrors = {
     /**
      * Insufficient permissions
      */
@@ -6866,18 +6866,18 @@ export type CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostErrors =
     422: HttpValidationError;
 };
 
-export type CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostError = CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostErrors[keyof CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostErrors];
+export type CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostError = CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostErrors[keyof CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostErrors];
 
-export type CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostResponses = {
+export type CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostResponses = {
     /**
      * Successful Response
      */
     201: KgNodeTypeDefResponse;
 };
 
-export type CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostResponse = CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostResponses[keyof CreateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesPostResponses];
+export type CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostResponse = CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostResponses[keyof CreateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesPostResponses];
 
-export type DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchData = {
+export type DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchData = {
     body?: never;
     path: {
         /**
@@ -6887,13 +6887,13 @@ export type DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDe
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/types/nodes/{type_id}/deactivate';
+    url: '/api/v1/organizations/{organization_id}/knowledge/types/nodes/{type_id}/deactivate';
 };
 
-export type DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchErrors = {
+export type DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchErrors = {
     /**
      * Cannot deactivate system type
      */
@@ -6912,30 +6912,30 @@ export type DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDe
     422: HttpValidationError;
 };
 
-export type DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchError = DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchErrors[keyof DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchErrors];
+export type DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchError = DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchErrors[keyof DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchErrors];
 
-export type DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchResponses = {
+export type DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchResponse = DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchResponses[keyof DeactivateNodeTypeApiV1CompaniesCompanyIdKnowledgeTypesNodesTypeIdDeactivatePatchResponses];
+export type DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchResponse = DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchResponses[keyof DeactivateNodeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesNodesTypeIdDeactivatePatchResponses];
 
-export type ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetData = {
+export type ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetData = {
     body?: never;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/types/edges';
+    url: '/api/v1/organizations/{organization_id}/knowledge/types/edges';
 };
 
-export type ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetErrors = {
+export type ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetErrors = {
     /**
      * Not a company member
      */
@@ -6946,9 +6946,9 @@ export type ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetErrors = {
     422: HttpValidationError;
 };
 
-export type ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetError = ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetErrors[keyof ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetErrors];
+export type ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetError = ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetErrors[keyof ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetErrors];
 
-export type ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetResponses = {
+export type ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetResponses = {
     /**
      * Response List Edge Types Api V1 Companies  Company Id  Knowledge Types Edges Get
      *
@@ -6957,21 +6957,21 @@ export type ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetResponses 
     200: Array<KgEdgeTypeDefResponse>;
 };
 
-export type ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetResponse = ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetResponses[keyof ListEdgeTypesApiV1CompaniesCompanyIdKnowledgeTypesEdgesGetResponses];
+export type ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetResponse = ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetResponses[keyof ListEdgeTypesApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesGetResponses];
 
-export type CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostData = {
+export type CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostData = {
     body: KgEdgeTypeDefCreate;
     path: {
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/types/edges';
+    url: '/api/v1/organizations/{organization_id}/knowledge/types/edges';
 };
 
-export type CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostErrors = {
+export type CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostErrors = {
     /**
      * Insufficient permissions
      */
@@ -6986,18 +6986,18 @@ export type CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostErrors =
     422: HttpValidationError;
 };
 
-export type CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostError = CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostErrors[keyof CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostErrors];
+export type CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostError = CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostErrors[keyof CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostErrors];
 
-export type CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostResponses = {
+export type CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostResponses = {
     /**
      * Successful Response
      */
     201: KgEdgeTypeDefResponse;
 };
 
-export type CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostResponse = CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostResponses[keyof CreateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesPostResponses];
+export type CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostResponse = CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostResponses[keyof CreateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesPostResponses];
 
-export type DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchData = {
+export type DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchData = {
     body?: never;
     path: {
         /**
@@ -7007,13 +7007,13 @@ export type DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDe
         /**
          * Company Id
          */
-        company_id: number;
+        organization_id: number;
     };
     query?: never;
-    url: '/api/v1/companies/{company_id}/knowledge/types/edges/{type_id}/deactivate';
+    url: '/api/v1/organizations/{organization_id}/knowledge/types/edges/{type_id}/deactivate';
 };
 
-export type DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchErrors = {
+export type DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchErrors = {
     /**
      * Cannot deactivate system type
      */
@@ -7032,16 +7032,16 @@ export type DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDe
     422: HttpValidationError;
 };
 
-export type DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchError = DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchErrors[keyof DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchErrors];
+export type DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchError = DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchErrors[keyof DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchErrors];
 
-export type DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponses = {
+export type DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponses = {
     /**
      * Successful Response
      */
     204: void;
 };
 
-export type DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponse = DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponses[keyof DeactivateEdgeTypeApiV1CompaniesCompanyIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponses];
+export type DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponse = DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponses[keyof DeactivateEdgeTypeApiV1OrganizationsOrganizationIdKnowledgeTypesEdgesTypeIdDeactivatePatchResponses];
 
 export type ChatStreamApiV1WorkspacesWorkspaceIdAiChatPostData = {
     body: ProxyChatRequest;

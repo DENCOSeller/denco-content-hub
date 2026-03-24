@@ -197,9 +197,25 @@ export default function LibraryItemDetailPage() {
     })
   }
 
-  if (isLoading) return <LoadingState message="Загрузка контента..." />
+  const baseBreadcrumbs = [
+    { label: activeWorkspace?.company_name ?? '' },
+    { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
+    { label: 'Библиотека', href: `/workspaces/${workspaceId}/library` },
+  ]
+
+  if (isLoading) return (
+    <Stack gap="md">
+      <AppBreadcrumbs items={[...baseBreadcrumbs, { label: '...' }]} />
+      <LoadingState message="Загрузка контента..." />
+    </Stack>
+  )
   if (isError || !item) {
-    return <ErrorState message="Не удалось загрузить элемент библиотеки" onRetry={refetch} />
+    return (
+      <Stack gap="md">
+        <AppBreadcrumbs items={[...baseBreadcrumbs, { label: 'Ошибка' }]} />
+        <ErrorState message="Не удалось загрузить элемент библиотеки" onRetry={refetch} />
+      </Stack>
+    )
   }
 
   const platform = PLATFORM_CONFIG[item.platform] ?? PLATFORM_CONFIG.vk
@@ -212,9 +228,7 @@ export default function LibraryItemDetailPage() {
   const isGenerating = generateMutation.isPending
 
   const breadcrumbs = [
-    { label: activeWorkspace?.company_name ?? '' },
-    { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
-    { label: 'Библиотека', href: `/workspaces/${workspaceId}/library` },
+    ...baseBreadcrumbs,
     { label: item.title ?? 'Без названия' },
   ]
 

@@ -6,7 +6,7 @@
 }
 
 .segmentRow:hover {
-  background: rgba(255, 255, 255, 0.025);
+  background: color-mix(in srgb, var(--text-primary) 2.5%, transparent);
 }
 
 .segmentRow:last-child {
@@ -43,7 +43,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: rgba(10, 132, 255, 0.7);
+  color: color-mix(in srgb, var(--eco-content) 70%, transparent);
 }
 
 .timecodeLink {
@@ -52,7 +52,7 @@
   gap: 4px;
   flex-shrink: 0;
   min-width: 60px;
-  color: rgba(10, 132, 255, 0.8);
+  color: color-mix(in srgb, var(--eco-content) 80%, transparent);
   cursor: pointer;
   border-radius: var(--mantine-radius-xs);
   padding: 2px 4px;
@@ -61,11 +61,11 @@
 }
 
 .timecodeLink:hover {
-  background: rgba(10, 132, 255, 0.12);
-  color: var(--neon-blue);
+  background: color-mix(in srgb, var(--eco-content) 12%, transparent);
+  color: var(--eco-content);
 }
 
 .segmentText {
   line-height: 1.6;
-  color: rgba(220, 220, 255, 0.85);
+  color: var(--text-primary);
 }

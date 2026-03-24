@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { Modal, TextInput, Textarea, Button, Group, Stack, Select } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { useMediaQuery } from '@mantine/hooks'
 import { zodResolver } from 'mantine-form-zod-resolver'
 import { notifications } from '@mantine/notifications'
 import { z } from 'zod'
@@ -10,7 +11,7 @@ import { z } from 'zod'
 import { useCreateNodeMutation, useUpdateNodeMutation } from '@/api/hooks/useKnowledge'
 import type { KnowledgeNodeResponse } from '@/api/client/types.gen'
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 
 const speakerSchema = z.object({
   title: z.string().min(1, 'Имя спикера обязательно'),
@@ -65,8 +66,9 @@ export function SpeakerFormModal({
   onClose,
   editingNode,
 }: SpeakerFormModalProps) {
-  const activeCompany = useCompanyStore((s) => s.activeCompany)
-  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+  const isMobile = useMediaQuery('(max-width: 48em)')
+  const activeOrganization = useOrganizationStore((s) => s.activeOrganization)
+  const { getTypeDefId } = useNodeTypeConfig(activeOrganization?.id ?? 0)
 
   const createNode = useCreateNodeMutation(workspaceId)
   const updateNode = useUpdateNodeMutation(workspaceId)
@@ -149,7 +151,8 @@ export function SpeakerFormModal({
       opened={opened}
       onClose={onClose}
       title={isEditing ? 'Редактировать спикера' : 'Добавить спикера'}
-      centered
+      centered={!isMobile}
+      fullScreen={isMobile}
       size="lg"
     >
       <form onSubmit={handleSubmit}>

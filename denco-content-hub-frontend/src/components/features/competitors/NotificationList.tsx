@@ -112,7 +112,7 @@ export function NotificationList({ notifications: items, workspaceId }: Notifica
                 <Icon size={14} />
               </ThemeIcon>
 
-              <Box style={{ flex: 1, minWidth: 0 }}>
+              <Box className="flexFill">
                 <Text size="sm" fw={notification.is_read ? 400 : 600} truncate>
                   {notification.title}
                 </Text>

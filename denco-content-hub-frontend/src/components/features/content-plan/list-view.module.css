@@ -1,8 +1,24 @@
 .dayGroup {
-  border-left: 2px solid var(--neon-blue, var(--mantine-color-blue-5));
+  border-left: 2px solid var(--group-color, var(--eco-content));
   padding-left: 16px;
+  transition: border-color var(--duration-normal, 150ms) var(--ease-out, ease);
 }
 
 .dayHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dayTitle {
   text-transform: capitalize;
+}
+
+.todayBadge {
+  flex-shrink: 0;
+}
+
+.itemCount {
+  margin-left: auto;
+  flex-shrink: 0;
 }

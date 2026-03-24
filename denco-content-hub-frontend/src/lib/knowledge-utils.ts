@@ -88,8 +88,8 @@ export function resolveIcon(iconName: string): TablerIcon {
 export const NODE_TYPE_CONFIG: Record<NodeType, NodeTypeConfig> = {
   target_audience: {
     label: 'Целевая аудитория',
-    color: '#0A84FF',
-    gradient: 'linear-gradient(135deg, #0A84FF, #3B9EFF)',
+    color: '#14B8A6',
+    gradient: 'linear-gradient(135deg, #14B8A6, #2DD4BF)',
     icon: IconTarget,
   },
   meaning: {

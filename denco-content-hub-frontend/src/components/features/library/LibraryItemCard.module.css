@@ -1,15 +1,20 @@
 .card {
-  background: var(--card-bg);
+  background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
   border-radius: var(--mantine-radius-lg);
-  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease, background 200ms ease;
+  transition: box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out);
   text-decoration: none;
+  cursor: pointer;
 }
 
 .card:hover {
-  background: var(--card-bg-hover);
-  border-color: var(--border-accent);
-  box-shadow: 0 4px 24px rgba(10, 132, 255, 0.12), 0 0 0 1px rgba(10, 132, 255, 0.1);
+  background: var(--surface-raised);
+  border-color: var(--eco-content);
+  box-shadow: 0 4px 24px color-mix(in srgb, var(--eco-content) 12%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--eco-content) 10%, transparent);
   transform: translateY(-1px);
 }
 
@@ -21,4 +26,19 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.gridPreview {
+  width: 100%;
+  height: 100px;
+  border-radius: var(--mantine-radius-sm);
+  background: color-mix(in srgb, var(--eco-content) 8%, var(--surface-ground));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gridPreviewIcon {
+  color: var(--eco-content);
+  opacity: 0.6;
 }

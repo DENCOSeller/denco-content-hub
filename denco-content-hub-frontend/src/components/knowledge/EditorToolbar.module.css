@@ -71,7 +71,7 @@
 }
 
 .titleInput input:focus {
-  border-color: var(--neon-blue, #0A84FF);
+  border-color: var(--eco-content, #14B8A6);
   outline: none;
 }
 

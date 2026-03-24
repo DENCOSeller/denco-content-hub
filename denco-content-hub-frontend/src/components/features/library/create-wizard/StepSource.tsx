@@ -68,7 +68,7 @@ export function StepSource({ state, onChange, workspaceId }: StepSourceProps) {
               aria-pressed={selected}
             >
               <Stack align="center" gap="xs">
-                <Icon size={28} color={selected ? 'var(--neon-blue)' : 'var(--text-muted)'} />
+                <Icon size={28} color={selected ? 'var(--eco-content)' : 'var(--text-muted)'} />
                 <Text size="sm" fw={selected ? 600 : 400}>{label}</Text>
                 <Text size="xs" c="dimmed">{desc}</Text>
               </Stack>

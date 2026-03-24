@@ -4,7 +4,7 @@ import { useRef, useEffect, useCallback, useState } from 'react'
 import { ActionIcon, Badge, Text, Stack, Tooltip } from '@mantine/core'
 import { IconX, IconSparkles, IconMapPin, IconHistory, IconUpload } from '@tabler/icons-react'
 
-import { useAiPanelStore } from '@/stores/ai-panel-store'
+import { useAiPanelStore, MIN_PANEL_WIDTH, MAX_PANEL_WIDTH } from '@/stores/ai-panel-store'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { useAiPageContext } from '@/contexts/AiPageContext'
 import type { AiPageContext } from '@/contexts/AiPageContext'
@@ -39,11 +39,13 @@ export function AiAssistantPanel() {
   const close = useAiPanelStore((s) => s.close)
   const activeSessionId = useAiPanelStore((s) => s.activeSessionId)
   const setActiveSessionId = useAiPanelStore((s) => s.setActiveSessionId)
+  const setPanelWidth = useAiPanelStore((s) => s.setPanelWidth)
   const activeWorkspace = useWorkspaceStore((s) => s.activeWorkspace)
   const pageContext = useAiPageContext()
 
   const [showSessionList, setShowSessionList] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isResizing, setIsResizing] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const scrollBottomRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<AiChatInputHandle>(null)
@@ -118,6 +120,36 @@ export function AiAssistantPanel() {
     setShowSessionList(false)
   }, [resetChat, setActiveSessionId])
 
+  // --- Resize handle ---
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      setIsResizing(true)
+      const startX = e.clientX
+      const startWidth = useAiPanelStore.getState().panelWidth
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const delta = startX - moveEvent.clientX
+        const newWidth = startWidth + delta
+        setPanelWidth(Math.max(MIN_PANEL_WIDTH, Math.min(MAX_PANEL_WIDTH, newWidth)))
+      }
+
+      const handleMouseUp = () => {
+        setIsResizing(false)
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+      }
+
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    },
+    [setPanelWidth],
+  )
+
   // --- Drag & Drop ---
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -161,12 +193,23 @@ export function AiAssistantPanel() {
 
   return (
     <div
-      className={styles.panel}
+      className={`${styles.panel} ${isResizing ? styles.panelResizing : ''}`}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
+      {/* Resize handle on left edge */}
+      <div
+        className={styles.resizeHandle}
+        onMouseDown={handleResizeStart}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Изменить ширину панели"
+      >
+        <div className={styles.resizeHandleLine} />
+      </div>
+
       {isDragOver && (
         <div className={styles.dragOverlay}>
           <div className={styles.dragOverlayContent}>
@@ -178,8 +221,10 @@ export function AiAssistantPanel() {
 
       <div className={styles.header}>
         <div className={styles.headerTitle}>
-          <IconSparkles size={20} className={styles.sparkle} />
-          <Text size="sm" fw={600} c="gray.2">
+          <div className={styles.sparkleIcon}>
+            <IconSparkles size={18} />
+          </div>
+          <Text size="sm" fw={600} className={styles.headerText}>
             AI Ассистент
           </Text>
         </div>
@@ -211,7 +256,7 @@ export function AiAssistantPanel() {
         <div className={styles.contextBar}>
           <Badge
             variant="light"
-            color="neonBlue"
+            color="contentHubTeal"
             size="sm"
             leftSection={<IconMapPin size={12} />}
             className={styles.contextBadge}
@@ -250,9 +295,9 @@ export function AiAssistantPanel() {
         ) : (
           <Stack className={styles.placeholder} gap="xs">
             <div className={styles.placeholderIcon}>
-              <IconSparkles size={28} style={{ color: 'var(--neon-blue)' }} />
+              <IconSparkles size={28} />
             </div>
-            <Text size="md" fw={500} c="gray.3">
+            <Text size="md" fw={500} className={styles.placeholderTitle}>
               Привет! Я твой AI ассистент
             </Text>
             <Text size="sm" c="dimmed" mb="md">

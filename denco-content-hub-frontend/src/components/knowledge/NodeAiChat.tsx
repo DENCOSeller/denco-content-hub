@@ -252,7 +252,7 @@ export function NodeAiChat({ scope, scopeId, nodeId, nodeTitle, nodeType, connec
         ) : (
           <div className={styles.empty}>
             <div className={styles.emptyIcon}>
-              <IconSparkles size={24} style={{ color: 'var(--neon-blue)' }} />
+              <IconSparkles size={24} style={{ color: 'var(--eco-content)' }} />
             </div>
             <Text size="sm" fw={500} c="gray.3">
               Спросить AI о «{nodeTitle}»

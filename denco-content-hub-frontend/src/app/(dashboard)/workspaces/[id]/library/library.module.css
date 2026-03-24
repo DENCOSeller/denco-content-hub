@@ -1,15 +1,11 @@
-.pageTitle {
-  background: var(--gradient-main);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 800;
-}
-
 .sectionTitle {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.65rem;
   font-weight: 700;
+}
+
+.viewToggle {
+  flex-shrink: 0;
 }

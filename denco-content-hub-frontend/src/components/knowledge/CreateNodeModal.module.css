@@ -65,7 +65,7 @@
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s var(--ease-smooth);
   padding: 8px;
 }
 
@@ -168,7 +168,7 @@
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s var(--ease-smooth);
   flex-shrink: 0;
 }
 
@@ -196,14 +196,14 @@
   font-weight: 600;
   color: #fff;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s var(--ease-smooth);
   position: relative;
   overflow: hidden;
 }
 
 .submitBtn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(20, 184, 166, 0.3);
 }
 
 .submitBtn:active:not(:disabled) {

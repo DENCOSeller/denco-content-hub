@@ -22,7 +22,7 @@ export function NodeReference({ id, nodeType, title, workspaceId, companyId }: N
     if (workspaceId) {
       router.push(`/workspaces/${workspaceId}/knowledge?focusNode=${id}`)
     } else if (companyId) {
-      router.push(`/companies/${companyId}/knowledge?focusNode=${id}`)
+      router.push(`/organizations/${companyId}/knowledge?focusNode=${id}`)
     }
   }
 

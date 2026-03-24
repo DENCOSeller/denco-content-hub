@@ -61,7 +61,7 @@ function getActionColor(action: AiAction): string {
     return getNodeTypeConfig(nodeSlug).color
   }
   if (action.action_type === 'create_edge') return '#30D158'
-  return '#0A84FF'
+  return 'var(--content-hub-teal, #14B8A6)'
 }
 
 export function AiActionCard({ action, onApply, onReject }: AiActionCardProps) {

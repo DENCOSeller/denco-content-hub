@@ -12,6 +12,7 @@ import {
   UnstyledButton,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { useMediaQuery } from '@mantine/hooks'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import { notifications } from '@mantine/notifications'
@@ -52,6 +53,7 @@ export function AddSourceModal({ workspaceId, opened, onClose }: AddSourceModalP
   const [sourceType, setSourceType] = useState<SourceType>('youtube_video')
   const [pdfFile, setPdfFile] = useState<File | null>(null)
 
+  const isMobile = useMediaQuery('(max-width: 48em)')
   const addSource = useAddSourceMutation(workspaceId)
 
   const youtubeForm = useForm({
@@ -181,7 +183,8 @@ export function AddSourceModal({ workspaceId, opened, onClose }: AddSourceModalP
       onClose={handleClose}
       title="Добавить источник"
       size="lg"
-      centered
+      fullScreen={isMobile}
+      centered={!isMobile}
       className={styles.modal}
       overlayProps={{ backgroundOpacity: 0.6, blur: 8 }}
     >

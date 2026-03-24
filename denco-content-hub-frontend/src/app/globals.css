@@ -17,14 +17,33 @@
   --sidebar-bg: #141416;
   --header-bg: #1c1c1e;
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(10, 132, 255, 0.25);
-  --neon-blue: #0A84FF;
+  --border-accent: var(--content-hub-teal-alpha-30);
   --neon-violet: #BF5AF2;
   --neon-cyan: #32ADE6;
-  --gradient-main: linear-gradient(135deg, #0A84FF, #BF5AF2);
-  --gradient-subtle: linear-gradient(135deg, rgba(10,132,255,0.15), rgba(191,90,242,0.15));
+  --content-hub-teal: #14B8A6;
+  --content-hub-teal-light: #2dd4bf;
+  --content-hub-teal-alpha-5: rgba(20, 184, 166, 0.05);
+  --content-hub-teal-alpha-10: rgba(20, 184, 166, 0.1);
+  --content-hub-teal-alpha-15: rgba(20, 184, 166, 0.15);
+  --content-hub-teal-alpha-20: rgba(20, 184, 166, 0.2);
+  --content-hub-teal-alpha-30: rgba(20, 184, 166, 0.3);
+  --content-hub-teal-alpha-50: rgba(20, 184, 166, 0.5);
+  --content-hub-teal-dim: var(--content-hub-teal-alpha-15);
+  --content-hub-teal-border: var(--content-hub-teal-alpha-20);
+  --gradient-main: linear-gradient(135deg, #14B8A6, #0d9488);
+  --gradient-subtle: linear-gradient(135deg, rgba(20,184,166,0.15), rgba(13,148,136,0.15));
+  --gradient-ai: linear-gradient(135deg, #14B8A6, #2dd4bf);
   --text-primary: #f0f0ff;
+  --text-secondary: rgba(255, 255, 255, 0.65);
   --text-muted: rgba(255, 255, 255, 0.45);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 180ms var(--ease-smooth);
+  --color-destructive: #f87171;
+  --color-neutral-muted: #9BA2B0;
+  --color-auth-accent: #a78bfa;
+  --color-info-accent: #60a5fa;
+  --color-error: #ef4444;
+  --color-surface-dark: #0d0d0f;
 }
 
 /* React Flow dark theme overrides */
@@ -33,7 +52,7 @@
   --xy-background-pattern-color: rgba(255, 255, 255, 0.03);
   --xy-node-border-radius: 8px;
   --xy-edge-stroke: rgba(130, 130, 220, 0.3);
-  --xy-edge-stroke-selected: var(--neon-blue);
+  --xy-edge-stroke-selected: var(--content-hub-teal);
   --xy-edge-stroke-width: 2;
   --xy-minimap-background: var(--card-bg);
   --xy-minimap-mask-background: rgba(0, 0, 0, 0.7);
@@ -65,7 +84,55 @@
 
 /* Handle visibility on hover */
 .react-flow__node:hover .react-flow__handle {
-  background: var(--neon-blue) !important;
+  background: var(--content-hub-teal) !important;
   width: 10px !important;
   height: 10px !important;
+}
+
+/* ─── Shared utility classes ─────────────────────────────────────── */
+
+/* Flex fill: takes remaining space, prevents overflow */
+.flexFill {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Truncate-safe: prevents overflow without flex grow */
+.minW0 {
+  min-width: 0;
+}
+
+/* Shared card base: hover/border/transition for list cards */
+.listCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-lg);
+  transition: border-color var(--transition-base), background var(--transition-base), transform var(--transition-base);
+}
+
+.listCard:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--border-accent);
+  transform: translateY(-1px);
+}
+
+/* Shared section title: uppercase muted label */
+.sectionTitle {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+/* Shared icon wrap with teal background */
+.iconWrapTeal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--mantine-radius-md);
+  background: var(--content-hub-teal-alpha-10);
+  flex-shrink: 0;
 }

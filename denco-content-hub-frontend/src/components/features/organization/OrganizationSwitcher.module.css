@@ -1,0 +1,18 @@
+.switcherButton {
+  padding: 6px 10px;
+  border-radius: var(--mantine-radius-md);
+  transition: background var(--transition-base);
+}
+
+.switcherButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.switcherButton:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.activeItem {
+  background: rgba(61, 184, 232, 0.08);
+}

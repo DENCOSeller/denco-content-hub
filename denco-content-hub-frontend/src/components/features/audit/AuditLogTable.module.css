@@ -1,0 +1,269 @@
+/* Filters card */
+.filtersCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.filtersGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+@media (max-width: 768px) {
+  .filtersGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtersGroup > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Table controls */
+.tableControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.recordCount {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pageSizeGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageSizeLabel {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Table wrapper — horizontal scroll on mobile */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-bg);
+}
+
+/* Audit table */
+.auditTable {
+  min-width: 800px;
+}
+
+.auditTable thead tr {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.auditTable thead th {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+}
+
+.auditTable tbody tr {
+  transition: background 150ms ease;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.auditTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.auditTable tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.auditTable tbody td {
+  padding: 12px 16px;
+  border: none;
+  vertical-align: top;
+}
+
+/* Date cell */
+.dateCell {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Email cell */
+.emailCell {
+  display: inline-block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+/* Action badges */
+.badgePositive {
+  background: var(--content-hub-teal-alpha-15);
+  color: var(--content-hub-teal-light);
+  border: none;
+}
+
+.badgeDestructive {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-destructive);
+  border: none;
+}
+
+.badgeNeutral {
+  background: rgba(107, 114, 128, 0.15);
+  color: var(--color-neutral-muted);
+  border: none;
+}
+
+.badgeAuth {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--color-auth-accent);
+  border: none;
+}
+
+.badgeUpdate {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-info-accent);
+  border: none;
+}
+
+/* Resource cell */
+.resourceGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.resourceType {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.resourceId {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Details toggle */
+.detailsToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.detailsToggle:hover {
+  color: var(--content-hub-teal-light);
+}
+
+/* Details code block */
+.detailsCode {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 11px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  background: var(--color-surface-dark);
+  color: #c9cdd6;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* IP cell */
+.ipCell {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+/* Pagination */
+.paginationWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+/* Forbidden state */
+.forbiddenCard {
+  background: var(--card-bg);
+  border: 1px solid rgba(248, 113, 113, 0.15);
+  border-radius: 8px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.forbiddenIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  margin: 0 auto 16px;
+}
+
+.forbiddenTitle {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.forbiddenText {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Mobile date format */
+@media (max-width: 768px) {
+  .dateFull {
+    display: none;
+  }
+
+  .dateShort {
+    display: inline;
+  }
+}
+
+@media (min-width: 769px) {
+  .dateFull {
+    display: inline;
+  }
+
+  .dateShort {
+    display: none;
+  }
+}

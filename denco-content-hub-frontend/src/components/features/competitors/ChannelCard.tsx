@@ -11,29 +11,17 @@ import {
   ThemeIcon,
   Tooltip,
 } from '@mantine/core'
-import {
-  IconBrandYoutube,
-  IconBrandTelegram,
-  IconBrandInstagram,
-  IconMessage,
-  IconRefresh,
-} from '@tabler/icons-react'
+import { IconRefresh } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { useRouter } from 'next/navigation'
 
 import { useSyncCompetitorMutation } from '@/api/hooks/useCompetitors'
-import type { CompetitorChannel, CompetitorPlatform, CompetitorChannelStatus } from '@/api/types/competitor'
+import type { CompetitorChannel, CompetitorChannelStatus } from '@/api/types/competitor'
+import { platformConfig } from './constants'
 
 interface ChannelCardProps {
   channel: CompetitorChannel
   workspaceId: number
-}
-
-const platformConfig: Record<CompetitorPlatform, { icon: typeof IconBrandYoutube; label: string; color: string }> = {
-  youtube: { icon: IconBrandYoutube, label: 'YouTube', color: 'red' },
-  telegram: { icon: IconBrandTelegram, label: 'Telegram', color: 'blue' },
-  instagram: { icon: IconBrandInstagram, label: 'Instagram', color: 'grape' },
-  vk: { icon: IconMessage, label: 'VK', color: 'indigo' },
 }
 
 const statusConfig: Record<CompetitorChannelStatus, { label: string; color: string }> = {
@@ -95,7 +83,7 @@ export function ChannelCard({ channel, workspaceId }: ChannelCardProps) {
       style={{ cursor: 'pointer' }}
     >
       <Group justify="space-between" wrap="nowrap">
-        <Group gap="md" wrap="nowrap" style={{ minWidth: 0 }}>
+        <Group gap="md" wrap="nowrap" className="minW0">
           {channel.avatar_url ? (
             <Avatar src={channel.avatar_url} size={48} radius="xl" />
           ) : (
@@ -104,7 +92,7 @@ export function ChannelCard({ channel, workspaceId }: ChannelCardProps) {
             </ThemeIcon>
           )}
 
-          <Stack gap={4} style={{ minWidth: 0 }}>
+          <Stack gap={4} className="minW0">
             <Group gap="xs" wrap="nowrap">
               <Text fw={600} truncate>
                 {channel.display_name ?? channel.handle ?? 'Без названия'}

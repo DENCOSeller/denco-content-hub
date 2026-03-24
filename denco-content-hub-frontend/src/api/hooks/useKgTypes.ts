@@ -31,8 +31,8 @@ export function useNodeTypeDefs(companyId: number) {
     queryKey: kgTypeKeys.nodeTypeDefs(companyId),
     queryFn: async () => {
       const result = await client.get({
-        url: '/api/v1/companies/{company_id}/knowledge/types/nodes',
-        path: { company_id: companyId },
+        url: '/api/v1/organizations/{organization_id}/knowledge/types/nodes',
+        path: { organization_id: companyId },
         throwOnError: true,
       })
       return result.data as KgNodeTypeDefResponse[]
@@ -51,8 +51,8 @@ export function useCreateNodeTypeDef(companyId: number) {
   return useMutation({
     mutationFn: async (data: KgNodeTypeDefCreate) => {
       const result = await client.post({
-        url: '/api/v1/companies/{company_id}/knowledge/types/nodes',
-        path: { company_id: companyId },
+        url: '/api/v1/organizations/{organization_id}/knowledge/types/nodes',
+        path: { organization_id: companyId },
         body: data,
         throwOnError: true,
       })
@@ -70,8 +70,8 @@ export function useDeactivateNodeTypeDef(companyId: number) {
   return useMutation({
     mutationFn: async (typeId: number) => {
       await client.patch({
-        url: '/api/v1/companies/{company_id}/knowledge/types/nodes/{type_id}/deactivate',
-        path: { company_id: companyId, type_id: typeId },
+        url: '/api/v1/organizations/{organization_id}/knowledge/types/nodes/{type_id}/deactivate',
+        path: { organization_id: companyId, type_id: typeId },
         throwOnError: true,
       })
     },
@@ -90,8 +90,8 @@ export function useEdgeTypeDefs(companyId: number) {
     queryKey: kgTypeKeys.edgeTypeDefs(companyId),
     queryFn: async () => {
       const result = await client.get({
-        url: '/api/v1/companies/{company_id}/knowledge/types/edges',
-        path: { company_id: companyId },
+        url: '/api/v1/organizations/{organization_id}/knowledge/types/edges',
+        path: { organization_id: companyId },
         throwOnError: true,
       })
       return result.data as KgEdgeTypeDefResponse[]
@@ -110,8 +110,8 @@ export function useCreateEdgeTypeDef(companyId: number) {
   return useMutation({
     mutationFn: async (data: KgEdgeTypeDefCreate) => {
       const result = await client.post({
-        url: '/api/v1/companies/{company_id}/knowledge/types/edges',
-        path: { company_id: companyId },
+        url: '/api/v1/organizations/{organization_id}/knowledge/types/edges',
+        path: { organization_id: companyId },
         body: data,
         throwOnError: true,
       })
@@ -129,8 +129,8 @@ export function useDeactivateEdgeTypeDef(companyId: number) {
   return useMutation({
     mutationFn: async (typeId: number) => {
       await client.patch({
-        url: '/api/v1/companies/{company_id}/knowledge/types/edges/{type_id}/deactivate',
-        path: { company_id: companyId, type_id: typeId },
+        url: '/api/v1/organizations/{organization_id}/knowledge/types/edges/{type_id}/deactivate',
+        path: { organization_id: companyId, type_id: typeId },
         throwOnError: true,
       })
     },

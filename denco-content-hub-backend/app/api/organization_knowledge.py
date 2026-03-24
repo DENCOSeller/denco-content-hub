@@ -1,0 +1,363 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from fastapi import APIRouter, Depends, Query, Response
+
+from app.dependencies import get_organization_member, get_current_user, require_organization_admin
+from app.integrations import kg_client
+from app.schemas.knowledge import (
+    BatchPositionUpdateRequest,
+    KnowledgeEdgeCreate,
+    KnowledgeEdgeResponse,
+    KnowledgeGraphResponse,
+    KnowledgeNodeCreate,
+    KnowledgeNodeResponse,
+    KnowledgeNodeUpdate,
+    KnowledgeNodeVersionResponse,
+)
+from app.schemas.public_knowledge import (
+    KgPublicLinkCreateRequest,
+    KgPublicLinkNodeAdd,
+    KgPublicLinkResponse,
+    KgPublicLinkUpdate,
+)
+
+if TYPE_CHECKING:
+    from app.models.organization_member import OrganizationMember
+    from app.models.user import User
+
+router = APIRouter(prefix="/organizations/{organization_id}/knowledge", tags=["organization-knowledge"])
+
+
+# --- Nodes ---
+
+
+@router.get(
+    "/nodes",
+    response_model=list[KnowledgeNodeResponse],
+    summary="List organization knowledge nodes",
+    status_code=200,
+    responses={403: {"description": "Not an organization member"}},
+)
+async def list_nodes(
+    organization_id: int,
+    node_type_def_id: int | None = Query(default=None),
+    search: str | None = Query(default=None, max_length=255),
+    _member: OrganizationMember = Depends(get_organization_member),
+    current_user: User = Depends(get_current_user),
+) -> list[KnowledgeNodeResponse]:
+    return await kg_client.list_nodes(
+        "company",
+        organization_id,
+        current_user.id,
+        node_type_def_id=node_type_def_id,
+        search=search,
+    )
+
+
+@router.post(
+    "/nodes",
+    response_model=KnowledgeNodeResponse,
+    summary="Create organization knowledge node",
+    status_code=201,
+    responses={403: {"description": "Insufficient permissions"}},
+)
+async def create_node(
+    organization_id: int,
+    data: KnowledgeNodeCreate,
+    current_user: User = Depends(get_current_user),
+    _admin: OrganizationMember = Depends(require_organization_admin),
+) -> KnowledgeNodeResponse:
+    return await kg_client.create_node(
+        "company",
+        organization_id,
+        current_user.id,
+        data.model_dump(exclude_none=True),
+        organization_scope_id=organization_id,
+    )
+
+
+# --- Positions (must be before /nodes/{node_id} to avoid route conflict) ---
+
+
+@router.patch(
+    "/nodes/positions",
+    summary="Batch update organization node positions",
+    status_code=200,
+    responses={403: {"description": "Not an organization member"}},
+)
+async def batch_update_positions(
+    organization_id: int,
+    data: BatchPositionUpdateRequest,
+    _member: OrganizationMember = Depends(get_organization_member),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, int]:
+    positions = [p.model_dump() for p in data.positions]
+    return await kg_client.batch_update_positions(
+        "company",
+        organization_id,
+        current_user.id,
+        positions,
+    )
+
+
+@router.get(
+    "/nodes/{node_id}",
+    response_model=KnowledgeNodeResponse,
+    summary="Get organization knowledge node",
+    status_code=200,
+    responses={
+        403: {"description": "Not an organization member"},
+        404: {"description": "Node not found"},
+    },
+)
+async def get_node(
+    node_id: int,
+    _member: OrganizationMember = Depends(get_organization_member),
+    current_user: User = Depends(get_current_user),
+) -> KnowledgeNodeResponse:
+    return await kg_client.get_node(node_id, current_user.id)
+
+
+@router.patch(
+    "/nodes/{node_id}",
+    response_model=KnowledgeNodeResponse,
+    summary="Update organization knowledge node",
+    status_code=200,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Node not found"},
+    },
+)
+async def update_node(
+    node_id: int,
+    data: KnowledgeNodeUpdate,
+    current_user: User = Depends(get_current_user),
+    _admin: OrganizationMember = Depends(require_organization_admin),
+) -> KnowledgeNodeResponse:
+    return await kg_client.update_node(
+        node_id,
+        current_user.id,
+        data.model_dump(exclude_none=True),
+    )
+
+
+@router.delete(
+    "/nodes/{node_id}",
+    summary="Delete organization knowledge node",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Node not found"},
+    },
+)
+async def delete_node(
+    node_id: int,
+    _admin: OrganizationMember = Depends(require_organization_admin),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    await kg_client.delete_node(node_id, current_user.id)
+    return Response(status_code=204)
+
+
+@router.get(
+    "/nodes/{node_id}/versions",
+    response_model=list[KnowledgeNodeVersionResponse],
+    summary="Get organization node version history",
+    status_code=200,
+    responses={
+        403: {"description": "Not an organization member"},
+        404: {"description": "Node not found"},
+    },
+)
+async def get_node_versions(
+    node_id: int,
+    limit: int = Query(default=20, ge=1, le=100),
+    _member: OrganizationMember = Depends(get_organization_member),
+    current_user: User = Depends(get_current_user),
+) -> list[KnowledgeNodeVersionResponse]:
+    return await kg_client.get_node_versions(node_id, current_user.id, limit=limit)
+
+
+# --- Edges ---
+
+
+@router.post(
+    "/edges",
+    response_model=KnowledgeEdgeResponse,
+    summary="Create organization knowledge edge",
+    status_code=201,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Node not found"},
+        409: {"description": "Edge already exists"},
+    },
+)
+async def create_edge(
+    organization_id: int,
+    data: KnowledgeEdgeCreate,
+    current_user: User = Depends(get_current_user),
+    _admin: OrganizationMember = Depends(require_organization_admin),
+) -> KnowledgeEdgeResponse:
+    return await kg_client.create_edge(
+        "company",
+        organization_id,
+        current_user.id,
+        data.model_dump(exclude_none=True),
+    )
+
+
+@router.delete(
+    "/edges/{edge_id}",
+    summary="Delete organization knowledge edge",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Edge not found"},
+    },
+)
+async def delete_edge(
+    edge_id: int,
+    _admin: OrganizationMember = Depends(require_organization_admin),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    await kg_client.delete_edge(edge_id, current_user.id)
+    return Response(status_code=204)
+
+
+# --- Graph ---
+
+
+@router.get(
+    "/graph",
+    response_model=KnowledgeGraphResponse,
+    summary="Get organization knowledge graph",
+    status_code=200,
+    responses={403: {"description": "Not an organization member"}},
+)
+async def get_graph(
+    organization_id: int,
+    _member: OrganizationMember = Depends(get_organization_member),
+    current_user: User = Depends(get_current_user),
+) -> KnowledgeGraphResponse:
+    return await kg_client.get_graph("company", organization_id, current_user.id)
+
+
+# --- Public Links ---
+
+
+@router.post(
+    "/public-links",
+    response_model=KgPublicLinkResponse,
+    summary="Create organization public link",
+    status_code=201,
+    responses={403: {"description": "Insufficient permissions"}},
+)
+async def create_organization_public_link(
+    organization_id: int,
+    data: KgPublicLinkCreateRequest,
+    current_user: User = Depends(get_current_user),
+    _admin: OrganizationMember = Depends(require_organization_admin),
+) -> KgPublicLinkResponse:
+    return await kg_client.create_public_link(
+        "company",
+        organization_id,
+        current_user.id,
+        data.model_dump(exclude_none=True),
+    )
+
+
+@router.get(
+    "/public-links",
+    response_model=list[KgPublicLinkResponse],
+    summary="List organization public links",
+    status_code=200,
+    responses={403: {"description": "Not an organization member"}},
+)
+async def list_organization_public_links(
+    organization_id: int,
+    _member: OrganizationMember = Depends(get_organization_member),
+    current_user: User = Depends(get_current_user),
+) -> list[KgPublicLinkResponse]:
+    return await kg_client.list_public_links("company", organization_id, current_user.id)
+
+
+@router.patch(
+    "/public-links/{link_id}",
+    response_model=KgPublicLinkResponse,
+    summary="Update organization public link",
+    status_code=200,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def update_organization_public_link(
+    link_id: int,
+    data: KgPublicLinkUpdate,
+    current_user: User = Depends(get_current_user),
+    _admin: OrganizationMember = Depends(require_organization_admin),
+) -> KgPublicLinkResponse:
+    return await kg_client.update_public_link(
+        link_id,
+        current_user.id,
+        data.model_dump(exclude_none=True),
+    )
+
+
+@router.delete(
+    "/public-links/{link_id}",
+    summary="Delete organization public link",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def delete_organization_public_link(
+    organization_id: int,
+    link_id: int,
+    _admin: OrganizationMember = Depends(require_organization_admin),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    await kg_client.delete_public_link(link_id, current_user.id)
+    return Response(status_code=204)
+
+
+@router.post(
+    "/public-links/{link_id}/nodes",
+    summary="Add node to organization public link (selected mode)",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link not found"},
+    },
+)
+async def add_node_to_organization_public_link(
+    link_id: int,
+    data: KgPublicLinkNodeAdd,
+    _admin: OrganizationMember = Depends(require_organization_admin),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    await kg_client.add_node_to_link(link_id, data.node_id, current_user.id)
+    return Response(status_code=204)
+
+
+@router.delete(
+    "/public-links/{link_id}/nodes/{node_id}",
+    summary="Remove node from organization public link",
+    status_code=204,
+    responses={
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Link or node not found"},
+    },
+)
+async def remove_node_from_organization_public_link(
+    link_id: int,
+    node_id: int,
+    _admin: OrganizationMember = Depends(require_organization_admin),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    await kg_client.remove_node_from_link(link_id, node_id, current_user.id)
+    return Response(status_code=204)

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { Modal, Badge, Text, ActionIcon, Stack } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 
@@ -72,6 +73,7 @@ export function ConflictModal({
   workspaceId,
 }: ConflictModalProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const isMobile = useMediaQuery('(max-width: 48em)')
   const resolve = useResolveConflict(workspaceId)
 
   const total = conflicts.length
@@ -145,7 +147,8 @@ export function ConflictModal({
         </>
       }
       size="xl"
-      centered
+      fullScreen={isMobile}
+      centered={!isMobile}
       className={styles.modal}
       overlayProps={{ backgroundOpacity: 0.6, blur: 8 }}
     >

@@ -1,9 +1,12 @@
 'use client'
 
-import { Group, Select, TextInput, ActionIcon } from '@mantine/core'
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { useState } from 'react'
+import { Select, TextInput, ActionIcon, Button, Collapse } from '@mantine/core'
+import { IconSearch, IconX, IconFilter } from '@tabler/icons-react'
 
 import type { Platform, ContentType, LibraryStatus } from '@/api/client/types.gen'
+
+import styles from './LibraryFilters.module.css'
 
 interface LibraryFiltersProps {
   platform: Platform | null
@@ -36,6 +39,7 @@ const CONTENT_TYPE_OPTIONS = [
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Черновик' },
   { value: 'ready', label: 'Готов' },
+  { value: 'scheduled', label: 'Запланирован' },
   { value: 'published', label: 'Опубликован' },
 ]
 
@@ -49,8 +53,12 @@ export function LibraryFilters({
   onStatusChange,
   onSearchChange,
 }: LibraryFiltersProps) {
-  return (
-    <Group gap="sm" wrap="wrap">
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  const hasActiveFilters = !!(platform || contentType || status)
+
+  const filtersContent = (
+    <div className={styles.filtersRow}>
       <Select
         placeholder="Платформа"
         data={PLATFORM_OPTIONS}
@@ -58,7 +66,7 @@ export function LibraryFilters({
         onChange={(v) => onPlatformChange(v as Platform | null)}
         clearable
         size="xs"
-        w={150}
+        className={styles.select}
       />
       <Select
         placeholder="Тип контента"
@@ -67,7 +75,7 @@ export function LibraryFilters({
         onChange={(v) => onContentTypeChange(v as ContentType | null)}
         clearable
         size="xs"
-        w={170}
+        className={styles.selectWide}
       />
       <Select
         placeholder="Статус"
@@ -76,7 +84,7 @@ export function LibraryFilters({
         onChange={(v) => onStatusChange(v as LibraryStatus | null)}
         clearable
         size="xs"
-        w={150}
+        className={styles.select}
       />
       <TextInput
         placeholder="Поиск по названию..."
@@ -96,8 +104,34 @@ export function LibraryFilters({
             <IconSearch size={14} style={{ color: 'var(--mantine-color-dimmed)' }} />
           )
         }
-        style={{ flex: 1, minWidth: 180 }}
+        className={styles.searchInput}
       />
-    </Group>
+    </div>
+  )
+
+  return (
+    <div className={styles.wrapper}>
+      {/* Mobile: toggle button + collapsible filters */}
+      <Button
+        variant="outline"
+        size="xs"
+        leftSection={<IconFilter size={14} />}
+        onClick={() => setFiltersOpen((o) => !o)}
+        className={styles.toggleButton}
+      >
+        Фильтры{hasActiveFilters ? ' (активны)' : ''}
+      </Button>
+
+      <div className={styles.mobileCollapse}>
+        <Collapse in={filtersOpen}>
+          {filtersContent}
+        </Collapse>
+      </div>
+
+      {/* Desktop: always visible */}
+      <div className={styles.desktopFilters}>
+        {filtersContent}
+      </div>
+    </div>
   )
 }

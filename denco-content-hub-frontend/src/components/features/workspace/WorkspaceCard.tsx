@@ -9,7 +9,7 @@ import styles from '@/app/(dashboard)/dashboard.module.css'
 
 const roleColorMap: Record<WorkspaceRole, string> = {
   owner: 'neonViolet',
-  admin: 'neonBlue',
+  admin: 'contentHubTeal',
   editor: 'green',
   viewer: 'gray',
   contractor: 'orange',
@@ -42,15 +42,15 @@ export function WorkspaceCard({ workspace, onEdit, onDelete }: WorkspaceCardProp
     >
       <Stack gap="sm">
         <Group justify="space-between" align="flex-start">
-          <Group gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
-            <IconBriefcase size={20} style={{ color: 'var(--neon-blue)', flexShrink: 0 }} />
+          <Group gap="xs" wrap="nowrap" className="flexFill">
+            <IconBriefcase size={20} style={{ color: 'var(--content-hub-teal)', flexShrink: 0 }} />
             <Text fw={600} c="gray.1" truncate="end">
               {workspace.name}
             </Text>
           </Group>
           <Group gap={4} wrap="nowrap">
             {workspace.is_personal && (
-              <Badge size="xs" variant="light" color="neonCyan">
+              <Badge size="xs" variant="light" color="contentHubTeal">
                 Личный
               </Badge>
             )}

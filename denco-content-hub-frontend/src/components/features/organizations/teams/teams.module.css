@@ -1,0 +1,32 @@
+.teamCard {
+  composes: listCard from global;
+  cursor: pointer;
+}
+
+.teamIconWrap {
+  composes: iconWrapTeal from global;
+}
+
+.sectionCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-lg);
+}
+
+.sectionTitle {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .tableWrap {
+    margin: 0 -12px;
+  }
+}

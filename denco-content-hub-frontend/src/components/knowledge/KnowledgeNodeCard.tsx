@@ -108,7 +108,7 @@ function KnowledgeNodeCardComponent({ data, selected }: NodeProps & { data: Know
           )}
           <Stack gap={6}>
             <Group gap={8} wrap="nowrap" justify="space-between">
-              <Group gap={8} wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+              <Group gap={8} wrap="nowrap" className="flexFill">
                 <Box
                   style={{
                     background: data.gradient,

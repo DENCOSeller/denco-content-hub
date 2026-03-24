@@ -12,13 +12,14 @@ import {
   Select,
   Textarea,
 } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 
 import type { NodeType } from '@/lib/knowledge-utils'
 import { useCreateNodeMutation } from '@/api/hooks/useKnowledge'
-import { useCompanyCreateNodeMutation } from '@/api/hooks/useCompanyKnowledge'
+import { useOrganizationCreateNodeMutation } from '@/api/hooks/useOrganizationKnowledge'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 
 import styles from './CreateNodeModal.module.css'
 
@@ -51,18 +52,19 @@ function hexToRgb(hex: string): string {
 }
 
 export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeModalProps) {
+  const isMobile = useMediaQuery('(max-width: 48em)')
   const [selectedType, setSelectedType] = useState<NodeType>('note')
   const [title, setTitle] = useState('')
   const [content, setContent] = useState<Record<string, unknown> | null>(null)
 
-  const activeCompany = useCompanyStore((s) => s.activeCompany)
-  const companyId = scope === 'company' ? scopeId : (activeCompany?.id ?? 0)
+  const activeOrganization = useOrganizationStore((s) => s.activeOrganization)
+  const companyId = scope === 'company' ? scopeId : (activeOrganization?.id ?? 0)
   const { config, getConfig, getTypeDefId, isLoading: isTypesLoading } = useNodeTypeConfig(companyId)
 
   const nodeTypes = Object.entries(config) as [NodeType, (typeof config)[string]][]
 
   const workspaceCreate = useCreateNodeMutation(scope === 'workspace' ? scopeId : 0)
-  const companyCreate = useCompanyCreateNodeMutation(scope === 'company' ? scopeId : 0)
+  const companyCreate = useOrganizationCreateNodeMutation(scope === 'company' ? scopeId : 0)
   const createNode = scope === 'workspace' ? workspaceCreate : companyCreate
 
   const selectedConfig = getConfig(selectedType)
@@ -108,7 +110,8 @@ export function CreateNodeModal({ scope, scopeId, opened, onClose }: CreateNodeM
       onClose={handleClose}
       title="Создать узел"
       size="xl"
-      centered
+      fullScreen={isMobile}
+      centered={!isMobile}
       className={styles.modal}
       overlayProps={{ backgroundOpacity: 0.6, blur: 8 }}
     >

@@ -1,0 +1,27 @@
+.roleCard {
+  composes: listCard from global;
+}
+
+.roleIconWrap {
+  composes: iconWrapTeal from global;
+}
+
+.sectionTitle {
+  composes: sectionTitle from global;
+}
+
+.infoCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+}
+
+.permissionCategory {
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  background: var(--card-bg);
+}
+
+.permissionCategory + .permissionCategory {
+  margin-top: 8px;
+}

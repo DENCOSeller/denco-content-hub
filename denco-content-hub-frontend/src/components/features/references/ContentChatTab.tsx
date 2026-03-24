@@ -6,7 +6,6 @@ import {
   Text,
   TextInput,
   ActionIcon,
-  Stack,
 } from '@mantine/core'
 import { IconSend, IconPlayerStop, IconSparkles } from '@tabler/icons-react'
 import { useContentChat, type ContentChatMessage } from '@/hooks/useContentChat'
@@ -30,7 +29,7 @@ function MessageBubble({ message }: { message: ContentChatMessage }) {
   return (
     <div className={`${styles.row} ${isUser ? styles.userRow : styles.assistantRow}`}>
       {!isUser && (
-        <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'neonBlue', to: 'neonCyan', deg: 135 }}>
+        <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'contentHubTeal', to: 'teal', deg: 135 }}>
           <IconSparkles size={14} />
         </Avatar>
       )}
@@ -42,7 +41,7 @@ function MessageBubble({ message }: { message: ContentChatMessage }) {
         <span className={styles.time}>{formatTime(message.created_at)}</span>
       </div>
       {isUser && (
-        <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'neonBlue', to: 'neonViolet', deg: 135 }}>
+        <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'contentHubTeal', to: 'neonViolet', deg: 135 }}>
           U
         </Avatar>
       )}
@@ -53,7 +52,7 @@ function MessageBubble({ message }: { message: ContentChatMessage }) {
 function StreamingBubble({ content }: { content: string }) {
   return (
     <div className={`${styles.row} ${styles.assistantRow}`}>
-      <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'neonBlue', to: 'neonCyan', deg: 135 }}>
+      <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'contentHubTeal', to: 'teal', deg: 135 }}>
         <IconSparkles size={14} />
       </Avatar>
       <div className={`${styles.bubble} ${styles.assistantBubble}`}>
@@ -129,7 +128,7 @@ export function ContentChatTab({ workspaceId, contentId }: ContentChatTabProps) 
       ) : (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>
-            <IconSparkles size={24} style={{ color: 'var(--neon-blue)' }} />
+            <IconSparkles size={24} style={{ color: 'var(--content-hub-teal)' }} />
           </div>
           <Text size="md" fw={500} c="gray.3">
             AI Чат по контенту
@@ -159,7 +158,7 @@ export function ContentChatTab({ workspaceId, contentId }: ContentChatTabProps) 
             ) : (
               <ActionIcon
                 variant="subtle"
-                color="neonBlue"
+                color="contentHubTeal"
                 onClick={handleSend}
                 aria-label="Отправить"
               >

@@ -1,0 +1,26 @@
+/* ─── Channel Grid ────────────────────────────────────────── */
+.channelGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 1100px) {
+  .channelGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .channelGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Skeleton Card ───────────────────────────────────────── */
+.skeletonCard {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}

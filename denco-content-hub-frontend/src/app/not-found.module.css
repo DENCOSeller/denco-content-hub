@@ -1,0 +1,10 @@
+.gradientTitle {
+  background: linear-gradient(135deg, var(--content-hub-teal), var(--neon-violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glowButton {
+  box-shadow: 0 0 20px var(--content-hub-teal-alpha-30);
+}

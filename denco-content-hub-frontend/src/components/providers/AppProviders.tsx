@@ -8,14 +8,14 @@ import { useEffect, useState } from 'react'
 
 import { theme } from '@/theme'
 import { useWorkspaceStore } from '@/stores/workspace-store'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 
 // Initialize API client and interceptors
 import '@/api/instance'
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const hydrateWorkspace = useWorkspaceStore((s) => s.hydrateFromCookie)
-  const hydrateCompany = useCompanyStore((s) => s.hydrateFromCookie)
+  const hydrateCompany = useOrganizationStore((s) => s.hydrateFromCookie)
 
   useEffect(() => {
     hydrateWorkspace()

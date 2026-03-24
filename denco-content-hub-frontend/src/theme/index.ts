@@ -39,12 +39,26 @@ const neonCyan: MantineColorsTuple = [
   '#0067ad',
 ]
 
+const contentHubTeal: MantineColorsTuple = [
+  '#f0fdfa',
+  '#ccfbf1',
+  '#99f6e4',
+  '#5eead4',
+  '#2dd4bf',
+  '#14B8A6',
+  '#0d9488',
+  '#0f766e',
+  '#115e59',
+  '#134e4a',
+]
+
 export const theme = createTheme({
-  primaryColor: 'neonBlue',
+  primaryColor: 'contentHubTeal',
   colors: {
     neonBlue,
     neonViolet,
     neonCyan,
+    contentHubTeal,
     dark: [
       '#C1C2C5',
       '#A6A7AB',

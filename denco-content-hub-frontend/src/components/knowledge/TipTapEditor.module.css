@@ -47,7 +47,7 @@
   background: transparent;
   color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s var(--ease-smooth);
 }
 
 .toolbarBtn:hover {
@@ -58,7 +58,7 @@
 .toolbarBtnActive {
   background: var(--tiptap-accent-gradient, var(--gradient-main));
   color: #fff;
-  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
 }
 
 .toolbarBtnActive:hover {
@@ -195,7 +195,7 @@
 }
 
 .editorArea :global(.tiptap a) {
-  color: var(--neon-blue, #0A84FF);
+  color: var(--eco-content, #14B8A6);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -245,8 +245,8 @@
 }
 
 .editorArea :global(.tiptap ul[data-type='taskList'] li label input[type='checkbox']:checked) {
-  background: var(--neon-blue, #0A84FF);
-  border-color: var(--neon-blue, #0A84FF);
+  background: var(--eco-content, #14B8A6);
+  border-color: var(--eco-content, #14B8A6);
 }
 
 .editorArea :global(.tiptap ul[data-type='taskList'] li label input[type='checkbox']:checked::after) {
@@ -268,7 +268,7 @@
 
 /* ── Blockquote (цитата) ── */
 .editorArea :global(.tiptap blockquote) {
-  border-left: 3px solid var(--neon-blue, #0A84FF);
+  border-left: 3px solid var(--eco-content, #14B8A6);
   background: rgba(255, 255, 255, 0.03);
   padding: 12px 16px;
   margin: 12px 0;

@@ -1,11 +1,11 @@
 'use client'
 
-import { Stack, Title } from '@mantine/core'
+import { Stack } from '@mantine/core'
 import { useParams } from 'next/navigation'
+import { PageHeader } from '@denco/ui'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { CreateWizard } from '@/components/features/library/create-wizard/CreateWizard'
-import styles from '../library.module.css'
 
 export default function LibraryCreatePage() {
   const params = useParams()
@@ -22,9 +22,7 @@ export default function LibraryCreatePage() {
   return (
     <Stack gap="lg">
       <AppBreadcrumbs items={breadcrumbs} />
-      <Title order={2} className={styles.pageTitle}>
-        Создание контента
-      </Title>
+      <PageHeader title="Создание контента" />
       <CreateWizard workspaceId={workspaceId} />
     </Stack>
   )

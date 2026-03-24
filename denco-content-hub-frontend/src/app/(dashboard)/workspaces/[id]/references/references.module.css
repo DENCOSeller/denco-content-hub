@@ -1,22 +1,83 @@
+/* References page — redesigned layout */
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
 .pageTitle {
-  background: var(--gradient-main);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.addForm {
-  background: var(--card-bg);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--mantine-radius-lg);
-  padding: var(--mantine-spacing-md);
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
 }
 
-.sectionTitle {
+.filtersBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  min-width: 200px;
+  max-width: 280px;
+}
+
+.filterToggle {
+  display: none;
+}
+
+.countLabel {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.65rem;
   font-weight: 700;
+  padding: 0 var(--space-2);
+}
+
+/* Skeleton card */
+.skeletonCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.skeletonThumb {
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  background: var(--surface-overlay);
+}
+
+.skeletonBody {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtersBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchInput {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .filterToggle {
+    display: inline-flex;
+  }
 }

@@ -9,10 +9,10 @@
 .card {
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--content-hub-teal-alpha-10);
+  background: var(--content-hub-teal-alpha-5);
   cursor: pointer;
-  transition: background 200ms ease, border-color 200ms ease;
+  transition: background 200ms ease, border-color 200ms ease, transform 150ms ease, box-shadow 200ms ease;
   text-align: left;
   font-family: inherit;
   color: var(--text-secondary);
@@ -21,13 +21,26 @@
 }
 
 .card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--border-accent);
+  background: var(--content-hub-teal-alpha-10);
+  border-color: var(--content-hub-teal-alpha-30);
   color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--content-hub-teal-alpha-10);
+}
+
+.card:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .cardIcon {
   font-size: 16px;
   margin-bottom: 6px;
-  opacity: 0.7;
+  color: var(--content-hub-teal, #14B8A6);
+  opacity: 0.8;
+  transition: opacity 200ms ease;
+}
+
+.card:hover .cardIcon {
+  opacity: 1;
 }

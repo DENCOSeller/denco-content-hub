@@ -2,16 +2,16 @@
   position: relative;
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  border-left: 3px solid var(--action-color, var(--mantine-color-dark-4));
+  border: 1px solid var(--content-hub-teal-alpha-10);
+  background: var(--content-hub-teal-alpha-5);
+  border-left: 3px solid var(--action-color, var(--content-hub-teal, #14B8A6));
   transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.12);
-  border-left-color: var(--action-color, var(--mantine-color-dark-3));
+  background: var(--content-hub-teal-alpha-5);
+  border-color: var(--content-hub-teal-alpha-20);
+  border-left-color: var(--action-color, var(--content-hub-teal, #14B8A6));
 }
 
 /* Flash after successful apply */
@@ -29,7 +29,7 @@
     box-shadow: 0 0 8px rgba(48, 209, 88, 0.2);
   }
   100% {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--content-hub-teal-alpha-5);
     box-shadow: 0 0 0 transparent;
   }
 }
@@ -78,7 +78,7 @@
 }
 
 .statusBadge[data-status='applied'] {
-  color: var(--mantine-color-teal-5);
+  color: var(--content-hub-teal, #14B8A6);
 }
 
 .statusBadge[data-status='rejected'] {
@@ -88,7 +88,7 @@
 .preview {
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--content-hub-teal-alpha-10);
 }
 
 .errorText {

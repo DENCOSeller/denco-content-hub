@@ -22,7 +22,7 @@
 }
 
 .iconWrapper svg {
-  color: var(--neon-blue, #0a84ff);
+  color: var(--content-hub-teal, #14B8A6);
 }
 
 .label {

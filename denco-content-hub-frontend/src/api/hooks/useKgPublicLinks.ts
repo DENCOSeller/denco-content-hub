@@ -54,7 +54,7 @@ export const kgPublicLinkKeys = {
 function baseUrl(scope: 'workspace' | 'company', scopeId: number) {
   return scope === 'workspace'
     ? `/api/v1/workspaces/${scopeId}/knowledge/public-links`
-    : `/api/v1/companies/${scopeId}/knowledge/public-links`
+    : `/api/v1/organizations/${scopeId}/knowledge/public-links`
 }
 
 // ---------------------------------------------------------------------------

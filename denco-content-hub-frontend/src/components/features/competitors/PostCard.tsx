@@ -56,7 +56,7 @@ export function PostCard({ post, isSelected, onSelect }: PostCardProps) {
       onClick={onSelect}
       style={{
         cursor: 'pointer',
-        borderColor: isSelected ? 'var(--neon-blue)' : undefined,
+        borderColor: isSelected ? 'var(--content-hub-teal)' : undefined,
       }}
     >
       <Group gap="md" wrap="nowrap" align="flex-start">
@@ -70,7 +70,7 @@ export function PostCard({ post, isSelected, onSelect }: PostCardProps) {
           />
         )}
 
-        <Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
+        <Stack gap="xs" className="flexFill">
           {previewText && (
             <Text size="sm" lineClamp={2}>
               {truncateText(previewText)}

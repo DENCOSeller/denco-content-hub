@@ -40,7 +40,7 @@ interface NodeTypeManagerProps {
 }
 
 const PRESET_COLORS = [
-  '#0A84FF', '#5E5CE6', '#BF5AF2', '#FF375F',
+  '#14B8A6', '#5E5CE6', '#BF5AF2', '#FF375F',
   '#FF9F0A', '#30D158', '#64D2FF', '#8E8E93',
 ]
 
@@ -167,7 +167,7 @@ export function NodeTypeManager({ companyId }: NodeTypeManagerProps) {
                 <IconNote size={16} color="#fff" />
               </Box>
 
-              <Box style={{ flex: 1, minWidth: 0 }}>
+              <Box className="flexFill">
                 <Group gap={6} wrap="nowrap">
                   <Text fw={600} size="sm" lineClamp={1}>
                     {t.label}

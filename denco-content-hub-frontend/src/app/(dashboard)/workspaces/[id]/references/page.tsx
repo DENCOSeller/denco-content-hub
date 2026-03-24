@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import {
-  Title,
   Stack,
   Group,
   TextInput,
@@ -11,27 +10,52 @@ import {
   ActionIcon,
   Pagination,
   SegmentedControl,
+  Skeleton,
+  Collapse,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconPlus, IconSearch, IconX } from '@tabler/icons-react'
+import { IconPlus, IconSearch, IconX, IconFilter } from '@tabler/icons-react'
 import { useParams, useSearchParams, useRouter, usePathname } from 'next/navigation'
 
-import { useContentListQuery } from '@/api/hooks/useContent'
-import { LoadingState } from '@/components/shared/LoadingState'
-import { ErrorState } from '@/components/shared/ErrorState'
-import { EmptyState } from '@/components/shared/EmptyState'
+import { PageHeader } from '@/components/shared/PageHeader'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
-import { ContentRow } from '@/components/features/references/ContentRow'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { useContentListQuery } from '@/api/hooks/useContent'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { ContentCard } from '@/components/features/references/ContentCard'
 import { AddSourceModal } from '@/components/features/references/AddSourceModal'
 import { useWorkspaceStore } from '@/stores/workspace-store'
-import type { ContentItemShortResponse } from '@/api/client/types.gen'
+import type { ContentItemShortWithYouTube } from '@/api/types/content'
 
 import styles from './references.module.css'
 
 type ContentStatus = 'pending' | 'processing' | 'completed' | 'failed'
 
-type ContentItemWithProcessingStep = ContentItemShortResponse & {
+type ContentItemWithProcessingStep = ContentItemShortWithYouTube & {
   processing_step?: string | null
+}
+
+function ContentCardSkeleton() {
+  return (
+    <div className={styles.skeletonCard}>
+      <Skeleton height={0} className={styles.skeletonThumb} />
+      <div className={styles.skeletonBody}>
+        <Skeleton height={14} width="80%" radius="sm" />
+        <Skeleton height={12} width="60%" radius="sm" mt={8} />
+        <Skeleton height={12} width="40%" radius="sm" mt={6} />
+      </div>
+    </div>
+  )
+}
+
+function ContentGridSkeleton() {
+  return (
+    <div className={styles.grid}>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <ContentCardSkeleton key={i} />
+      ))}
+    </div>
+  )
 }
 
 export default function WorkspaceReferencesPage() {
@@ -50,14 +74,9 @@ export default function WorkspaceReferencesPage() {
   )
 
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false)
+  const [filtersOpen, { toggle: toggleFilters }] = useDisclosure(true)
 
   const basePath = `/workspaces/${workspaceId}/references`
-
-  const breadcrumbs = [
-    { label: activeWorkspace?.company_name ?? '' },
-    { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
-    { label: 'Референсы' },
-  ]
 
   const {
     data: contentData,
@@ -102,21 +121,39 @@ export default function WorkspaceReferencesPage() {
     updateSearchParams({ page: String(newPage) })
   }
 
+  const breadcrumbs = [
+    { label: activeWorkspace?.company_name ?? '' },
+    { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
+    { label: 'Референсы' },
+  ]
+
   return (
     <Stack gap="lg">
       <AppBreadcrumbs items={breadcrumbs} />
-
-      <Group justify="space-between" align="center">
-        <Title order={2} className={styles.pageTitle}>
-          Референсы
-        </Title>
-        <Button
-          leftSection={<IconPlus size={16} />}
-          onClick={openModal}
-        >
-          Добавить источник
-        </Button>
-      </Group>
+      <PageHeader
+        title="Референсы"
+        subtitle={activeWorkspace ? `${activeWorkspace.company_name} / ${activeWorkspace.name}` : undefined}
+        actions={[
+          <Button
+            key="add"
+            leftSection={<IconPlus size={16} />}
+            size="sm"
+            onClick={openModal}
+          >
+            Добавить источник
+          </Button>,
+          <Button
+            key="filters"
+            variant="subtle"
+            size="xs"
+            leftSection={<IconFilter size={14} />}
+            onClick={toggleFilters}
+            className={styles.filterToggle}
+          >
+            Фильтры
+          </Button>,
+        ]}
+      />
 
       <AddSourceModal
         workspaceId={workspaceId}
@@ -124,28 +161,29 @@ export default function WorkspaceReferencesPage() {
         onClose={closeModal}
       />
 
-      {/* Filters */}
-      <Group justify="space-between" align="flex-end">
-        <SegmentedControl
-          value={statusFilter ?? 'all'}
-          onChange={handleStatusChange}
-          data={[
-            { label: 'Все', value: 'all' },
-            { label: 'Ожидает', value: 'pending' },
-            { label: 'Обработка', value: 'processing' },
-            { label: 'Готово', value: 'completed' },
-            { label: 'Ошибка', value: 'failed' },
-          ]}
-          size="xs"
-        />
+      {/* Filters — collapsible on mobile */}
+      <Collapse in={filtersOpen}>
+        <div className={styles.filtersBar}>
+          <SegmentedControl
+            value={statusFilter ?? 'all'}
+            onChange={handleStatusChange}
+            data={[
+              { label: 'Все', value: 'all' },
+              { label: 'Ожидает', value: 'pending' },
+              { label: 'Обработка', value: 'processing' },
+              { label: 'Готово', value: 'completed' },
+              { label: 'Ошибка', value: 'failed' },
+            ]}
+            size="xs"
+          />
 
-        <Group gap="xs">
           <TextInput
             placeholder="Поиск по названию..."
             size="xs"
             value={searchValue}
             onChange={(e) => setSearchValue(e.currentTarget.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            className={styles.searchInput}
             rightSection={
               searchValue ? (
                 <ActionIcon
@@ -169,30 +207,36 @@ export default function WorkspaceReferencesPage() {
               )
             }
           />
-        </Group>
-      </Group>
+        </div>
+      </Collapse>
 
-      {/* Content list */}
-      {isLoading && <LoadingState />}
-      {isError && <ErrorState onRetry={refetch} />}
+      {/* Content */}
+      {isLoading && <ContentGridSkeleton />}
+
+      {isError && (
+        <ErrorState message="Ошибка загрузки контента" onRetry={refetch} />
+      )}
+
       {!isLoading && !isError && (!contentData || contentData.items.length === 0) && (
         <EmptyState message="Нет источников. Нажмите «Добавить источник» для начала." />
       )}
 
       {contentData && contentData.items.length > 0 && (
-        <Stack gap="sm">
-          <Text className={styles.sectionTitle} px="sm">
+        <>
+          <Text className={styles.countLabel}>
             {contentData.total} элементов
           </Text>
-          {contentData.items.map((item) => (
-            <ContentRow
-              key={item.id}
-              item={item as ContentItemWithProcessingStep}
-              workspaceId={workspaceId}
-              basePath={basePath}
-            />
-          ))}
-        </Stack>
+          <div className={styles.grid}>
+            {contentData.items.map((item) => (
+              <ContentCard
+                key={item.id}
+                item={item as ContentItemWithProcessingStep}
+                workspaceId={workspaceId}
+                basePath={basePath}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Pagination */}

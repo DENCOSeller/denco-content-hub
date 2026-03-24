@@ -1,0 +1,119 @@
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform var(--transition-slow, 0.2s), box-shadow var(--transition-slow, 0.2s);
+  min-width: 0;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--eco-content) 12%, transparent);
+  color: var(--eco-content);
+  flex-shrink: 0;
+}
+
+.trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.trendUp {
+  color: var(--mantine-color-green-5);
+  background: color-mix(in srgb, var(--mantine-color-green-5) 10%, transparent);
+}
+
+.trendDown {
+  color: var(--mantine-color-red-5);
+  background: color-mix(in srgb, var(--mantine-color-red-5) 10%, transparent);
+}
+
+.trendNeutral {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary, rgba(255, 255, 255, 0.95));
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--text-muted, rgba(200, 200, 240, 0.55));
+  line-height: 1.3;
+}
+
+/* Skeleton */
+.skeleton {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--mantine-radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeletonValue {
+  width: 60px;
+  height: 28px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  animation: pulse 1.5s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+
+.skeletonLabel {
+  width: 100px;
+  height: 14px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  animation: pulse 1.5s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

@@ -5,6 +5,7 @@ import { Avatar } from '@mantine/core'
 import { IconSparkles, IconSearch, IconFileImport, IconCheck } from '@tabler/icons-react'
 import type { ChatMessage, AiAction } from '@/hooks/useAiChat'
 import { parseMessageContent } from '@/lib/chat-message-parser'
+import { markdownToHtml } from '@/lib/markdown-to-html'
 import { NodeReference } from './NodeReference'
 import { AiActionCard } from './AiActionCard'
 import { AiToolProgress } from './AiToolProgress'
@@ -41,7 +42,7 @@ function RenderContent({ content, workspaceId, companyId, streaming }: { content
   if (!hasNodeRefs) {
     return (
       <div className={styles.content}>
-        <span dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} />
+        <span dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }} />
         {cursor}
       </div>
     )
@@ -51,7 +52,7 @@ function RenderContent({ content, workspaceId, companyId, streaming }: { content
     <div className={styles.content}>
       {segments.map((segment, i) =>
         segment.type === 'text' ? (
-          <span key={i} dangerouslySetInnerHTML={{ __html: renderMarkdown(segment.content) }} />
+          <span key={i} dangerouslySetInnerHTML={{ __html: markdownToHtml(segment.content) }} />
         ) : (
           <NodeReference
             key={i}
@@ -76,7 +77,7 @@ export function AiChatMessageItem({ message, workspaceId, companyId, onApplyActi
     <div className={`${styles.row} ${isUser ? styles.userRow : styles.assistantRow}`}>
       {!isUser && (
         <div className={styles.avatar}>
-          <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'neonBlue', to: 'neonCyan', deg: 135 }}>
+          <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'contentHubTeal', to: 'teal.3', deg: 135 }}>
             <IconSparkles size={14} />
           </Avatar>
         </div>
@@ -97,7 +98,7 @@ export function AiChatMessageItem({ message, workspaceId, companyId, onApplyActi
               </div>
             )}
             {message.content && (
-              <div className={styles.content} dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }} />
+              <div className={styles.content} dangerouslySetInnerHTML={{ __html: markdownToHtml(message.content) }} />
             )}
           </>
         ) : (
@@ -139,7 +140,7 @@ export function AiChatMessageItem({ message, workspaceId, companyId, onApplyActi
       </div>
       {isUser && (
         <div className={styles.avatar}>
-          <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'neonBlue', to: 'neonViolet', deg: 135 }}>
+          <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'contentHubTeal', to: 'teal.8', deg: 135 }}>
             U
           </Avatar>
         </div>
@@ -179,7 +180,7 @@ export function AiStreamingMessage({ content, actions, toolProgress, workspaceId
   return (
     <div className={`${styles.row} ${styles.assistantRow}`}>
       <div className={styles.avatar}>
-        <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'neonBlue', to: 'neonCyan', deg: 135 }}>
+        <Avatar size={30} radius="xl" variant="gradient" gradient={{ from: 'contentHubTeal', to: 'teal.3', deg: 135 }}>
           <IconSparkles size={14} />
         </Avatar>
       </div>
@@ -209,58 +210,3 @@ export function AiStreamingMessage({ content, actions, toolProgress, workspaceId
   )
 }
 
-function renderMarkdown(text: string): string {
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, _lang, code) => {
-    return `<pre><code>${code.trim()}</code></pre>`
-  })
-
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
-
-  html = html.replace(
-    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>',
-  )
-
-  html = html.replace(/(?:^|\n)((?:- .+\n?)+)/g, (_match, list: string) => {
-    const items = list
-      .trim()
-      .split('\n')
-      .map((item: string) => `<li>${item.replace(/^- /, '')}</li>`)
-      .join('')
-    return `<ul>${items}</ul>`
-  })
-
-  html = html.replace(/(?:^|\n)((?:\d+\. .+\n?)+)/g, (_match, list: string) => {
-    const items = list
-      .trim()
-      .split('\n')
-      .map((item: string) => `<li>${item.replace(/^\d+\. /, '')}</li>`)
-      .join('')
-    return `<ol>${items}</ol>`
-  })
-
-  const blocks = html.split(/\n\n+/)
-  html = blocks
-    .map((block) => {
-      const trimmed = block.trim()
-      if (!trimmed) return ''
-      if (
-        trimmed.startsWith('<pre>') ||
-        trimmed.startsWith('<ul>') ||
-        trimmed.startsWith('<ol>')
-      ) {
-        return trimmed
-      }
-      return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`
-    })
-    .join('')
-
-  return html
-}

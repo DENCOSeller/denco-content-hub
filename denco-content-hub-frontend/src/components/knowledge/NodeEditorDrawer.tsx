@@ -26,12 +26,12 @@ import {
   useWorkspaceGraphQuery,
 } from '@/api/hooks/useKnowledge'
 import {
-  useCompanyNodeQuery,
-  useCompanyUpdateNodeMutation,
-  useCompanyDeleteNodeMutation,
-  useCompanyNodeVersionsQuery,
-  useCompanyGraphQuery,
-} from '@/api/hooks/useCompanyKnowledge'
+  useOrganizationNodeQuery,
+  useOrganizationUpdateNodeMutation,
+  useOrganizationDeleteNodeMutation,
+  useOrganizationNodeVersionsQuery,
+  useOrganizationGraphQuery,
+} from '@/api/hooks/useOrganizationKnowledge'
 import { getNodeTypeConfig } from '@/lib/knowledge-utils'
 import { markdownToHtml } from '@/lib/markdown-to-html'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
@@ -97,14 +97,14 @@ export function NodeEditorDrawer({ scope, scopeId, nodeId, opened, onClose }: No
   const wsDelete = useDeleteNodeMutation(scope === 'workspace' ? scopeId : 0)
 
   // Company hooks
-  const coNode = useCompanyNodeQuery(scope === 'company' ? scopeId : 0, scope === 'company' ? activeNodeId : 0)
-  const coVersions = useCompanyNodeVersionsQuery(scope === 'company' ? scopeId : 0, scope === 'company' ? activeNodeId : 0)
-  const coUpdate = useCompanyUpdateNodeMutation(scope === 'company' ? scopeId : 0)
-  const coDelete = useCompanyDeleteNodeMutation(scope === 'company' ? scopeId : 0)
+  const coNode = useOrganizationNodeQuery(scope === 'company' ? scopeId : 0, scope === 'company' ? activeNodeId : 0)
+  const coVersions = useOrganizationNodeVersionsQuery(scope === 'company' ? scopeId : 0, scope === 'company' ? activeNodeId : 0)
+  const coUpdate = useOrganizationUpdateNodeMutation(scope === 'company' ? scopeId : 0)
+  const coDelete = useOrganizationDeleteNodeMutation(scope === 'company' ? scopeId : 0)
 
   // Graph hooks (cached — no extra request)
   const wsGraph = useWorkspaceGraphQuery(scope === 'workspace' ? scopeId : 0)
-  const coGraph = useCompanyGraphQuery(scope === 'company' ? scopeId : 0)
+  const coGraph = useOrganizationGraphQuery(scope === 'company' ? scopeId : 0)
   const graphData = scope === 'workspace' ? wsGraph.data : coGraph.data
 
   const nodeQuery = scope === 'workspace' ? wsNode : coNode

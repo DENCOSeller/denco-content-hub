@@ -1,0 +1,14 @@
+.sectionTitle {
+  composes: sectionTitle from global;
+}
+
+.statLabel {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.statValue {
+  color: var(--mantine-color-gray-2);
+  font-weight: 600;
+  font-size: 0.85rem;
+}

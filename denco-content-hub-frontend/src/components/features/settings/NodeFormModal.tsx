@@ -9,7 +9,7 @@ import { z } from 'zod'
 
 import { useCreateNodeMutation, useUpdateNodeMutation } from '@/api/hooks/useKnowledge'
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 
 const nodeFormSchema = z.object({
   title: z.string().min(1, 'Название обязательно'),
@@ -48,8 +48,8 @@ export function NodeFormModal({
   onClose,
   editingNode,
 }: NodeFormModalProps) {
-  const activeCompany = useCompanyStore((s) => s.activeCompany)
-  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+  const activeOrganization = useOrganizationStore((s) => s.activeOrganization)
+  const { getTypeDefId } = useNodeTypeConfig(activeOrganization?.id ?? 0)
 
   const createNode = useCreateNodeMutation(workspaceId)
   const updateNode = useUpdateNodeMutation(workspaceId)

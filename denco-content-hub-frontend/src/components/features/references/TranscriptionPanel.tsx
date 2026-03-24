@@ -21,7 +21,7 @@ import styles from './transcription-panel.module.css'
 // ─── Speaker colors ──────────────────────────────────────────────────────────
 
 const SPEAKER_COLORS = [
-  '#0A84FF', '#30D158', '#FF9F0A', '#FF375F', '#32ADE6', '#BF5AF2',
+  '#14B8A6', '#30D158', '#FF9F0A', '#FF375F', '#2dd4bf', '#BF5AF2',
 ]
 
 function getSpeakerColor(speaker: string): string {

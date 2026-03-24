@@ -8,9 +8,10 @@ import {
   ActionIcon,
   Tooltip,
   Card,
+  Avatar,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { IconX } from '@tabler/icons-react'
+import { IconX, IconClock } from '@tabler/icons-react'
 
 import {
   useInvitationsQuery,
@@ -18,9 +19,10 @@ import {
 } from '@/api/hooks/useTeam'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
-import { EmptyState } from '@/components/shared/EmptyState'
+import { EmptyState } from '@denco/ui'
 
 import { roleLabelMap, roleColorMap } from './constants'
+import styles from './settings.module.css'
 
 interface InvitationsTabProps {
   workspaceId: number
@@ -35,7 +37,7 @@ export function InvitationsTab({ workspaceId }: InvitationsTabProps) {
       onSuccess: () => {
         notifications.show({
           title: 'Приглашение отменено',
-          message: `Инвайт для ${email} отменён`,
+          message: `Инвайт для ${email} отменен`,
           color: 'green',
         })
       },
@@ -56,49 +58,53 @@ export function InvitationsTab({ workspaceId }: InvitationsTabProps) {
   if (pending.length === 0) return <EmptyState message="Нет ожидающих приглашений" />
 
   return (
-    <Stack gap="sm">
-      <Text
-        c="dimmed"
-        tt="uppercase"
-        fz="0.7rem"
-        fw={600}
-        style={{ letterSpacing: '1px' }}
-      >
+    <Stack gap="md">
+      <Text className={styles.sectionLabel}>
         {pending.length} ожидающих
       </Text>
-      {pending.map((inv) => (
-        <Card
-          key={inv.id}
-          padding="sm"
-          radius="md"
-          style={{ background: 'var(--card-bg)', border: '1px solid var(--border-subtle)' }}
-        >
-          <Group justify="space-between" wrap="nowrap">
-            <Stack gap={2} style={{ minWidth: 0 }}>
-              <Text fw={500} c="gray.1" truncate="end">{inv.email}</Text>
-              <Text size="xs" c="dimmed">
-                Истекает: {new Date(inv.expires_at).toLocaleDateString('ru-RU')}
-              </Text>
-            </Stack>
-            <Group gap="xs" wrap="nowrap">
-              <Badge color={roleColorMap[inv.role] ?? 'gray'} variant="light" size="sm">
-                {roleLabelMap[inv.role] ?? inv.role}
-              </Badge>
-              <Tooltip label="Отменить приглашение">
-                <ActionIcon
-                  variant="light"
-                  color="red"
-                  size="sm"
-                  onClick={() => handleCancel(inv.id, inv.email)}
-                  loading={cancelInvitation.isPending && cancelInvitation.variables === inv.id}
-                >
-                  <IconX size={14} />
-                </ActionIcon>
-              </Tooltip>
+      <Stack gap="xs">
+        {pending.map((inv) => (
+          <Card
+            key={inv.id}
+            padding="sm"
+            radius="md"
+            className={styles.memberCard}
+          >
+            <Group justify="space-between" wrap="nowrap">
+              <Group gap="sm" wrap="nowrap" className="flexFill">
+                <Avatar size="sm" radius="xl" color="gray" variant="light">
+                  {inv.email?.charAt(0).toUpperCase() ?? '?'}
+                </Avatar>
+                <Stack gap={2} className="flexFill">
+                  <Text fw={500} c="var(--text-primary)" size="sm" truncate="end">{inv.email}</Text>
+                  <Group gap={4} wrap="nowrap">
+                    <IconClock size={12} color="var(--text-muted)" />
+                    <Text size="xs" c="var(--text-secondary)">
+                      Истекает: {new Date(inv.expires_at).toLocaleDateString('ru-RU')}
+                    </Text>
+                  </Group>
+                </Stack>
+              </Group>
+              <Group gap="xs" wrap="nowrap">
+                <Badge color={roleColorMap[inv.role] ?? 'gray'} variant="light" size="sm">
+                  {roleLabelMap[inv.role] ?? inv.role}
+                </Badge>
+                <Tooltip label="Отменить приглашение">
+                  <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    size="sm"
+                    onClick={() => handleCancel(inv.id, inv.email)}
+                    loading={cancelInvitation.isPending && cancelInvitation.variables === inv.id}
+                  >
+                    <IconX size={14} />
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
             </Group>
-          </Group>
-        </Card>
-      ))}
+          </Card>
+        ))}
+      </Stack>
     </Stack>
   )
 }

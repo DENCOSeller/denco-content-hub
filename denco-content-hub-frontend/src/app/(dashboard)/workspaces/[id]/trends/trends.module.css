@@ -13,3 +13,105 @@
   font-size: 0.65rem;
   font-weight: 700;
 }
+
+/* ─── Main Tabs ──────────────────────────────────────────────────── */
+
+.mainTabs {
+  /* Container for main tab navigation */
+}
+
+.mainTabsList {
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 0;
+}
+
+.mainTabsList :global(.mantine-Tabs-tab) {
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.625rem 1rem;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.mainTabsList :global(.mantine-Tabs-tab:hover) {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.mainTabsList :global(.mantine-Tabs-tab[data-active]) {
+  color: var(--mantine-color-teal-5);
+  border-bottom-color: var(--mantine-color-teal-5);
+  background: transparent;
+}
+
+/* ─── Niches Stats ───────────────────────────────────────────────── */
+
+.nichesStats {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ─── Detail Page ────────────────────────────────────────────────── */
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--mantine-spacing-lg);
+}
+
+@media (min-width: 62em) {
+  .detailGrid {
+    grid-template-columns: 1fr 360px;
+  }
+}
+
+.detailMainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-lg);
+  min-width: 0;
+}
+
+.detailSideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-lg);
+}
+
+.detailSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-lg);
+}
+
+.similarTrendItem {
+  min-width: 220px;
+  max-width: 220px;
+}
+
+/* ─── Stat Card ─────────────────────────────────────────────────── */
+
+.statCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ─── Similar Trends Card ───────────────────────────────────────── */
+
+.similarTrendsCard {
+  background: var(--card-bg);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+
+@media (max-width: 48em) {
+  .mainTabsList :global(.mantine-Tabs-tab) {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .nichesStats {
+    flex-direction: column;
+  }
+}

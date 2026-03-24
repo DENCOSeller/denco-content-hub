@@ -157,7 +157,7 @@ export function EdgeTypeManager({ companyId }: EdgeTypeManagerProps) {
                 }
               </Box>
 
-              <Box style={{ flex: 1, minWidth: 0 }}>
+              <Box className="flexFill">
                 <Group gap={6} wrap="nowrap">
                   <Text fw={600} size="sm" lineClamp={1}>
                     {t.label}

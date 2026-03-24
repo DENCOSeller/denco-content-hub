@@ -14,6 +14,7 @@ import {
   Tooltip,
   Card,
   CopyButton,
+  Avatar,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { zodResolver } from 'mantine-form-zod-resolver'
@@ -23,6 +24,7 @@ import {
   IconCopy,
   IconCheck,
   IconLink,
+  IconUserPlus,
 } from '@tabler/icons-react'
 
 import {
@@ -32,10 +34,11 @@ import {
 } from '@/api/hooks/useTeam'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
-import { EmptyState } from '@/components/shared/EmptyState'
+import { EmptyState } from '@denco/ui'
 import type { WorkspaceRole, InvitationResponse } from '@/api/client/types.gen'
 
 import { roleLabelMap, roleColorMap, inviteSchema, type InviteFormValues } from './constants'
+import styles from './settings.module.css'
 
 interface TeamTabProps {
   workspaceId: number
@@ -80,7 +83,7 @@ export function TeamTab({ workspaceId }: TeamTabProps) {
       onSuccess: () => {
         notifications.show({
           title: 'Удалено',
-          message: `${name} удалён из воркспейса`,
+          message: `${name} удален из воркспейса`,
           color: 'green',
         })
       },
@@ -97,14 +100,17 @@ export function TeamTab({ workspaceId }: TeamTabProps) {
   return (
     <Stack gap="md">
       {/* Invite form */}
-      <Card padding="md" radius="md" withBorder style={{ borderColor: 'var(--border-subtle)', background: 'var(--card-bg)' }}>
-        <Text fw={500} c="gray.2" mb="sm">Пригласить участника</Text>
+      <Card padding="lg" radius="md" className={styles.inviteCard}>
+        <Group gap="xs" mb="md">
+          <IconUserPlus size={18} color="var(--eco-content)" />
+          <Text fw={500} c="var(--text-primary)" size="sm">Пригласить участника</Text>
+        </Group>
         <form onSubmit={handleInvite}>
-          <Group align="flex-end" gap="sm">
+          <Group align="flex-end" gap="sm" wrap="wrap">
             <TextInput
               label="Email"
               placeholder="user@example.com"
-              style={{ flex: 1 }}
+              className={styles.emailInput}
               key={form.key('email')}
               {...form.getInputProps('email')}
             />
@@ -115,7 +121,7 @@ export function TeamTab({ workspaceId }: TeamTabProps) {
                 { value: 'editor', label: 'Редактор' },
                 { value: 'viewer', label: 'Просмотр' },
               ]}
-              style={{ width: 150 }}
+              className={styles.roleSelect}
               key={form.key('role')}
               {...form.getInputProps('role')}
             />
@@ -132,20 +138,20 @@ export function TeamTab({ workspaceId }: TeamTabProps) {
         {lastInvite && (
           <Alert
             mt="md"
-            color="blue"
+            color="teal"
             title="Ссылка-приглашение"
             withCloseButton
             onClose={() => setLastInvite(null)}
           >
             <Group gap="xs" wrap="nowrap">
-              <Text size="sm" style={{ wordBreak: 'break-all', flex: 1 }}>
+              <Text size="sm" className={styles.inviteLink}>
                 {lastInvite.invite_link}
               </Text>
               <CopyButton value={lastInvite.invite_link} timeout={2000}>
                 {({ copied, copy }) => (
-                  <Tooltip label={copied ? 'Скопировано!' : 'Скопировать'}>
+                  <Tooltip label={copied ? 'Скопировано' : 'Скопировать'}>
                     <ActionIcon
-                      color={copied ? 'teal' : 'blue'}
+                      color={copied ? 'teal' : 'gray'}
                       variant="light"
                       onClick={copy}
                       size="sm"
@@ -161,13 +167,7 @@ export function TeamTab({ workspaceId }: TeamTabProps) {
       </Card>
 
       {/* Members list */}
-      <Text
-        c="dimmed"
-        tt="uppercase"
-        fz="0.7rem"
-        fw={600}
-        style={{ letterSpacing: '1px' }}
-      >
+      <Text className={styles.sectionLabel}>
         Участники
       </Text>
 
@@ -177,39 +177,51 @@ export function TeamTab({ workspaceId }: TeamTabProps) {
         <EmptyState message="Участников пока нет" />
       )}
 
-      {data && data.items.map((member) => (
-        <Card
-          key={member.id}
-          padding="sm"
-          radius="md"
-          style={{ background: 'var(--card-bg)', border: '1px solid var(--border-subtle)' }}
-        >
-          <Group justify="space-between" wrap="nowrap">
-            <Stack gap={2} style={{ minWidth: 0 }}>
-              <Text fw={500} c="gray.1" truncate="end">{member.user_name}</Text>
-              <Text size="xs" c="dimmed" truncate="end">{member.user_email}</Text>
-            </Stack>
-            <Group gap="xs" wrap="nowrap">
-              <Badge color={roleColorMap[member.role] ?? 'gray'} variant="light" size="sm">
-                {roleLabelMap[member.role] ?? member.role}
-              </Badge>
-              {member.role !== 'owner' && (
-                <Tooltip label="Удалить из воркспейса">
-                  <ActionIcon
-                    variant="light"
-                    color="red"
-                    size="sm"
-                    onClick={() => handleRemove(member.id, member.user_name)}
-                    loading={removeMember.isPending && removeMember.variables === member.id}
-                  >
-                    <IconTrash size={14} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
+      <Stack gap="xs">
+        {data && data.items.map((member) => (
+          <Card
+            key={member.id}
+            padding="sm"
+            radius="md"
+            className={styles.memberCard}
+          >
+            <Group justify="space-between" wrap="nowrap">
+              <Group gap="sm" wrap="nowrap" className="flexFill">
+                <Avatar size="sm" radius="xl" color="contentHubTeal" variant="light">
+                  {member.user_name?.charAt(0).toUpperCase() ?? '?'}
+                </Avatar>
+                <Stack gap={2} className="flexFill">
+                  <Text fw={500} c="var(--text-primary)" size="sm" truncate="end">{member.user_name}</Text>
+                  <Text size="xs" c="var(--text-secondary)" truncate="end">{member.user_email}</Text>
+                </Stack>
+              </Group>
+              <Group gap="xs" wrap="nowrap">
+                <Badge
+                  color={roleColorMap[member.role] ?? 'gray'}
+                  variant="light"
+                  size="sm"
+                  className={styles.roleBadge}
+                >
+                  {roleLabelMap[member.role] ?? member.role}
+                </Badge>
+                {member.role !== 'owner' && (
+                  <Tooltip label="Удалить из воркспейса">
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      size="sm"
+                      onClick={() => handleRemove(member.id, member.user_name)}
+                      loading={removeMember.isPending && removeMember.variables === member.id}
+                    >
+                      <IconTrash size={14} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+              </Group>
             </Group>
-          </Group>
-        </Card>
-      ))}
+          </Card>
+        ))}
+      </Stack>
     </Stack>
   )
 }

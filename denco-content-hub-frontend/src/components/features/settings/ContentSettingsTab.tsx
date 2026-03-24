@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { SegmentedControl, Stack } from '@mantine/core'
+import { SegmentedControl, Stack, Text } from '@mantine/core'
 
 import { NodeTypeManager } from './NodeTypeManager'
 
@@ -15,6 +15,15 @@ const NODE_TYPE_OPTIONS: { value: NodeType; label: string }[] = [
   { value: 'tone_of_voice', label: 'Тональность' },
   { value: 'product_focus', label: 'Продукты' },
 ]
+
+const NODE_TYPE_DESCRIPTIONS: Record<NodeType, string> = {
+  speaker: 'Управление спикерами и ведущими контента',
+  content_goal: 'Цели и задачи создаваемого контента',
+  narrative_format: 'Форматы повествования и подачи',
+  hook_type: 'Типы привлечения внимания в начале',
+  tone_of_voice: 'Тональность и стиль коммуникации',
+  product_focus: 'Продукты и услуги для продвижения',
+}
 
 interface ContentSettingsTabProps {
   workspaceId: number
@@ -33,6 +42,10 @@ export function ContentSettingsTab({ workspaceId }: ContentSettingsTabProps) {
         data={NODE_TYPE_OPTIONS}
         fullWidth
       />
+
+      <Text size="xs" c="var(--text-secondary)">
+        {NODE_TYPE_DESCRIPTIONS[activeType]}
+      </Text>
 
       <NodeTypeManager
         key={activeType}

@@ -1,19 +1,58 @@
 .card {
   padding: 2px 8px 2px 0;
-  border-radius: var(--mantine-radius-sm);
-  background: var(--card-bg, var(--mantine-color-dark-6));
-  border: 1px solid var(--border-subtle, var(--mantine-color-dark-4));
-  border-left: 3px solid var(--platform-color, var(--mantine-color-gray-5));
+  border-radius: var(--radius-sm, 4px);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--status-color, var(--text-tertiary));
   cursor: pointer;
-  transition: background 150ms ease, transform 150ms ease;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    background var(--duration-normal, 150ms) var(--ease-out, ease),
+    transform var(--duration-normal, 150ms) var(--ease-out, ease),
+    box-shadow var(--duration-normal, 150ms) var(--ease-out, ease);
   height: 28px;
   display: flex;
   align-items: center;
 }
 
+.card[data-variant='expanded'] {
+  height: auto;
+  min-height: 36px;
+  padding: 6px 10px 6px 0;
+}
+
 .card:hover {
-  background: var(--mantine-color-dark-5);
+  background: var(--surface-overlay);
   transform: translateX(2px);
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.card[data-dragging='true'] {
+  opacity: 0.85;
+  box-shadow: var(--shadow-md);
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.card[data-cancelled='true'] {
+  opacity: 0.55;
+}
+
+.card[data-cancelled='true'] .title {
+  text-decoration: line-through;
+}
+
+.platformIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  color: var(--text-secondary);
 }
 
 .time {
@@ -28,9 +67,25 @@
   min-width: 0;
 }
 
-.statusDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+.notes {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+
+/* Selection */
+.card[data-selected='true'] {
+  border-color: var(--eco-content);
+  background: rgba(20, 184, 166, 0.06);
+}
+
+.checkboxWrapper {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  cursor: pointer;
 }

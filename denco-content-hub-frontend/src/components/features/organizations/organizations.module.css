@@ -1,0 +1,7 @@
+.organizationCard {
+  composes: listCard from global;
+}
+
+.orgIconWrap {
+  composes: iconWrapTeal from global;
+}

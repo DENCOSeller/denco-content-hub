@@ -11,9 +11,9 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: rgba(10, 132, 255, 0.06);
-  border-bottom: 1px solid rgba(10, 132, 255, 0.12);
-  color: rgba(10, 132, 255, 0.8);
+  background: rgba(20, 184, 166, 0.06);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.12);
+  color: rgba(20, 184, 166, 0.8);
   flex-shrink: 0;
 }
 
@@ -55,7 +55,7 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(10, 132, 255, 0.08);
+  background: rgba(20, 184, 166, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,6 +84,6 @@
 
 .suggestionBtn:hover {
   background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(10, 132, 255, 0.3);
+  border-color: rgba(20, 184, 166, 0.3);
   color: var(--text-primary, #f0f0ff);
 }

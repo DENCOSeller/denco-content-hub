@@ -82,7 +82,7 @@
 }
 
 .aiToggle:hover {
-  box-shadow: 0 0 12px rgba(10, 132, 255, 0.25);
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.25);
 }
 
 /* === AI FAB (mobile) === */
@@ -95,13 +95,13 @@
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #0a84ff 0%, #7b61ff 100%);
+  background: linear-gradient(135deg, #14B8A6 0%, #0d9488 100%);
   color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(10, 132, 255, 0.4), 0 0 0 0 rgba(10, 132, 255, 0);
+  box-shadow: 0 4px 20px rgba(20, 184, 166, 0.4), 0 0 0 0 rgba(20, 184, 166, 0);
   transition: transform 200ms ease, box-shadow 200ms ease;
   animation: fabPulse 3s ease-in-out infinite;
 }
@@ -112,10 +112,10 @@
 
 @keyframes fabPulse {
   0%, 100% {
-    box-shadow: 0 4px 20px rgba(10, 132, 255, 0.4), 0 0 0 0 rgba(10, 132, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(20, 184, 166, 0.4), 0 0 0 0 rgba(20, 184, 166, 0.2);
   }
   50% {
-    box-shadow: 0 4px 20px rgba(10, 132, 255, 0.4), 0 0 0 8px rgba(10, 132, 255, 0);
+    box-shadow: 0 4px 20px rgba(20, 184, 166, 0.4), 0 0 0 8px rgba(20, 184, 166, 0);
   }
 }
 
@@ -150,7 +150,7 @@
 }
 
 .workspaceCard:hover {
-  box-shadow: 0 8px 32px rgba(10, 132, 255, 0.12), 0 0 0 1px rgba(10, 132, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(20, 184, 166, 0.12), 0 0 0 1px rgba(20, 184, 166, 0.08);
   transform: translateY(-2px);
 }
 
@@ -159,5 +159,132 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* === Header Brand === */
+.headerBrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.headerBrandSeparator {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 300;
+  opacity: 0.4;
+}
+
+.headerBrandProduct {
+  color: var(--content-hub-teal, #2dd4bf);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+/* === Sidebar Collapse === */
+.navLinkCollapsed {
+  justify-content: center;
+}
+
+.navLinkCollapsed :global(.mantine-NavLink-body) {
+  display: none;
+}
+
+.collapseBtn {
+  opacity: 0.5;
+  transition: opacity 180ms ease;
+}
+
+.collapseBtn:hover {
+  opacity: 1;
+}
+
+/* === Sidebar Zones === */
+.sidebarTop {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sidebarNav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.sidebarBottom {
+  padding: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* === Section Headers (collapsible) === */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  margin-top: 8px;
+  margin-bottom: 2px;
+  cursor: pointer;
+  border-radius: var(--mantine-radius-sm);
+  transition: background 160ms ease;
+  user-select: none;
+}
+
+.sectionHeader:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sectionLabel {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.sectionChevron {
+  color: var(--text-muted);
+  transition: transform 200ms ease;
+}
+
+.sectionChevronOpen {
+  transform: rotate(90deg);
+}
+
+.sectionDividerCollapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  margin: 4px 0;
+}
+
+.sectionIconCollapsed {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+/* === Collapsed Sidebar Extras === */
+.collapsedAvatar {
+  cursor: default;
+}
+
+.userSection {
+  padding: 4px 8px;
+}
+
+.userSectionCollapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.userInfoBox {
+  flex: 1;
+  min-width: 0;
 }
 

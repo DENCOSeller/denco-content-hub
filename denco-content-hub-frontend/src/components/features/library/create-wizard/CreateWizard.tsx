@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Stepper, Button, Group, Stack } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { useRouter } from 'next/navigation'
 import { IconArrowLeft, IconArrowRight, IconSparkles } from '@tabler/icons-react'
@@ -14,6 +15,7 @@ import { StepContentType } from './StepContentType'
 import { StepSource } from './StepSource'
 import { StepSettings } from './StepSettings'
 import { StepPreview } from './StepPreview'
+import styles from './create-wizard.module.css'
 
 interface CreateWizardProps {
   workspaceId: number
@@ -23,6 +25,7 @@ const STEP_LABELS = ['Платформа', 'Тип и категория', 'Ис
 
 export function CreateWizard({ workspaceId }: CreateWizardProps) {
   const router = useRouter()
+  const isMobile = useMediaQuery('(max-width: 48em)')
   const [active, setActive] = useState(0)
   const [state, setState] = useState<WizardState>(INITIAL_WIZARD_STATE)
 
@@ -151,7 +154,15 @@ export function CreateWizard({ workspaceId }: CreateWizardProps) {
 
   return (
     <Stack gap="xl">
-      <Stepper active={active} onStepClick={setActive} size="sm" allowNextStepsSelect={false}>
+      <Stepper
+        active={active}
+        onStepClick={setActive}
+        size="sm"
+        allowNextStepsSelect={false}
+        color="teal"
+        orientation={isMobile ? 'vertical' : 'horizontal'}
+        className={styles.wizardStepper}
+      >
         {STEP_LABELS.map((label) => (
           <Stepper.Step key={label} label={label} />
         ))}
@@ -175,6 +186,7 @@ export function CreateWizard({ workspaceId }: CreateWizardProps) {
 
         {active < 4 ? (
           <Button
+            color="teal"
             rightSection={<IconArrowRight size={16} />}
             onClick={handleNext}
           >
@@ -182,6 +194,7 @@ export function CreateWizard({ workspaceId }: CreateWizardProps) {
           </Button>
         ) : (
           <Button
+            color="teal"
             leftSection={<IconSparkles size={16} />}
             onClick={handleCreate}
             loading={isSubmitting}

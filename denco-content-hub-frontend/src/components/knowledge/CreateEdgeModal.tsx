@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { Modal, TextInput, Select, Stack, Group, Button, Loader } from '@mantine/core'
 
 import { useCreateEdgeMutation } from '@/api/hooks/useKnowledge'
-import { useCompanyCreateEdgeMutation } from '@/api/hooks/useCompanyKnowledge'
+import { useOrganizationCreateEdgeMutation } from '@/api/hooks/useOrganizationKnowledge'
 import { useEdgeTypeDefs } from '@/api/hooks/useKgTypes'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 
 const FALLBACK_EDGE_TYPES = [
@@ -42,8 +42,8 @@ export function CreateEdgeModal({
   const [label, setLabel] = useState('')
   const [edgeTypeDefId, setEdgeTypeDefId] = useState<string | null>(null)
 
-  const activeCompany = useCompanyStore((s) => s.activeCompany)
-  const companyId = scope === 'company' ? scopeId : (activeCompany?.id ?? 0)
+  const activeOrganization = useOrganizationStore((s) => s.activeOrganization)
+  const companyId = scope === 'company' ? scopeId : (activeOrganization?.id ?? 0)
 
   const { data: edgeTypeDefs, isLoading: isTypesLoading } = useEdgeTypeDefs(companyId)
 
@@ -54,7 +54,7 @@ export function CreateEdgeModal({
   })) ?? FALLBACK_EDGE_TYPES
 
   const workspaceCreate = useCreateEdgeMutation(scope === 'workspace' ? scopeId : 0)
-  const companyCreate = useCompanyCreateEdgeMutation(scope === 'company' ? scopeId : 0)
+  const companyCreate = useOrganizationCreateEdgeMutation(scope === 'company' ? scopeId : 0)
   const createEdge = scope === 'workspace' ? workspaceCreate : companyCreate
 
   const handleClose = () => {

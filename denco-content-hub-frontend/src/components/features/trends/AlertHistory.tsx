@@ -141,7 +141,7 @@ export function AlertHistory({ workspaceId }: AlertHistoryProps) {
                 <ThemeIcon variant="light" color={color} size="md" mt={2}>
                   <Icon size={16} />
                 </ThemeIcon>
-                <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+                <Stack gap={2} className="flexFill">
                   <Text
                     size="sm"
                     fw={alert.is_read ? 400 : 700}

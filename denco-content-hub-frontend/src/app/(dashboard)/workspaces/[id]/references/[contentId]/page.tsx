@@ -84,15 +84,29 @@ export default function WorkspaceContentDetailPage() {
     )
   }
 
-  if (contentLoading) return <LoadingState message="Загрузка контента..." />
-  if (contentError || !content) {
-    return <ErrorState message="Не удалось загрузить контент" onRetry={contentRefetch} />
-  }
-
-  const breadcrumbs = [
+  const baseBreadcrumbs = [
     { label: activeWorkspace?.company_name ?? '' },
     { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
     { label: 'Референсы', href: `/workspaces/${workspaceId}/references` },
+  ]
+
+  if (contentLoading) return (
+    <Stack gap="md">
+      <AppBreadcrumbs items={[...baseBreadcrumbs, { label: '...' }]} />
+      <LoadingState message="Загрузка контента..." />
+    </Stack>
+  )
+  if (contentError || !content) {
+    return (
+      <Stack gap="md">
+        <AppBreadcrumbs items={[...baseBreadcrumbs, { label: 'Ошибка' }]} />
+        <ErrorState message="Не удалось загрузить контент" onRetry={contentRefetch} />
+      </Stack>
+    )
+  }
+
+  const breadcrumbs = [
+    ...baseBreadcrumbs,
     { label: content.title ?? 'Детали' },
   ]
 

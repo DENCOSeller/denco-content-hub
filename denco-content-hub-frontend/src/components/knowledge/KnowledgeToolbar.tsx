@@ -11,7 +11,7 @@ import type { KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 import type { DisplayMode } from './KnowledgeGraph'
 
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 import { ShareGraphModal } from './ShareGraphModal'
 
 const DEBOUNCE_MS = 300
@@ -54,8 +54,8 @@ export function KnowledgeToolbar({
   onSwitchMode,
 }: KnowledgeToolbarProps) {
   const { fitView } = useReactFlow()
-  const activeCompany = useCompanyStore((s) => s.activeCompany)
-  const companyId = scope === 'company' ? scopeId : (activeCompany?.id ?? 0)
+  const activeOrganization = useOrganizationStore((s) => s.activeOrganization)
+  const companyId = scope === 'company' ? scopeId : (activeOrganization?.id ?? 0)
   const { typeOptions } = useNodeTypeConfig(companyId)
   const [shareOpened, setShareOpened] = useState(false)
 

@@ -1,0 +1,82 @@
+.tableCard {
+  border-color: var(--border-subtle);
+  background: var(--card-bg);
+}
+
+.colUsage {
+  width: 120px;
+}
+
+.colActions {
+  width: 80px;
+}
+
+.inviteCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-lg);
+}
+
+.memberCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--mantine-radius-md);
+  transition: border-color var(--transition-base), background var(--transition-base);
+}
+
+.memberCard:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--border-accent);
+}
+
+.emailInput {
+  flex: 1;
+  min-width: 200px;
+}
+
+.roleSelect {
+  width: 150px;
+}
+
+.inviteLink {
+  word-break: break-all;
+  flex: 1;
+}
+
+.sectionLabel {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.roleBadge {
+  white-space: nowrap;
+}
+
+.wsSelect {
+  flex: 1;
+  min-width: 150px;
+}
+
+.wsRoleSelect {
+  width: 120px;
+}
+
+.teamAccordionCard {
+  background: var(--card-bg);
+}
+
+.teamLetterSpacing {
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 640px) {
+  .emailInput {
+    min-width: 100%;
+  }
+  .roleSelect {
+    width: 100%;
+  }
+}

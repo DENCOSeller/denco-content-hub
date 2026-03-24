@@ -1,0 +1,30 @@
+.tabsList {
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 0;
+}
+
+.tab {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-base), border-color var(--transition-base);
+}
+
+.tab:hover {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.tab[data-active] {
+  color: var(--text-primary);
+  border-bottom-color: var(--eco-content);
+}
+
+@media (max-width: 640px) {
+  .tab {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

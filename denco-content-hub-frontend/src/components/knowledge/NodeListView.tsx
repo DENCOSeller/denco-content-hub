@@ -161,7 +161,7 @@ export function NodeListView({
                 >
                   <Icon size={18} color="white" />
                 </Box>
-                <Box style={{ flex: 1, minWidth: 0 }}>
+                <Box className="flexFill">
                   <Group gap="xs" wrap="nowrap">
                     <Text fw={600} size="sm" lineClamp={1} style={{ flex: 1 }}>
                       {node.title}

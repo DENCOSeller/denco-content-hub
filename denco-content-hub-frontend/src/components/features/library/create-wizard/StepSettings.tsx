@@ -3,7 +3,7 @@
 import { SimpleGrid, Stack, Select, Text } from '@mantine/core'
 import { useKnowledgeNodesByTypeDefId } from '@/api/hooks/useKnowledge'
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 import { HUNT_LEVEL_OPTIONS } from './wizard-types'
 import type { WizardState } from './wizard-types'
 
@@ -14,8 +14,8 @@ interface StepSettingsProps {
 }
 
 export function StepSettings({ state, onChange, workspaceId }: StepSettingsProps) {
-  const activeCompany = useCompanyStore((s) => s.activeCompany)
-  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+  const activeOrganization = useOrganizationStore((s) => s.activeOrganization)
+  const { getTypeDefId } = useNodeTypeConfig(activeOrganization?.id ?? 0)
 
   const { data: speakers } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('speaker') ?? 0)
   const { data: goals } = useKnowledgeNodesByTypeDefId(workspaceId, getTypeDefId('content_goal') ?? 0)

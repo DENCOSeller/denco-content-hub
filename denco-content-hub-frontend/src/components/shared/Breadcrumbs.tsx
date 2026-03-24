@@ -1,6 +1,7 @@
 'use client'
 
 import { Anchor, Breadcrumbs as MantineBreadcrumbs, Text } from '@mantine/core'
+import { IconHome } from '@tabler/icons-react'
 import Link from 'next/link'
 
 interface BreadcrumbItem {
@@ -13,10 +14,16 @@ interface AppBreadcrumbsProps {
 }
 
 export function AppBreadcrumbs({ items }: AppBreadcrumbsProps) {
+  const allItems: BreadcrumbItem[] = [
+    { label: 'Content Hub', href: '/dashboard' },
+    ...items,
+  ]
+
   return (
     <MantineBreadcrumbs mb="md">
-      {items.map((item, index) => {
-        const isLast = index === items.length - 1
+      {allItems.map((item, index) => {
+        const isLast = index === allItems.length - 1
+        const isFirst = index === 0
 
         if (isLast || !item.href) {
           return (
@@ -35,7 +42,7 @@ export function AppBreadcrumbs({ items }: AppBreadcrumbsProps) {
             truncate
             maw={200}
           >
-            {item.label}
+            {isFirst ? <IconHome size={14} style={{ verticalAlign: 'middle' }} /> : item.label}
           </Anchor>
         )
       })}

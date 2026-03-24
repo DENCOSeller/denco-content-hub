@@ -13,7 +13,7 @@ import {
 } from '@xyflow/react'
 
 import { useWorkspaceGraphQuery, useBatchPositionsMutation } from '@/api/hooks/useKnowledge'
-import { useCompanyGraphQuery, useCompanyBatchPositionsMutation } from '@/api/hooks/useCompanyKnowledge'
+import { useOrganizationGraphQuery, useOrganizationBatchPositionsMutation } from '@/api/hooks/useOrganizationKnowledge'
 import { transformGraph, type KnowledgeNodeData, type KnowledgeEdgeData } from '@/lib/knowledge-transform'
 import type { Node } from '@xyflow/react'
 import type { NodeType } from '@/lib/knowledge-utils'
@@ -28,11 +28,11 @@ export function useKnowledgeGraph(scopeId: number, scope: KnowledgeScope = 'work
   const [searchQuery, setSearchQuery] = useState('')
 
   const workspaceGraph = useWorkspaceGraphQuery(scope === 'workspace' ? scopeId : 0)
-  const companyGraph = useCompanyGraphQuery(scope === 'company' ? scopeId : 0)
+  const companyGraph = useOrganizationGraphQuery(scope === 'company' ? scopeId : 0)
   const graphQuery = scope === 'workspace' ? workspaceGraph : companyGraph
 
   const workspaceBatch = useBatchPositionsMutation(scope === 'workspace' ? scopeId : 0)
-  const companyBatch = useCompanyBatchPositionsMutation(scope === 'company' ? scopeId : 0)
+  const companyBatch = useOrganizationBatchPositionsMutation(scope === 'company' ? scopeId : 0)
   const batchPositions = scope === 'workspace' ? workspaceBatch : companyBatch
 
   const { data: graph, isLoading, isError, dataUpdatedAt } = graphQuery

@@ -24,7 +24,7 @@ import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useNodeTypeConfig } from '@/hooks/useNodeTypeConfig'
-import { useCompanyStore } from '@/stores/company-store'
+import { useOrganizationStore } from '@/stores/organization-store'
 import { NodeFormModal } from './NodeFormModal'
 import { SpeakerFormModal } from './SpeakerFormModal'
 import { SpeakerCards } from './SpeakerCards'
@@ -37,8 +37,8 @@ interface NodeTypeManagerProps {
 }
 
 export function NodeTypeManager({ workspaceId, nodeType, nodeLabel }: NodeTypeManagerProps) {
-  const activeCompany = useCompanyStore((s) => s.activeCompany)
-  const { getTypeDefId } = useNodeTypeConfig(activeCompany?.id ?? 0)
+  const activeOrganization = useOrganizationStore((s) => s.activeOrganization)
+  const { getTypeDefId } = useNodeTypeConfig(activeOrganization?.id ?? 0)
   const typeDefId = getTypeDefId(nodeType) ?? 0
   const { data, isLoading, isError, refetch } = useKnowledgeNodesByTypeDefId(workspaceId, typeDefId)
   const deleteNode = useDeleteNodeMutation(workspaceId)

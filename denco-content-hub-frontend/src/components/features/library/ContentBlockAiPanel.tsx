@@ -201,8 +201,8 @@ export function ContentBlockAiPanel({
     >
       {/* Header */}
       <div className={styles.header}>
-        <Group gap="xs" style={{ flex: 1, minWidth: 0 }}>
-          <IconSparkles size={16} style={{ color: 'var(--neon-blue)', flexShrink: 0 }} />
+        <Group gap="xs" className="flexFill">
+          <IconSparkles size={16} style={{ color: 'var(--content-hub-teal)', flexShrink: 0 }} />
           <Text size="sm" fw={600} truncate>
             AI: Улучшить «{block?.fieldLabel ?? ''}»
           </Text>
@@ -241,7 +241,7 @@ export function ContentBlockAiPanel({
         ) : (
           <div className={styles.empty}>
             <div className={styles.emptyIcon}>
-              <IconSparkles size={24} style={{ color: 'var(--neon-blue)' }} />
+              <IconSparkles size={24} style={{ color: 'var(--content-hub-teal)' }} />
             </div>
             <Text size="sm" fw={500} c="gray.3" ta="center">
               Улучшить блок «{block?.fieldLabel ?? ''}»

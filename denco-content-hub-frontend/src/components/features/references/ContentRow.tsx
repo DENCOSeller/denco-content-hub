@@ -120,7 +120,7 @@ export function ContentRow({ item, workspaceId, basePath }: ContentRowProps) {
       style={{ cursor: 'pointer', textDecoration: 'none' }}
     >
       <Group justify="space-between" wrap="nowrap">
-        <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+        <Group gap="sm" wrap="nowrap" className="flexFill">
           {videoId ? (
             <Image
               src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
@@ -134,7 +134,7 @@ export function ContentRow({ item, workspaceId, basePath }: ContentRowProps) {
               {sourceInfo.icon(24)}
             </div>
           )}
-          <Stack gap={2} style={{ minWidth: 0 }}>
+          <Stack gap={2} className="minW0">
             <Text fw={500} c="gray.1" truncate="end">
               {item.title ?? item.url}
             </Text>

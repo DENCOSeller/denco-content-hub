@@ -7,22 +7,16 @@ import {
   Text,
   Avatar,
   Badge,
-  ThemeIcon,
   Card,
   Pagination,
   ActionIcon,
   Tooltip,
   Tabs,
+  Skeleton,
 } from '@mantine/core'
 import {
   IconArrowLeft,
-  IconBrandYoutube,
-  IconBrandTelegram,
-  IconBrandInstagram,
-  IconMessage,
   IconEye,
-  IconThumbUp,
-  IconMessageCircle,
   IconRefresh,
   IconChartLine,
   IconList,
@@ -37,21 +31,14 @@ import {
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { useSetAiPageContext } from '@/contexts/AiPageContext'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
-import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { EmptyState } from '@/components/shared/EmptyState'
-import type { CompetitorPlatform, CompetitorPost } from '@/api/types/competitor'
+import type { CompetitorPost } from '@/api/types/competitor'
 import { PostCard } from '@/components/features/competitors/PostCard'
 import { ContentIntelligencePanel } from '@/components/features/content-intelligence'
 import { AnalyticsTab } from '@/components/features/competitors/AnalyticsTab'
+import { platformConfig } from '@/components/features/competitors/constants'
 import { notifications } from '@mantine/notifications'
-
-const platformConfig: Record<CompetitorPlatform, { icon: typeof IconBrandYoutube; label: string; color: string }> = {
-  youtube: { icon: IconBrandYoutube, label: 'YouTube', color: 'red' },
-  telegram: { icon: IconBrandTelegram, label: 'Telegram', color: 'blue' },
-  instagram: { icon: IconBrandInstagram, label: 'Instagram', color: 'grape' },
-  vk: { icon: IconMessage, label: 'VK', color: 'indigo' },
-}
 
 export default function ChannelDashboardPage() {
   const params = useParams()
@@ -73,14 +60,66 @@ export default function ChannelDashboardPage() {
   const { data: postsData, isLoading: postsLoading } = useCompetitorPostsQuery(channelId, { page, size: 10 })
   const syncMutation = useSyncCompetitorMutation()
 
-  if (isLoading) return <LoadingState message="Загрузка канала..." />
-  if (isError || !channel) return <ErrorState onRetry={refetch} />
+  const loadingBreadcrumbs = [
+    { label: activeWorkspace?.company_name ?? '' },
+    { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
+    { label: 'Мониторинг', href: `/workspaces/${workspaceId}/competitors` },
+    { label: '...' },
+  ]
+
+  if (isLoading) return (
+    <Stack>
+      <AppBreadcrumbs items={loadingBreadcrumbs} />
+      <Card withBorder padding="lg" radius="md">
+        <Group justify="space-between" wrap="nowrap">
+          <Group gap="md" wrap="nowrap">
+            <Skeleton circle height={56} />
+            <Stack gap={4} style={{ flex: 1 }}>
+              <Group gap="xs">
+                <Skeleton height={22} width={180} />
+                <Skeleton height={20} width={80} radius="xl" />
+              </Group>
+              <Group gap="md">
+                <Skeleton height={14} width={100} />
+                <Skeleton height={14} width={80} />
+                <Skeleton height={14} width={120} />
+              </Group>
+            </Stack>
+          </Group>
+        </Group>
+      </Card>
+      <Stack gap="md">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Card key={i} withBorder padding="md" radius="md">
+            <Group gap="md" wrap="nowrap" align="flex-start">
+              <Skeleton width={160} height={90} radius="md" />
+              <Stack gap="xs" style={{ flex: 1 }}>
+                <Skeleton height={14} width="80%" />
+                <Skeleton height={14} width="50%" />
+                <Group gap="md">
+                  <Skeleton height={12} width={50} />
+                  <Skeleton height={12} width={50} />
+                  <Skeleton height={12} width={50} />
+                </Group>
+              </Stack>
+            </Group>
+          </Card>
+        ))}
+      </Stack>
+    </Stack>
+  )
+  if (isError || !channel) return (
+    <Stack>
+      <AppBreadcrumbs items={loadingBreadcrumbs} />
+      <ErrorState onRetry={refetch} />
+    </Stack>
+  )
 
   const platform = platformConfig[channel.platform]
   const PlatformIcon = platform.icon
 
   const breadcrumbs = [
-    { label: activeWorkspace?.company_name ?? '', href: '/' },
+    { label: activeWorkspace?.company_name ?? '' },
     { label: activeWorkspace?.name ?? '', href: `/workspaces/${workspaceId}` },
     { label: 'Мониторинг', href: `/workspaces/${workspaceId}/competitors` },
     { label: channel.display_name ?? channel.handle ?? 'Канал' },
@@ -180,7 +219,24 @@ export default function ChannelDashboardPage() {
 
         <Tabs.Panel value="posts" pt="md">
           {postsLoading ? (
-            <LoadingState message="Загрузка публикаций..." />
+            <Stack gap="md">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} withBorder padding="md" radius="md">
+                  <Group gap="md" wrap="nowrap" align="flex-start">
+                    <Skeleton width={160} height={90} radius="md" />
+                    <Stack gap="xs" style={{ flex: 1 }}>
+                      <Skeleton height={14} width="80%" />
+                      <Skeleton height={14} width="50%" />
+                      <Group gap="md">
+                        <Skeleton height={12} width={50} />
+                        <Skeleton height={12} width={50} />
+                        <Skeleton height={12} width={50} />
+                      </Group>
+                    </Stack>
+                  </Group>
+                </Card>
+              ))}
+            </Stack>
           ) : !postsData?.items.length ? (
             <EmptyState message="Публикации пока не загружены. Запустите синхронизацию." />
           ) : (

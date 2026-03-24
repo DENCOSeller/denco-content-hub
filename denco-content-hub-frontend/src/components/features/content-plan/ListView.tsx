@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Stack, Text, Title } from '@mantine/core'
+import { Stack, Text, Title, Badge } from '@mantine/core'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 
@@ -16,14 +16,33 @@ import styles from './list-view.module.css'
 
 dayjs.locale('ru')
 
-interface ListViewProps {
-  workspaceId: number
+function pluralize(n: number, one: string, few: string, many: string): string {
+  const abs = Math.abs(n) % 100
+  const lastDigit = abs % 10
+  if (abs > 10 && abs < 20) return many
+  if (lastDigit > 1 && lastDigit < 5) return few
+  if (lastDigit === 1) return one
+  return many
 }
 
+const STATUS_COLOR: Record<string, string> = {
+  draft: 'var(--text-tertiary)',
+  scheduled: 'var(--eco-content)',
+  published: '#22c55e',
+  cancelled: 'var(--color-error)',
+}
+
+interface ListViewProps {
+  workspaceId: number
+  selectable?: boolean
+  selectedIds?: Set<number>
+  onSelect?: (id: number) => void
+}
 
 interface DayGroup {
   date: string
   label: string
+  isToday: boolean
   items: ContentPlanItemResponse[]
 }
 
@@ -41,11 +60,13 @@ function groupByDay(items: ContentPlanItemResponse[]): DayGroup[] {
   }
 
   const groups: DayGroup[] = []
+  const today = dayjs().format('YYYY-MM-DD')
 
   for (const [date, dayItems] of map) {
     groups.push({
       date,
       label: dayjs(date).format('D MMMM YYYY, dddd'),
+      isToday: date === today,
       items: dayItems.sort(
         (a, b) =>
           new Date(a.scheduled_at).getTime() -
@@ -59,7 +80,16 @@ function groupByDay(items: ContentPlanItemResponse[]): DayGroup[] {
   return groups
 }
 
-export function ListView({ workspaceId }: ListViewProps) {
+function getGroupStatusColor(items: ContentPlanItemResponse[]): string {
+  // Use the "highest priority" status color for the group border
+  const statuses = new Set(items.map((i) => i.status))
+  if (statuses.has('published')) return STATUS_COLOR.published
+  if (statuses.has('scheduled')) return STATUS_COLOR.scheduled
+  if (statuses.has('draft')) return STATUS_COLOR.draft
+  return STATUS_COLOR.cancelled
+}
+
+export function ListView({ workspaceId, selectable, selectedIds, onSelect }: ListViewProps) {
   const { data, isLoading, isError, refetch } = useContentPlanItemsQuery(
     workspaceId,
     { size: 100 },
@@ -77,14 +107,39 @@ export function ListView({ workspaceId }: ListViewProps) {
   return (
     <Stack gap="lg">
       {groups.map((group) => (
-        <Stack key={group.date} gap="xs" className={styles.dayGroup}>
-          <Title order={5} className={styles.dayHeader}>
-            {group.label}
-          </Title>
+        <Stack
+          key={group.date}
+          gap="xs"
+          className={styles.dayGroup}
+          style={{
+            '--group-color': getGroupStatusColor(group.items),
+          } as React.CSSProperties}
+        >
+          <div className={styles.dayHeader}>
+            <Title order={5} className={styles.dayTitle}>
+              {group.label}
+            </Title>
+            {group.isToday && (
+              <Badge size="xs" color="teal" variant="light" className={styles.todayBadge}>
+                Сегодня
+              </Badge>
+            )}
+            <Text size="xs" c="dimmed" className={styles.itemCount}>
+              {group.items.length} {pluralize(group.items.length, 'элемент', 'элемента', 'элементов')}
+            </Text>
+          </div>
 
           <Stack gap={4}>
             {group.items.map((item) => (
-              <PlanItemCard key={item.id} item={item} workspaceId={workspaceId} />
+              <PlanItemCard
+                key={item.id}
+                item={item}
+                workspaceId={workspaceId}
+                variant="expanded"
+                selectable={selectable}
+                selected={selectedIds?.has(item.id)}
+                onSelect={onSelect}
+              />
             ))}
           </Stack>
         </Stack>

@@ -78,6 +78,18 @@ export function useLogoutMutation() {
   })
 }
 
+export function useSsoLogout() {
+  const queryClient = useQueryClient()
+  const storeClearAuth = useAuthStore((s) => s.clearAuth)
+
+  return () => {
+    storeClearAuth()
+    queryClient.clear()
+    const ssoBaseUrl = process.env.NEXT_PUBLIC_SSO_BASE_URL || 'https://auth.denco.store'
+    window.location.href = `${ssoBaseUrl}/logout?redirect=${encodeURIComponent(window.location.origin)}`
+  }
+}
+
 export function useMeQuery() {
   const storeSetUser = useAuthStore((s) => s.setUser)
 

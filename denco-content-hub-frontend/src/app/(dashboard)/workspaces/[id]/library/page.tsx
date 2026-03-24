@@ -2,24 +2,26 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Title,
   Stack,
-  Group,
   Button,
   Text,
   Pagination,
+  Group,
+  SegmentedControl,
+  SimpleGrid,
 } from '@mantine/core'
-import { IconPlus } from '@tabler/icons-react'
+import { IconPlus, IconLayoutGrid, IconList } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useParams, useSearchParams, useRouter, usePathname } from 'next/navigation'
 
-import { useLibraryItemsQuery } from '@/api/hooks/useLibrary'
-import { LoadingState } from '@/components/shared/LoadingState'
-import { ErrorState } from '@/components/shared/ErrorState'
+import { PageHeader } from '@denco/ui'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { useLibraryItemsQuery } from '@/api/hooks/useLibrary'
 import { AppBreadcrumbs } from '@/components/shared/Breadcrumbs'
 import { LibraryItemCard } from '@/components/features/library/LibraryItemCard'
 import { LibraryFilters } from '@/components/features/library/LibraryFilters'
+import { LibrarySkeleton } from '@/components/features/library/LibrarySkeleton'
 import { useWorkspaceStore } from '@/stores/workspace-store'
 import { pluralize } from '@/utils/pluralize'
 import type { Platform, ContentType, LibraryStatus } from '@/api/client/types.gen'
@@ -41,6 +43,7 @@ export default function WorkspaceLibraryPage() {
   const statusFilter = (searchParams.get('status') as LibraryStatus) || null
   const [searchValue, setSearchValue] = useState(searchParams.get('search') ?? '')
   const [debouncedSearch, setDebouncedSearch] = useState(searchValue)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
 
   const updateSearchParams = (updates: Record<string, string | null>) => {
     const newParams = new URLSearchParams(searchParams.toString())
@@ -106,32 +109,45 @@ export default function WorkspaceLibraryPage() {
     <Stack gap="lg">
       <AppBreadcrumbs items={breadcrumbs} />
 
-      <Group justify="space-between" align="center">
-        <Title order={2} className={styles.pageTitle}>
-          Библиотека
-        </Title>
-        <Button
-          leftSection={<IconPlus size={16} />}
-          component={Link}
-          href={`/workspaces/${workspaceId}/library/create`}
-        >
-          Создать
-        </Button>
-      </Group>
-
-      <LibraryFilters
-        platform={platformFilter}
-        contentType={contentTypeFilter}
-        status={statusFilter}
-        search={searchValue}
-        onPlatformChange={handlePlatformChange}
-        onContentTypeChange={handleContentTypeChange}
-        onStatusChange={handleStatusChange}
-        onSearchChange={setSearchValue}
+      <PageHeader
+        title="Библиотека"
+        actions={[
+          <Button
+            key="create"
+            leftSection={<IconPlus size={16} />}
+            component={Link}
+            href={`/workspaces/${workspaceId}/library/create`}
+          >
+            Создать
+          </Button>,
+        ]}
       />
 
-      {isLoading && <LoadingState />}
-      {isError && <ErrorState onRetry={refetch} />}
+      <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+        <LibraryFilters
+          platform={platformFilter}
+          contentType={contentTypeFilter}
+          status={statusFilter}
+          search={searchValue}
+          onPlatformChange={handlePlatformChange}
+          onContentTypeChange={handleContentTypeChange}
+          onStatusChange={handleStatusChange}
+          onSearchChange={setSearchValue}
+        />
+        <SegmentedControl
+          size="xs"
+          value={viewMode}
+          onChange={(v) => setViewMode(v as 'grid' | 'list')}
+          data={[
+            { value: 'list', label: <IconList size={16} /> },
+            { value: 'grid', label: <IconLayoutGrid size={16} /> },
+          ]}
+          className={styles.viewToggle}
+        />
+      </Group>
+
+      {isLoading && <LibrarySkeleton viewMode={viewMode} />}
+      {isError && <ErrorState message="Не удалось загрузить библиотеку" onRetry={refetch} />}
       {!isLoading && !isError && (!libraryData || libraryData.items.length === 0) && (
         <EmptyState message="Нет контента. Нажмите «Создать» для начала." />
       )}
@@ -141,13 +157,28 @@ export default function WorkspaceLibraryPage() {
           <Text className={styles.sectionTitle} px="sm">
             {libraryData.total} {pluralize(libraryData.total, 'элемент', 'элемента', 'элементов')}
           </Text>
-          {libraryData.items.map((item) => (
-            <LibraryItemCard
-              key={item.id}
-              item={item}
-              workspaceId={workspaceId}
-            />
-          ))}
+
+          {viewMode === 'grid' ? (
+            <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }} spacing="md">
+              {libraryData.items.map((item) => (
+                <LibraryItemCard
+                  key={item.id}
+                  item={item}
+                  workspaceId={workspaceId}
+                  viewMode="grid"
+                />
+              ))}
+            </SimpleGrid>
+          ) : (
+            libraryData.items.map((item) => (
+              <LibraryItemCard
+                key={item.id}
+                item={item}
+                workspaceId={workspaceId}
+                viewMode="list"
+              />
+            ))
+          )}
         </Stack>
       )}
 

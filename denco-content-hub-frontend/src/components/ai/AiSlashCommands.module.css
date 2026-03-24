@@ -6,10 +6,10 @@
   margin-bottom: 4px;
   background: rgba(22, 22, 30, 0.95);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--content-hub-teal-alpha-15);
   border-radius: 12px;
   padding: 4px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 1px var(--content-hub-teal-alpha-20);
   z-index: 10;
   max-height: 220px;
   overflow-y: auto;
@@ -33,7 +33,7 @@
 
 .item:hover,
 .item.active {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--content-hub-teal-alpha-10);
 }
 
 .iconWrapper {
@@ -46,12 +46,13 @@
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+  transition: background 150ms ease, color 150ms ease;
 }
 
 .item.active .iconWrapper,
 .item:hover .iconWrapper {
-  background: rgba(99, 140, 255, 0.15);
-  color: #638cff;
+  background: var(--content-hub-teal-alpha-15);
+  color: var(--content-hub-teal, #14B8A6);
 }
 
 .content {

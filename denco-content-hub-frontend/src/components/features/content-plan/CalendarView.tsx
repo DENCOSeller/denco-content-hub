@@ -13,10 +13,25 @@ import {
 } from '@mantine/core'
 import { IconChevronLeft, IconChevronRight, IconPlus } from '@tabler/icons-react'
 import { AnimatePresence, motion } from 'motion/react'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragStartEvent,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import { useDroppable } from '@dnd-kit/core'
+import { useDraggable } from '@dnd-kit/core'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
+import { notifications } from '@mantine/notifications'
 
-import { useContentPlanItemsQuery } from '@/api/hooks/useContentPlan'
+import {
+  useContentPlanItemsQuery,
+  useUpdateContentPlanItemMutation,
+} from '@/api/hooks/useContentPlan'
 import { LoadingState } from '@/components/shared/LoadingState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import type { ContentPlanItemResponse } from '@/api/client/types.gen'
@@ -31,6 +46,9 @@ const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 interface CalendarViewProps {
   workspaceId: number
   onAddClick?: (date: Date) => void
+  selectable?: boolean
+  selectedIds?: Set<number>
+  onSelect?: (id: number) => void
 }
 
 function getMonthDays(year: number, month: number) {
@@ -65,6 +83,85 @@ function groupItemsByDate(
   return map
 }
 
+/* ---------- Draggable card wrapper ---------- */
+
+interface DraggableCardProps {
+  item: ContentPlanItemResponse
+  workspaceId: number
+  selectable?: boolean
+  selected?: boolean
+  onSelect?: (id: number) => void
+}
+
+function DraggableCard({ item, workspaceId, selectable, selected, onSelect }: DraggableCardProps) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `plan-item-${item.id}`,
+    data: { item },
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={isDragging ? styles.draggingSource : undefined}
+    >
+      <PlanItemCard
+        item={item}
+        workspaceId={workspaceId}
+        isDragging={isDragging}
+        selectable={selectable}
+        selected={selected}
+        onSelect={onSelect}
+      />
+    </div>
+  )
+}
+
+/* ---------- Droppable day cell ---------- */
+
+interface DroppableDayCellProps {
+  dateKey: string
+  children: React.ReactNode
+  className: string
+  isToday: boolean
+  isCurrentMonth: boolean
+  isWeekend: boolean
+  isEmpty: boolean
+}
+
+function DroppableDayCell({
+  dateKey,
+  children,
+  className,
+  isToday,
+  isCurrentMonth,
+  isWeekend,
+  isEmpty,
+}: DroppableDayCellProps) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `day-${dateKey}`,
+    data: { dateKey },
+  })
+
+  return (
+    <Box
+      ref={setNodeRef}
+      className={className}
+      data-today={isToday || undefined}
+      data-other-month={!isCurrentMonth || undefined}
+      data-weekend={isWeekend || undefined}
+      data-empty={isEmpty || undefined}
+      data-drag-over={isOver || undefined}
+      pos="relative"
+    >
+      {children}
+    </Box>
+  )
+}
+
+/* ---------- Overflow popover ---------- */
+
 interface OverflowPopoverProps {
   items: ContentPlanItemResponse[]
   overflow: number
@@ -95,9 +192,12 @@ function OverflowPopover({ items, overflow, workspaceId }: OverflowPopoverProps)
   )
 }
 
-export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
+/* ---------- Main CalendarView ---------- */
+
+export function CalendarView({ workspaceId, onAddClick, selectable, selectedIds, onSelect }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(() => dayjs())
   const [direction, setDirection] = useState(0)
+  const [activeItem, setActiveItem] = useState<ContentPlanItemResponse | null>(null)
 
   const year = currentDate.year()
   const month = currentDate.month()
@@ -125,11 +225,19 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
     },
   )
 
+  const updateMutation = useUpdateContentPlanItemMutation(workspaceId)
+
   const days = useMemo(() => getMonthDays(year, month), [year, month])
 
   const itemsByDate = useMemo(
     () => groupItemsByDate(data?.items ?? []),
     [data?.items],
+  )
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
   )
 
   const goToPrev = useCallback(() => {
@@ -146,6 +254,54 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
     setDirection(dayjs().isAfter(currentDate) ? 1 : -1)
     setCurrentDate(dayjs())
   }, [currentDate])
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const item = event.active.data.current?.item as ContentPlanItemResponse | undefined
+    if (item) setActiveItem(item)
+  }, [])
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      setActiveItem(null)
+      const { active, over } = event
+
+      if (!over) return
+
+      const draggedItem = active.data.current?.item as ContentPlanItemResponse | undefined
+      const targetDateKey = over.data.current?.dateKey as string | undefined
+
+      if (!draggedItem || !targetDateKey) return
+
+      const currentDateKey = dayjs(draggedItem.scheduled_at).format('YYYY-MM-DD')
+      if (currentDateKey === targetDateKey) return
+
+      // Preserve time, change date
+      const oldTime = dayjs(draggedItem.scheduled_at)
+      const newDate = dayjs(targetDateKey)
+        .hour(oldTime.hour())
+        .minute(oldTime.minute())
+        .second(0)
+
+      try {
+        await updateMutation.mutateAsync({
+          itemId: draggedItem.id,
+          data: { scheduled_at: newDate.toISOString() },
+        })
+        notifications.show({
+          title: 'Перенесено',
+          message: `"${draggedItem.library_item_title ?? 'Элемент'}" перенесён на ${newDate.format('D MMMM')}`,
+          color: 'teal',
+        })
+      } catch {
+        notifications.show({
+          title: 'Ошибка',
+          message: 'Не удалось перенести элемент',
+          color: 'red',
+        })
+      }
+    },
+    [updateMutation],
+  )
 
   const monthLabel = currentDate.format('MMMM YYYY')
 
@@ -168,6 +324,7 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
           variant="light"
           radius="xl"
           size="xs"
+          color="teal"
           onClick={goToToday}
         >
           Сегодня
@@ -178,7 +335,11 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
       {isError && <ErrorState onRetry={refetch} />}
 
       {!isLoading && !isError && (
-        <>
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
           <div className={styles.weekdayGrid}>
             {WEEKDAYS.map((day) => (
               <Box key={day} className={styles.weekdayHeader}>
@@ -212,14 +373,14 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
                   const isEmpty = dayItems.length === 0
 
                   return (
-                    <Box
+                    <DroppableDayCell
                       key={key}
+                      dateKey={key}
                       className={styles.dayCell}
-                      data-today={isToday || undefined}
-                      data-other-month={!isCurrentMonth || undefined}
-                      data-weekend={isWeekend || undefined}
-                      data-empty={isEmpty || undefined}
-                      pos="relative"
+                      isToday={isToday}
+                      isCurrentMonth={isCurrentMonth}
+                      isWeekend={isWeekend}
+                      isEmpty={isEmpty}
                     >
                       <Group justify="space-between" align="center" gap={0}>
                         {isToday ? (
@@ -250,7 +411,14 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
 
                       <Stack gap={2} mt={4}>
                         {dayItems.slice(0, maxVisible).map((item) => (
-                          <PlanItemCard key={item.id} item={item} workspaceId={workspaceId} />
+                          <DraggableCard
+                            key={item.id}
+                            item={item}
+                            workspaceId={workspaceId}
+                            selectable={selectable}
+                            selected={selectedIds?.has(item.id)}
+                            onSelect={onSelect}
+                          />
                         ))}
                         {overflow > 0 && (
                           <OverflowPopover
@@ -260,13 +428,23 @@ export function CalendarView({ workspaceId, onAddClick }: CalendarViewProps) {
                           />
                         )}
                       </Stack>
-                    </Box>
+                    </DroppableDayCell>
                   )
                 })}
               </motion.div>
             </AnimatePresence>
           </div>
-        </>
+
+          <DragOverlay dropAnimation={null}>
+            {activeItem ? (
+              <PlanItemCard
+                item={activeItem}
+                workspaceId={workspaceId}
+                isDragging
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       )}
     </Stack>
   )

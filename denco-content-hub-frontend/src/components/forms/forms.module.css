@@ -1,12 +1,12 @@
 .glowButton {
-  background: linear-gradient(135deg, #0A84FF, #BF5AF2);
+  background: linear-gradient(135deg, #14B8A6, #0d9488);
   border: none;
-  box-shadow: 0 0 20px rgba(10, 132, 255, 0.35), 0 0 40px rgba(191, 90, 242, 0.15);
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.35), 0 0 40px rgba(13, 148, 136, 0.15);
   transition: box-shadow 200ms ease, transform 200ms ease;
 }
 
 .glowButton:hover {
-  box-shadow: 0 0 25px rgba(10, 132, 255, 0.5), 0 0 50px rgba(191, 90, 242, 0.25);
+  box-shadow: 0 0 25px rgba(20, 184, 166, 0.5), 0 0 50px rgba(13, 148, 136, 0.25);
   transform: translateY(-1px);
 }
 

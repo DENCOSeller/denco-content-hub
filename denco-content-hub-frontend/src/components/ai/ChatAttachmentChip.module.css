@@ -14,7 +14,7 @@
 .icon {
   flex-shrink: 0;
   display: flex;
-  color: var(--neon-blue);
+  color: var(--content-hub-teal, #14B8A6);
 }
 
 .name {

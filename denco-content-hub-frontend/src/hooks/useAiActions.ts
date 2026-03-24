@@ -13,12 +13,12 @@ import {
   createNodeApiV1WorkspacesWorkspaceIdKnowledgeNodesPost,
   updateNodeApiV1WorkspacesWorkspaceIdKnowledgeNodesNodeIdPatch,
   createEdgeApiV1WorkspacesWorkspaceIdKnowledgeEdgesPost,
-  createNodeApiV1CompaniesCompanyIdKnowledgeNodesPost,
-  updateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatch,
-  createEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPost,
+  createNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPost,
+  updateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatch,
+  createEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPost,
 } from '@/api/client'
 import { knowledgeKeys } from '@/api/hooks/useKnowledge'
-import { companyKnowledgeKeys } from '@/api/hooks/useCompanyKnowledge'
+import { organizationKnowledgeKeys } from '@/api/hooks/useOrganizationKnowledge'
 import { markdownToHtml } from '@/lib/markdown-to-html'
 import type { AiAction, AiActionStatus } from './useAiChat'
 
@@ -101,13 +101,13 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
             await qc.refetchQueries({ queryKey: knowledgeKeys.graph(workspaceId) })
             qc.invalidateQueries({ queryKey: knowledgeKeys.nodes(workspaceId) })
           } else if (companyId) {
-            await createNodeApiV1CompaniesCompanyIdKnowledgeNodesPost({
-              path: { company_id: companyId },
+            await createNodeApiV1OrganizationsOrganizationIdKnowledgeNodesPost({
+              path: { organization_id: companyId },
               body: body as never,
               throwOnError: true,
             })
-            await qc.refetchQueries({ queryKey: companyKnowledgeKeys.graph(companyId) })
-            qc.invalidateQueries({ queryKey: companyKnowledgeKeys.nodes(companyId) })
+            await qc.refetchQueries({ queryKey: organizationKnowledgeKeys.graph(companyId) })
+            qc.invalidateQueries({ queryKey: organizationKnowledgeKeys.nodes(companyId) })
           }
         } else if (action.action_type === 'update_node') {
           const nodeId = focusedNodeId ?? Number(action.payload.node_id)
@@ -141,13 +141,13 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
             await qc.refetchQueries({ queryKey: knowledgeKeys.graph(workspaceId) })
             qc.invalidateQueries({ queryKey: knowledgeKeys.node(workspaceId, nodeId) })
           } else if (companyId) {
-            await updateNodeApiV1CompaniesCompanyIdKnowledgeNodesNodeIdPatch({
-              path: { company_id: companyId, node_id: nodeId },
+            await updateNodeApiV1OrganizationsOrganizationIdKnowledgeNodesNodeIdPatch({
+              path: { organization_id: companyId, node_id: nodeId },
               body: body as never,
               throwOnError: true,
             })
-            await qc.refetchQueries({ queryKey: companyKnowledgeKeys.graph(companyId) })
-            qc.invalidateQueries({ queryKey: companyKnowledgeKeys.node(companyId, nodeId) })
+            await qc.refetchQueries({ queryKey: organizationKnowledgeKeys.graph(companyId) })
+            qc.invalidateQueries({ queryKey: organizationKnowledgeKeys.node(companyId, nodeId) })
           }
         } else if (action.action_type === 'create_edge') {
           const body = {
@@ -163,12 +163,12 @@ export function useAiActions({ workspaceId, companyId, focusedNodeId, updateActi
             })
             qc.invalidateQueries({ queryKey: knowledgeKeys.graph(workspaceId) })
           } else if (companyId) {
-            await createEdgeApiV1CompaniesCompanyIdKnowledgeEdgesPost({
-              path: { company_id: companyId },
+            await createEdgeApiV1OrganizationsOrganizationIdKnowledgeEdgesPost({
+              path: { organization_id: companyId },
               body,
               throwOnError: true,
             })
-            qc.invalidateQueries({ queryKey: companyKnowledgeKeys.graph(companyId) })
+            qc.invalidateQueries({ queryKey: organizationKnowledgeKeys.graph(companyId) })
           }
         } else {
           notifications.show({ title: 'Ошибка', message: 'Неизвестный тип действия', color: 'red' })

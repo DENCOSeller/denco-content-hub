@@ -96,7 +96,7 @@ export function NicheCard({ niche, workspaceId, onEdit }: NicheCardProps) {
     <Card padding="lg" radius="md" className={styles.card}>
       <Stack gap="sm">
         <div className={styles.header}>
-          <Group gap="xs" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+          <Group gap="xs" wrap="nowrap" className="flexFill">
             <Text fw={600} size="md" c="gray.1" truncate="end">
               {niche.name}
             </Text>

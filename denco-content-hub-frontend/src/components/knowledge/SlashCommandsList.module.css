@@ -61,8 +61,8 @@
 }
 
 .itemSelected .itemIcon {
-  background: rgba(10, 132, 255, 0.15);
-  color: var(--neon-blue, #0A84FF);
+  background: rgba(20, 184, 166, 0.15);
+  color: var(--eco-content, #14B8A6);
 }
 
 .itemText {

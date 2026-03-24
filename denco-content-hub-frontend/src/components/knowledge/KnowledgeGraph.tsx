@@ -33,7 +33,7 @@ import { NodeTypeManager } from './NodeTypeManager'
 import { EdgeTypeManager } from './EdgeTypeManager'
 import { useKnowledgeGraph, type KnowledgeScope } from '@/hooks/useKnowledgeGraph'
 import { useDeleteNodeMutation } from '@/api/hooks/useKnowledge'
-import { useCompanyDeleteNodeMutation } from '@/api/hooks/useCompanyKnowledge'
+import { useOrganizationDeleteNodeMutation } from '@/api/hooks/useOrganizationKnowledge'
 import { useKgConflicts } from '@/api/hooks/useKgConflicts'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { applyClusterLayout, applySubtreeDagreLayout, animateNodePositions, type DagreDirection } from '@/lib/graph-layout'
@@ -102,7 +102,7 @@ function DesktopGraphView({ scope, scopeId }: KnowledgeGraphProps) {
   const { data: conflicts } = useKgConflicts(scope === 'workspace' ? scopeId : 0)
 
   const workspaceDelete = useDeleteNodeMutation(scope === 'workspace' ? scopeId : 0)
-  const companyDelete = useCompanyDeleteNodeMutation(scope === 'company' ? scopeId : 0)
+  const companyDelete = useOrganizationDeleteNodeMutation(scope === 'company' ? scopeId : 0)
   const deleteMutation = scope === 'workspace' ? workspaceDelete : companyDelete
 
   const { getNodes, fitView: reactFlowFitView } = useReactFlow()

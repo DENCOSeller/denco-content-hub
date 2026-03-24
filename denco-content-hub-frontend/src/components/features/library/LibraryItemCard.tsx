@@ -31,6 +31,7 @@ import styles from './LibraryItemCard.module.css'
 interface LibraryItemCardProps {
   item: LibraryItemResponse
   workspaceId: number
+  viewMode?: 'grid' | 'list'
 }
 
 const PLATFORM_CONFIG: Record<string, { icon: typeof IconBrandYoutube; color: string; label: string }> = {
@@ -51,7 +52,7 @@ const CONTENT_TYPE_LABELS: Record<string, string> = {
 }
 
 const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
-  reach: { label: 'Охват', color: 'blue' },
+  reach: { label: 'Охват', color: 'teal' },
   expert: { label: 'Экспертный', color: 'violet' },
   selling: { label: 'Продающий', color: 'green' },
   warming: { label: 'Прогрев', color: 'orange' },
@@ -59,11 +60,12 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   draft: { label: 'Черновик', color: 'gray' },
-  ready: { label: 'Готов', color: 'green' },
+  ready: { label: 'Готов', color: 'teal' },
+  scheduled: { label: 'Запланирован', color: 'yellow' },
   published: { label: 'Опубликован', color: 'blue' },
 }
 
-export function LibraryItemCard({ item, workspaceId }: LibraryItemCardProps) {
+export function LibraryItemCard({ item, workspaceId, viewMode = 'list' }: LibraryItemCardProps) {
   const deleteItem = useDeleteLibraryItemMutation(workspaceId)
   const [planModalOpen, setPlanModalOpen] = useState(false)
   const basePath = `/workspaces/${workspaceId}/library`
@@ -100,6 +102,86 @@ export function LibraryItemCard({ item, workspaceId }: LibraryItemCardProps) {
     })
   }
 
+  const actionButtons = (
+    <>
+      <Tooltip label="В план">
+        <ActionIcon
+          variant="light"
+          color="teal"
+          size="sm"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setPlanModalOpen(true) }}
+        >
+          <IconCalendarPlus size={14} />
+        </ActionIcon>
+      </Tooltip>
+
+      <Tooltip label="Удалить">
+        <ActionIcon
+          variant="light"
+          color="red"
+          size="sm"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteConfirm() }}
+          loading={deleteItem.isPending}
+        >
+          <IconTrash size={14} />
+        </ActionIcon>
+      </Tooltip>
+    </>
+  )
+
+  const modal = (
+    <AddToPlanModal
+      opened={planModalOpen}
+      onClose={() => setPlanModalOpen(false)}
+      workspaceId={workspaceId}
+      preselectedItem={{
+        id: item.id,
+        label: item.title ?? `#${item.id} (${item.platform})`,
+      }}
+    />
+  )
+
+  if (viewMode === 'grid') {
+    return (
+      <Card
+        component={Link}
+        href={`${basePath}/${item.id}`}
+        padding="md"
+        radius="md"
+        className={styles.card}
+      >
+        <Stack gap="sm">
+          <div className={styles.gridPreview}>
+            <PlatformIcon size={32} className={styles.gridPreviewIcon} />
+          </div>
+
+          <Text fw={500} c="gray.1" truncate="end" size="sm">
+            {item.title ?? 'Без названия'}
+          </Text>
+
+          <Group gap="xs">
+            <Text size="xs" c="dimmed">{platform.label}</Text>
+            <Text size="xs" c="dimmed">&middot;</Text>
+            <Text size="xs" c="dimmed">{contentTypeLabel}</Text>
+          </Group>
+
+          <Group gap="xs" justify="space-between">
+            <Group gap={4}>
+              <Badge variant="light" color={category.color} size="xs">{category.label}</Badge>
+              <Badge variant="light" color={status.color} size="xs">{status.label}</Badge>
+            </Group>
+            <Group gap={4} wrap="nowrap">
+              {actionButtons}
+            </Group>
+          </Group>
+        </Stack>
+
+        {modal}
+      </Card>
+    )
+  }
+
+  // List view
   return (
     <Card
       component={Link}
@@ -107,22 +189,21 @@ export function LibraryItemCard({ item, workspaceId }: LibraryItemCardProps) {
       padding="md"
       radius="md"
       className={styles.card}
-      style={{ cursor: 'pointer', textDecoration: 'none' }}
     >
       <Group justify="space-between" wrap="nowrap">
-        <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+        <Group gap="sm" wrap="nowrap" className="flexFill">
           <div className={styles.platformIcon} style={{ background: `${platform.color}20` }}>
             <PlatformIcon size={22} style={{ color: platform.color }} />
           </div>
-          <Stack gap={2} style={{ minWidth: 0 }}>
+          <Stack gap={2} className="minW0">
             <Text fw={500} c="gray.1" truncate="end">
               {item.title ?? 'Без названия'}
             </Text>
             <Group gap="xs">
               <Text size="xs" c="dimmed">{platform.label}</Text>
-              <Text size="xs" c="dimmed">·</Text>
+              <Text size="xs" c="dimmed">&middot;</Text>
               <Text size="xs" c="dimmed">{contentTypeLabel}</Text>
-              <Text size="xs" c="dimmed">·</Text>
+              <Text size="xs" c="dimmed">&middot;</Text>
               <Text size="xs" c="dimmed">
                 {new Date(item.created_at).toLocaleDateString('ru-RU')}
               </Text>
@@ -135,40 +216,11 @@ export function LibraryItemCard({ item, workspaceId }: LibraryItemCardProps) {
           <Badge variant="light" color={status.color} size="sm">{status.label}</Badge>
           <Badge variant="outline" color="gray" size="sm">Hunt {item.hunt_level}</Badge>
 
-          <Tooltip label="В план">
-            <ActionIcon
-              variant="light"
-              color="blue"
-              size="sm"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setPlanModalOpen(true) }}
-            >
-              <IconCalendarPlus size={14} />
-            </ActionIcon>
-          </Tooltip>
-
-          <Tooltip label="Удалить">
-            <ActionIcon
-              variant="light"
-              color="red"
-              size="sm"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteConfirm() }}
-              loading={deleteItem.isPending}
-            >
-              <IconTrash size={14} />
-            </ActionIcon>
-          </Tooltip>
+          {actionButtons}
         </Group>
       </Group>
 
-      <AddToPlanModal
-        opened={planModalOpen}
-        onClose={() => setPlanModalOpen(false)}
-        workspaceId={workspaceId}
-        preselectedItem={{
-          id: item.id,
-          label: item.title ?? `#${item.id} (${item.platform})`,
-        }}
-      />
+      {modal}
     </Card>
   )
 }

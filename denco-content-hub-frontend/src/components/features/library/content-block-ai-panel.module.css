@@ -52,7 +52,7 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(10, 132, 255, 0.08);
+  background: rgba(20, 184, 166, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +81,7 @@
 
 .suggestionBtn:hover {
   background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(10, 132, 255, 0.3);
+  border-color: rgba(20, 184, 166, 0.3);
   color: #f0f0ff;
 }
 
@@ -92,18 +92,18 @@
   gap: 4px;
   margin: 4px 0 4px 42px;
   padding: 4px 10px;
-  background: rgba(10, 132, 255, 0.1);
-  border: 1px solid rgba(10, 132, 255, 0.25);
+  background: rgba(20, 184, 166, 0.1);
+  border: 1px solid rgba(20, 184, 166, 0.25);
   border-radius: 6px;
-  color: rgba(10, 132, 255, 0.9);
+  color: rgba(20, 184, 166, 0.9);
   font-size: 12px;
   cursor: pointer;
   transition: background 150ms ease, border-color 150ms ease;
 }
 
 .applyBtn:hover:not(:disabled) {
-  background: rgba(10, 132, 255, 0.18);
-  border-color: rgba(10, 132, 255, 0.4);
+  background: rgba(20, 184, 166, 0.18);
+  border-color: rgba(20, 184, 166, 0.4);
 }
 
 .applyBtn:disabled {

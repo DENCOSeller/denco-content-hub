@@ -186,7 +186,7 @@ export function PropertyBar({
       </div>
 
       {/* Relations Collapse */}
-      <Collapse in={relationsOpen} transitionDuration={200} transitionTimingFunction="cubic-bezier(0.4, 0, 0.2, 1)">
+      <Collapse in={relationsOpen} transitionDuration={200} transitionTimingFunction="ease">
         <div className={styles.relationsCollapse}>
           <div className={styles.relationsCollapseInner}>
             {connectedNodes.map((rel) => {
