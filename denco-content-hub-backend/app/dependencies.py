@@ -16,7 +16,7 @@ from app.repositories.company_member_repository import CompanyMemberRepository
 from app.repositories.user_repository import UserRepository
 from app.repositories.workspace_member_repository import WorkspaceMemberRepository
 from app.repositories.workspace_repository import WorkspaceRepository
-from app.utils.security import decode_token, hash_password
+from app.utils.security import hash_password
 from app.utils.sso import decode_sso_token
 
 if TYPE_CHECKING:
@@ -221,43 +221,19 @@ async def get_current_user(
 ) -> User:
     """Extract and validate Bearer token, return active user.
 
-    Supports dual JWT validation:
-    1. RS256 SSO tokens from Staff Service (detected by kid header)
-    2. HS256 legacy tokens from Content Hub local auth
+    Only RS256 SSO tokens from Staff Service are accepted.
     """
     token = credentials.credentials
 
-    # Try SSO (RS256) first — returns None if token is not SSO
     try:
         sso_payload = await decode_sso_token(token)
     except JWTError as err:
         raise UnauthorizedException("Invalid SSO token") from err
 
-    if sso_payload is not None:
-        return await _resolve_sso_user(sso_payload, db)
+    if sso_payload is None:
+        raise UnauthorizedException("Invalid token: SSO token required")
 
-    # Fall back to legacy HS256
-    try:
-        payload = decode_token(token)
-    except JWTError as err:
-        raise UnauthorizedException("Invalid token") from err
-
-    if payload.get("type") != "access":
-        raise UnauthorizedException("Invalid token type")
-
-    user_id = payload.get("sub")
-    if not user_id:
-        raise UnauthorizedException("Invalid token payload")
-
-    user_repo = UserRepository(db)
-    user = await user_repo.get_by_id_or_none(int(user_id))
-    if not user:
-        raise UnauthorizedException("User not found")
-
-    if not user.is_active:
-        raise UnauthorizedException("Account is deactivated")
-
-    return user
+    return await _resolve_sso_user(sso_payload, db)
 
 
 async def require_platform_owner(

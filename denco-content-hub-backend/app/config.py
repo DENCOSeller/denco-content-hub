@@ -59,6 +59,10 @@ class Settings(BaseSettings):
     kg_service_url: str = "http://localhost:8010"
     kg_service_secret: str = "kg-service-secret-change-me"
 
+    # SSO (Staff Service)
+    staff_jwks_url: str = "http://localhost:8004/api/v1/auth/.well-known/jwks.json"
+    staff_jwks_refresh_seconds: int = 3600
+
     # App
     debug: bool = True
     app_name: str = "DENCO Content Hub API"
