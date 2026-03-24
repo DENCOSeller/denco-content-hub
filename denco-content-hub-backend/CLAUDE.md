@@ -152,6 +152,13 @@ Frontend uses **Hey-api** code generation from our OpenAPI schema.
 
 ---
 
+## Git Workflow
+- **НИКОГДА** не коммитить напрямую в `main`, `dev` или `master`
+- Для каждой задачи создавать ветку: `feat/<название>`, `fix/<название>`, `refactor/<название>`
+- После завершения — `git push -u origin <ветка>`
+- Merge в основную ветку делает только программист (человек), не агент
+- PR создаётся через GitHub или Gitea
+
 ## Workflow
 
 ### Before coding
