@@ -1,6 +1,7 @@
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 import '@denco/ui/styles/variables.css'
+import '@denco/ui/styles/components.css'
 import './globals.css'
 
 import type { Metadata } from 'next'

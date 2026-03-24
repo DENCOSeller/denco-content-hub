@@ -11,6 +11,7 @@
 }
 
 :root {
+  --accent-rgb: 20, 184, 166;
   --app-bg: #0d0d0f;
   --card-bg: #1c1c1e;
   --card-bg-hover: #2c2e33;
