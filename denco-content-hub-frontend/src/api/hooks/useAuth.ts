@@ -4,10 +4,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   loginApiV1AuthLoginPost,
   registerApiV1AuthRegisterPost,
-  logoutApiV1AuthLogoutPost,
   getMeApiV1UsersMeGet,
 } from '@/api/client'
-import { setTokens, getRefreshToken, isAuthenticated } from '@/lib/auth'
+import { setTokens, isAuthenticated, clearTokens, redirectToSsoLogin, SSO_BASE_URL } from '@/lib/auth'
 import { useAuthStore } from '@/stores/auth-store'
 import type { LoginRequest, RegisterRequest } from '@/api/client/types.gen'
 
@@ -61,19 +60,15 @@ export function useLogoutMutation() {
 
   return useMutation({
     mutationFn: async () => {
-      const refreshToken = getRefreshToken()
-      if (!refreshToken) {
-        storeClearAuth()
-        return
-      }
-      await logoutApiV1AuthLogoutPost({
-        body: { refresh_token: refreshToken },
-        throwOnError: true,
-      })
+      // SSO logout — just clear local state, redirect to SSO
+      storeClearAuth()
+      queryClient.clear()
     },
     onSettled: () => {
       storeClearAuth()
       queryClient.clear()
+      const redirectUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      window.location.href = `${SSO_BASE_URL}/logout?redirect=${encodeURIComponent(redirectUrl)}`
     },
   })
 }
@@ -85,7 +80,7 @@ export function useSsoLogout() {
   return () => {
     storeClearAuth()
     queryClient.clear()
-    const ssoBaseUrl = process.env.NEXT_PUBLIC_SSO_BASE_URL || 'https://auth.denco.store'
+    const ssoBaseUrl = SSO_BASE_URL
     window.location.href = `${ssoBaseUrl}/logout?redirect=${encodeURIComponent(window.location.origin)}`
   }
 }

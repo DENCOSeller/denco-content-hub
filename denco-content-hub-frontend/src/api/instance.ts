@@ -1,64 +1,36 @@
 import { client } from '@/api/client/client.gen'
-import { getAccessToken, getRefreshToken, setTokens, clearTokens } from '@/lib/auth'
+import { configureApiClient } from '@denco/ui/api'
+import { createAuthBroadcast } from '@denco/ui/auth'
+import { getAccessToken, clearTokens, redirectToSsoLogin, silentRefresh } from '@/lib/auth'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 
-client.setConfig({
+const broadcast = createAuthBroadcast({
+  onTokenRefreshed: (_token) => {
+    // Token cookie is already set server-side by auth-frontend via Set-Cookie header.
+    // BroadcastChannel notifies this tab that a refresh happened in another tab,
+    // so the next API request will pick up the fresh cookie automatically.
+  },
+  onLogout: () => {
+    clearTokens()
+    redirectToSsoLogin()
+  },
+})
+
+configureApiClient({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client: client as any,
   baseUrl: API_BASE_URL,
+  getAccessToken,
+  onUnauthorized: () => {
+    clearTokens()
+    redirectToSsoLogin()
+  },
+  refreshFn: () => silentRefresh(),
+  broadcast,
 })
 
+// Send cookies (access_token) with every API request
 client.interceptors.request.use((request) => {
-  const token = getAccessToken()
-  if (token) {
-    request.headers.set('Authorization', `Bearer ${token}`)
-  }
-  return request
+  return new Request(request, { credentials: 'include' })
 })
-
-let isRefreshing = false
-
-client.interceptors.response.use(async (response, request) => {
-  if (response.status === 401 && !isRefreshing) {
-    const refreshToken = getRefreshToken()
-
-    if (refreshToken) {
-      isRefreshing = true
-
-      try {
-        const refreshResponse = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: refreshToken }),
-        })
-
-        if (refreshResponse.ok) {
-          const data = await refreshResponse.json()
-          setTokens(data.access_token, data.refresh_token)
-
-          const retryRequest = new Request(request.url, request)
-          retryRequest.headers.set('Authorization', `Bearer ${data.access_token}`)
-          return fetch(retryRequest)
-        }
-
-        clearTokens()
-        redirectToLogin()
-      } catch {
-        clearTokens()
-        redirectToLogin()
-      } finally {
-        isRefreshing = false
-      }
-    } else {
-      clearTokens()
-      redirectToLogin()
-    }
-  }
-
-  return response
-})
-
-function redirectToLogin(): void {
-  if (typeof window !== 'undefined') {
-    window.location.href = '/login'
-  }
-}

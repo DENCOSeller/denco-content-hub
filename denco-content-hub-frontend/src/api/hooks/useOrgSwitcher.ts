@@ -3,11 +3,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useCallback } from 'react'
 import { notifications } from '@mantine/notifications'
-import { getAccessToken, setTokens } from '@/lib/auth'
+import { getAccessToken, setTokens, SSO_BASE_URL } from '@/lib/auth'
 import { getOrgsFromJwt } from '@/lib/jwt'
 import { useOrganizationStore } from '@/stores/organization-store'
 
-const SSO_BASE_URL = 'https://auth.denco.store'
+// SSO_BASE_URL imported from @/lib/auth
 
 interface SwitchOrgResponse {
   access_token: string

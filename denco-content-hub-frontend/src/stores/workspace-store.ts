@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getCookie, setCookie, deleteCookie } from '@/lib/cookies'
+import { getCookie, setCookie, deleteCookie } from '@denco/ui/auth'
 
 interface ActiveWorkspace {
   id: number
