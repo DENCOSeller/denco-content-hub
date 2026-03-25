@@ -24,6 +24,12 @@ class UserRepository(BaseRepository[User]):
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
+    async def get_by_staff_employee_id(self, staff_employee_id: int) -> User | None:
+        """Get active user by staff_employee_id. Returns None if not found."""
+        query = self._base_query().where(User.staff_employee_id == staff_employee_id)
+        result = await self.db.execute(query)
+        return result.scalar_one_or_none()
+
     async def get_all_users(
         self,
         params: PaginationParams,

@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import structlog
+from denco_auth import AuthPayload  # noqa: TC002 — runtime use in require_product + get_current_auth
+from denco_auth.fastapi import require_product
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
@@ -17,7 +19,7 @@ from app.repositories.user_repository import UserRepository
 from app.repositories.workspace_member_repository import WorkspaceMemberRepository
 from app.repositories.workspace_repository import WorkspaceRepository
 from app.utils.security import hash_password
-from app.utils.sso import decode_sso_token
+from app.utils.sso import decode_sso_token, validate_sso_token
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -234,6 +236,29 @@ async def get_current_user(
         raise UnauthorizedException("Invalid token: SSO token required")
 
     return await _resolve_sso_user(sso_payload, db)
+
+
+async def get_current_auth(
+    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
+) -> AuthPayload:
+    """Validate Bearer token and return AuthPayload (no DB lookup).
+
+    Used for product gate checks before user provisioning.
+    """
+    token = credentials.credentials
+    try:
+        auth_payload = await validate_sso_token(token)
+    except JWTError as err:
+        raise UnauthorizedException("Invalid SSO token") from err
+
+    if auth_payload is None:
+        raise UnauthorizedException("Invalid token: SSO token required")
+
+    return auth_payload
+
+
+# Product gate: only JWT with content_hub product access
+content_hub_gate = require_product("content_hub", get_auth=get_current_auth)
 
 
 async def require_platform_owner(

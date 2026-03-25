@@ -59,9 +59,14 @@ class Settings(BaseSettings):
     kg_service_url: str = "http://localhost:8010"
     kg_service_secret: str = "kg-service-secret-change-me"
 
-    # SSO (Staff Service)
+    # SSO (Staff Service — Staff IdP)
     staff_jwks_url: str = "http://localhost:8004/api/v1/auth/.well-known/jwks.json"
+    staff_issuer: str = "https://auth.denco.store/staff"
     staff_jwks_refresh_seconds: int = 3600
+
+    # SSO (Client IdP)
+    client_jwks_url: str = "http://localhost:8007/api/v1/auth/.well-known/jwks.json"
+    client_issuer: str = "https://auth.denco.store/client"
 
     # App
     debug: bool = True
