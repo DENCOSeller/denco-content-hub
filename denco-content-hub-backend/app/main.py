@@ -25,6 +25,13 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
 
     setup_logging()
     redis_pool = Redis.from_url(settings.redis_url, decode_responses=True)
+
+    # Синхронизация реестра модулей разрешений с БД
+    import app.permissions.modules  # noqa: F401 — регистрация деклараций
+    from app.permissions.sync import sync_module_registry
+
+    await sync_module_registry()
+
     logger.info("Application started", app_name=settings.app_name)
 
     yield

@@ -48,6 +48,15 @@ from app.models.trend import (
     TrendStage,
 )
 from app.models.user import User
+from app.models.module_permission import (
+    ModulePermission,
+    ModuleRegistry,
+    OrgModuleConfig,
+    PlanModuleAccess,
+    RolePermissionTemplate,
+    UserPermissionGrant,
+)
+from app.models.permission_audit_log import PermissionAuditLog
 from app.models.workspace import Workspace, WorkspaceMember, WorkspaceRole
 
 __all__ = [
@@ -108,4 +117,11 @@ __all__ = [
     "WorkspaceInvitation",
     "WorkspaceMember",
     "WorkspaceRole",
+    "ModulePermission",
+    "ModuleRegistry",
+    "OrgModuleConfig",
+    "PlanModuleAccess",
+    "RolePermissionTemplate",
+    "UserPermissionGrant",
+    "PermissionAuditLog",
 ]
