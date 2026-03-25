@@ -2,57 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  loginApiV1AuthLoginPost,
-  registerApiV1AuthRegisterPost,
   getMeApiV1UsersMeGet,
 } from '@/api/client'
-import { setTokens, isAuthenticated, clearTokens, redirectToSsoLogin, SSO_BASE_URL } from '@/lib/auth'
+import { isAuthenticated, clearTokens, SSO_BASE_URL } from '@/lib/auth'
 import { useAuthStore } from '@/stores/auth-store'
-import type { LoginRequest, RegisterRequest } from '@/api/client/types.gen'
-
-export function useLoginMutation() {
-  const storeSetUser = useAuthStore((s) => s.setUser)
-
-  return useMutation({
-    mutationFn: async (data: LoginRequest) => {
-      const result = await loginApiV1AuthLoginPost({
-        body: data,
-        throwOnError: true,
-      })
-
-      setTokens(result.data.access_token, result.data.refresh_token)
-
-      const meResult = await getMeApiV1UsersMeGet({
-        throwOnError: true,
-      })
-      storeSetUser(meResult.data)
-
-      return result
-    },
-  })
-}
-
-export function useRegisterMutation() {
-  const storeSetUser = useAuthStore((s) => s.setUser)
-
-  return useMutation({
-    mutationFn: async (data: RegisterRequest) => {
-      const result = await registerApiV1AuthRegisterPost({
-        body: data,
-        throwOnError: true,
-      })
-
-      setTokens(result.data.access_token, result.data.refresh_token)
-
-      const meResult = await getMeApiV1UsersMeGet({
-        throwOnError: true,
-      })
-      storeSetUser(meResult.data)
-
-      return result
-    },
-  })
-}
 
 export function useLogoutMutation() {
   const queryClient = useQueryClient()

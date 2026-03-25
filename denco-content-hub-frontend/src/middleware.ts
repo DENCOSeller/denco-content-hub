@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Маршруты только для неавторизованных — авторизованных редиректим на /dashboard
-const authRoutes = ['/login', '/register']
+const SSO_BASE_URL = process.env.NEXT_PUBLIC_SSO_BASE_URL || 'https://auth.denco.store'
+
+// Legacy auth routes — redirect to SSO
+const legacyAuthRoutes = ['/login', '/register']
 
 // Маршруты открытые для всех — не редиректим никого
 const openRoutes = ['/invite', '/public']
@@ -19,13 +21,14 @@ export function middleware(request: NextRequest) {
   }
 
   const token = request.cookies.get('access_token')?.value
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route))
+  const isLegacyAuth = legacyAuthRoutes.some((route) => pathname.startsWith(route))
   const isOpenRoute = openRoutes.some((route) => pathname.startsWith(route))
 
-  // Авторизован + страница входа/регистрации → на redirect или /dashboard
-  if (token && isAuthRoute) {
-    const redirectTo = request.nextUrl.searchParams.get('redirect') || '/dashboard'
-    return NextResponse.redirect(new URL(redirectTo, request.url))
+  // Legacy login/register pages → redirect to SSO
+  if (isLegacyAuth) {
+    const currentUrl = request.nextUrl.searchParams.get('redirect') || request.nextUrl.origin + '/dashboard'
+    const ssoLoginUrl = `${SSO_BASE_URL}/login?redirect_to=${encodeURIComponent(currentUrl)}`
+    return NextResponse.redirect(ssoLoginUrl)
   }
 
   // Открытый маршрут — пропускаем всех
@@ -33,9 +36,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Не авторизован + защищённый роут → на логин
-  if (!token && !isAuthRoute && pathname !== '/') {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Не авторизован + защищённый роут → redirect на SSO login
+  if (!token && pathname !== '/') {
+    const currentUrl = request.nextUrl.href
+    const ssoLoginUrl = `${SSO_BASE_URL}/login?redirect_to=${encodeURIComponent(currentUrl)}`
+    return NextResponse.redirect(ssoLoginUrl)
   }
 
   return NextResponse.next()
